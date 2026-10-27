@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>{{{ PRODUCT_NAME }}}</title>
+  <style>
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #1e1e1e; touch-action: none; }
+    #unity-canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; background: #1e1e1e; }
+    #loader { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; font-family: sans-serif; color: #ddd; }
+    #bar { width: min(60vw, 320px); height: 8px; background: #444; border-radius: 4px; overflow: hidden; }
+    #fill { width: 0; height: 100%; background: #ddd; transition: width 0.2s; }
+  </style>
+</head>
+<body>
+  <canvas id="unity-canvas" tabindex="-1"></canvas>
+  <div id="loader">
+    <div>Wird geladen&hellip;</div>
+    <div id="bar"><div id="fill"></div></div>
+  </div>
+  <script>
+    var canvas = document.querySelector("#unity-canvas");
+    var loader = document.querySelector("#loader");
+    var fill = document.querySelector("#fill");
+
+    var config = {
+      dataUrl: "Build/{{{ DATA_FILENAME }}}",
+      frameworkUrl: "Build/{{{ FRAMEWORK_FILENAME }}}",
+#if USE_WASM
+      codeUrl: "Build/{{{ CODE_FILENAME }}}",
+#endif
+#if SYMBOLS_FILENAME
+      symbolsUrl: "Build/{{{ SYMBOLS_FILENAME }}}",
+#endif
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: {{{ JSON.stringify(COMPANY_NAME) }}},
+      productName: {{{ JSON.stringify(PRODUCT_NAME) }}},
+      productVersion: {{{ JSON.stringify(PRODUCT_VERSION) }}},
+      matchWebGLToCanvasSize: true,
+      devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2)
+    };
+
+    var script = document.createElement("script");
+    script.src = "Build/{{{ LOADER_FILENAME }}}";
+    script.onload = function () {
+      createUnityInstance(canvas, config, function (progress) {
+        fill.style.width = (100 * progress) + "%";
+      }).then(function () {
+        loader.style.display = "none";
+      }).catch(function (message) {
+        loader.firstElementChild.textContent = "Fehler beim Laden: " + message;
+      });
+    };
+    document.body.appendChild(script);
+  </script>
+</body>
+</html>

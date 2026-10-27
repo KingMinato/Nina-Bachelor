@@ -1,0 +1,37 @@
+{
+  "version": "0.1.0",
+  "moneyPerRound": 100,
+  "splitStep": 5,
+  "npcAcceptMaxPlayerKeeps": 90,
+  "round2NpcKeeps": 50,
+  "round4NpcKeeps": 75,
+  "turnAngle": 45,
+  "submitTimeoutSeconds": 5,
+  "appsScriptUrl": "https://script.google.com/macros/s/XXXX/exec",
+  "returnUrlTemplate": "https://XXXX.qualtrics.com/jfe/form/SV_XXXX?pid={pid}&g={g}&ag={ag}&s={s}&r1={r1}&r2={r2}&r3={r3}&r4={r4}&t1={t1}&t2={t2}&t3={t3}&t4={t4}&bal={bal}&dev={dev}&dur={dur}&test={test}&ver={ver}",
+  "tutorialSteps": [
+    { "text": "Dreh dich nach links.", "action": "turnLeft", "count": 2 },
+    { "text": "Dreh dich nach rechts.", "action": "turnRight", "count": 2 },
+    { "text": "Spring einmal.", "action": "jump", "count": 1 },
+    { "text": "Dreh dich einmal komplett um.", "action": "turnLeft", "count": 8 }
+  ],
+  "texts": {
+    "intro": "PLACEHOLDER",
+    "doorOpened": "PLACEHOLDER",
+    "goToDoor": "Zur Tür",
+    "talk": "Ansprechen",
+    "npcGreeting": "PLACEHOLDER",
+    "round1Intro": "PLACEHOLDER",
+    "round2Intro": "PLACEHOLDER",
+    "round3Intro": "PLACEHOLDER",
+    "round4Intro": "PLACEHOLDER",
+    "accept": "Annehmen",
+    "reject": "Ablehnen",
+    "confirm": "Bestätigen",
+    "npcAccepted": "PLACEHOLDER",
+    "npcRejected": "PLACEHOLDER",
+    "balance": "Kontostand",
+    "end": "Danke! Du wirst jetzt zur Umfrage weitergeleitet.",
+    "rotateDevice": "Bitte Gerät drehen"
+  }
+}

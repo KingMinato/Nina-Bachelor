@@ -80,7 +80,19 @@ public class Texts
     public string confirm = "Bestätigen";
     public string npcAccepted = "PLACEHOLDER";
     public string npcRejected = "PLACEHOLDER";
+    public string playerAccepted = "Du hast das Angebot angenommen.";
+    public string playerRejected = "Du hast das Angebot abgelehnt.";
+    // {player} and {npc} are replaced with the amounts in CHF.
+    public string splitShares = "Du: {player} CHF / Gegenüber: {npc} CHF";
+    public string npcOffer = "Dein Gegenüber behält {npc} CHF und bietet dir {player} CHF an.";
+    public string roundResult = "Du erhältst {player} CHF, dein Gegenüber erhält {npc} CHF.";
+    public string next = "Weiter";
     public string balance = "Kontostand";
     public string end = "Danke! Du wirst jetzt zur Umfrage weitergeleitet.";
     public string rotateDevice = "Bitte Gerät drehen";
+
+    public static string Fill(string template, int player, int npc)
+    {
+        return (template ?? "").Replace("{player}", player.ToString()).Replace("{npc}", npc.ToString());
+    }
 }

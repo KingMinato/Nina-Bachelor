@@ -5,6 +5,7 @@ public class GameFlow : MonoBehaviour
 {
     [SerializeField] UIManager ui;
     [SerializeField] DebugOverlay debugOverlay;
+    [SerializeField] UltimatumController ultimatum;
 
     [Tooltip("Used in the Editor instead of the browser URL, e.g. ?pid=R_test&g=w&s=2&debug=1")]
     [SerializeField] string editorQuery = "";
@@ -38,7 +39,7 @@ public class GameFlow : MonoBehaviour
         await ui.ShowPrompt(config.texts.npcGreeting, config.texts.talk);
 
         SetState(GameState.Dialog);
-        await ui.ShowPrompt("Dialog (Platzhalter)", "Weiter");
+        await ultimatum.Run(config, session);
 
         SetState(GameState.Submit);
         session.Finish(Time.realtimeSinceStartupAsDouble);

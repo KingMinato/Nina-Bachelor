@@ -172,6 +172,12 @@ No reflection cameras or render textures. Mirrors are faked with copied geometry
     "confirm": "Bestätigen",
     "npcAccepted": "PLACEHOLDER",
     "npcRejected": "PLACEHOLDER",
+    "playerAccepted": "Du hast das Angebot angenommen.",
+    "playerRejected": "Du hast das Angebot abgelehnt.",
+    "splitShares": "Du: {player} CHF / Gegenüber: {npc} CHF",
+    "npcOffer": "Dein Gegenüber behält {npc} CHF und bietet dir {player} CHF an.",
+    "roundResult": "Du erhältst {player} CHF, dein Gegenüber erhält {npc} CHF.",
+    "next": "Weiter",
     "balance": "Kontostand",
     "end": "Danke! Du wirst jetzt zur Umfrage weitergeleitet.",
     "rotateDevice": "Bitte Gerät drehen"

@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
@@ -36,8 +37,12 @@ public static class BuildScript
         };
 
         BuildReport report = BuildPipeline.BuildPlayer(options);
-        bool ok = report.summary.result == BuildResult.Succeeded;
-        Debug.Log($"WebGL build {report.summary.result}: {report.summary.totalSize / (1024f * 1024f):F1} MB -> {OutputPath}");
+        // Unity can report Succeeded although postprocessing threw (e.g. WebGL module not loaded), so check the output too.
+        bool ok = report.summary.result == BuildResult.Succeeded && File.Exists(Path.Combine(OutputPath, "index.html"));
+        if (ok)
+            Debug.Log($"WebGL build Succeeded: {report.summary.totalSize / (1024f * 1024f):F1} MB -> {OutputPath}");
+        else
+            Debug.LogError($"WebGL build Failed ({report.summary.result}), no {OutputPath}/index.html. If the WebGL module was installed while the Editor was running, restart the Editor.");
 
         if (Application.isBatchMode && !ok)
             EditorApplication.Exit(1);

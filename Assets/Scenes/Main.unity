@@ -2526,6 +2526,7 @@ MonoBehaviour:
   debugOverlay: {fileID: 1859839076}
   ultimatum: {fileID: 1603114375}
   editorQuery: 
+  minEndSeconds: 1.5
 --- !u!114 &1603114375
 MonoBehaviour:
   m_ObjectHideFlags: 0

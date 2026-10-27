@@ -199,7 +199,7 @@ Assets/
     Mirror/      MirrorWorld.cs, MirrorAvatarSync.cs
     Avatar/      AvatarDatabase.cs (ScriptableObject), AvatarSpawner.cs
     Dialog/      UltimatumController.cs, SplitInputUI.cs, BalanceUI.cs
-    Data/        SessionData.cs, ResultSubmitter.cs, Redirector.cs
+    Data/        SessionData.cs, IResultSubmitter.cs, ResultSubmitter.cs, ResultJson.cs, Redirector.cs
     UI/          UIManager.cs, OrientationOverlay.cs, DebugOverlay.cs
   Plugins/WebGL/ Redirect.jslib
   Editor/        BuildScript.cs
@@ -246,7 +246,8 @@ Note: the university may have data storage rules. Keep the submitter behind an i
 // Assets/Plugins/WebGL/Redirect.jslib
 mergeInto(LibraryManager.library, {
   RedirectTo: function (urlPtr) {
-    window.location.href = UTF8ToString(urlPtr);
+    // replace(): game is not kept in history, "back" in Survey B cannot start a second run
+    window.location.replace(UTF8ToString(urlPtr));
   }
 });
 ```

@@ -10,11 +10,15 @@ public class GameFlow : MonoBehaviour
     [Tooltip("Used in the Editor instead of the browser URL, e.g. ?pid=R_test&g=w&s=2&debug=1")]
     [SerializeField] string editorQuery = "";
 
+    [Tooltip("Minimum time the end text stays visible before the redirect.")]
+    [SerializeField] float minEndSeconds = 1.5f;
+
     public GameState State { get; private set; }
 
     Config config;
     UrlParams urlParams;
     SessionData session;
+    IResultSubmitter submitter;
 
     async void Start()
     {
@@ -25,6 +29,7 @@ public class GameFlow : MonoBehaviour
         SetState(GameState.Init);
         config = await ConfigLoader.LoadAsync();
         session = new SessionData(urlParams, config.version, Application.isMobilePlatform, Time.realtimeSinceStartupAsDouble);
+        submitter = new ResultSubmitter(config.appsScriptUrl);
 
         if (!urlParams.Debug)
         {
@@ -44,9 +49,21 @@ public class GameFlow : MonoBehaviour
         SetState(GameState.Submit);
         session.Finish(Time.realtimeSinceStartupAsDouble);
         ui.ShowMessage(config.texts.end);
-        Debug.Log("Submit (placeholder): " + string.Join("&", session.ToFields().ConvertAll(f => $"{f.Key}={f.Value}")));
+        double endShownAt = Time.realtimeSinceStartupAsDouble;
+        var fields = session.ToFields();
+
+        if (urlParams.Debug)
+            Debug.Log("Debug mode, not submitting: " + ResultJson.Build(fields));
+        else
+            await submitter.Submit(fields, config.submitTimeoutSeconds);
+
+        // Keep the end text readable even when the POST returns instantly.
+        float remaining = minEndSeconds - (float)(Time.realtimeSinceStartupAsDouble - endShownAt);
+        if (remaining > 0)
+            await Awaitable.WaitForSecondsAsync(remaining);
 
         SetState(GameState.Redirect);
+        Redirector.Go(Redirector.BuildUrl(config.returnUrlTemplate, fields));
     }
 
     string GetUrl()

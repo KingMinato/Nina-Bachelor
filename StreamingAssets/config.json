@@ -1,0 +1,43 @@
+{
+  "version": "0.1.0",
+  "moneyPerRound": 100,
+  "splitStep": 5,
+  "npcAcceptMaxPlayerKeeps": 90,
+  "round2NpcKeeps": 50,
+  "round4NpcKeeps": 75,
+  "turnAngle": 45,
+  "submitTimeoutSeconds": 5,
+  "appsScriptUrl": "https://script.google.com/macros/s/AKfycbxSzp_JSOD9seyMz0s4_OTsAFD7WxqrvOFcRndbEbzNJ9SjKMJgF96rdgxavEkB4VI/exec",
+  "returnUrlTemplate": "https://qualtricsxmbxwbdbh7v.qualtrics.com/jfe/form/SV_afuLYLkSWdZEeoK?pid={pid}&g={g}&ag={ag}&s={s}&r1={r1}&r2={r2}&r3={r3}&r4={r4}&t1={t1}&t2={t2}&t3={t3}&t4={t4}&bal={bal}&dev={dev}&dur={dur}&test={test}&ver={ver}",
+  "tutorialSteps": [
+    { "text": "Dreh dich nach links.", "action": "turnLeft", "count": 2 },
+    { "text": "Dreh dich nach rechts.", "action": "turnRight", "count": 2 },
+    { "text": "Spring einmal.", "action": "jump", "count": 1 },
+    { "text": "Dreh dich einmal komplett um.", "action": "turnLeft", "count": 8 }
+  ],
+  "texts": {
+    "intro": "PLACEHOLDER",
+    "doorOpened": "PLACEHOLDER",
+    "goToDoor": "Zur Tür",
+    "talk": "Ansprechen",
+    "npcGreeting": "PLACEHOLDER",
+    "round1Intro": "PLACEHOLDER",
+    "round2Intro": "PLACEHOLDER",
+    "round3Intro": "PLACEHOLDER",
+    "round4Intro": "PLACEHOLDER",
+    "accept": "Annehmen",
+    "reject": "Ablehnen",
+    "confirm": "Bestätigen",
+    "npcAccepted": "PLACEHOLDER",
+    "npcRejected": "PLACEHOLDER",
+    "playerAccepted": "Du hast das Angebot angenommen.",
+    "playerRejected": "Du hast das Angebot abgelehnt.",
+    "splitShares": "Du: {player} CHF / Gegenüber: {npc} CHF",
+    "npcOffer": "Dein Gegenüber behält {npc} CHF und bietet dir {player} CHF an.",
+    "roundResult": "Du erhältst {player} CHF, dein Gegenüber erhält {npc} CHF.",
+    "next": "Weiter",
+    "balance": "Kontostand",
+    "end": "Danke! Du wirst jetzt zur Umfrage weitergeleitet.",
+    "rotateDevice": "Bitte Gerät drehen"
+  }
+}

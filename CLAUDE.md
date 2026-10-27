@@ -288,6 +288,7 @@ Note: "Evenly Present" counts assignments, not completions. Dropouts can unbalan
   Output to `Builds/WebGL`.
 - Compression: Gzip with **Decompression Fallback** enabled (GitHub Pages does not set Content-Encoding headers).
 - Hosting: GitHub Pages (or Netlify / Cloudflare Pages). Not itch.io, its iframe does not pass URL parameters.
+- Deployed at https://kingminato.github.io/Nina-Bachelor/ from the `gh-pages` branch (root). That branch only holds the contents of `Builds/WebGL` plus an empty `.nojekyll`; `Builds/` stays ignored on `main`. To deploy: build, then replace the files on `gh-pages` (e.g. via `git worktree add`), commit, push.
 - Performance targets for mobile browsers: 30 fps, baked lighting, no realtime shadows, low poly, texture size max 1024, keep build small (< 30 MB). Room is minimal so this should be easy, but mirror worlds multiply geometry and avatars by 4.
 - Mobile-friendly WebGL template: full window canvas, loading bar, no Unity footer.
 

@@ -331,3 +331,4 @@ Note: "Evenly Present" counts assignments, not completions. Dropouts can unbalan
 - Final texts (intro, tutorial, NPC dialog) will be written by the thesis author.
 - Data storage rules of the university unknown. Google Sheet is the working assumption.
 - Asset store characters to be chosen.
+- Test setup runs on the developer's Google account (Sheet + Apps Script). Before the pilot, move everything (Sheet, Apps Script, Qualtrics surveys) to the thesis author's account and update `appsScriptUrl` and `returnUrlTemplate` in config.json.

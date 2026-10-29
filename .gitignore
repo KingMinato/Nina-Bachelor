@@ -106,3 +106,7 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# Synty POLYGON assets: licensed, must not be redistributed in this public repo
+/[Aa]ssets/Synty/
+/[Aa]ssets/Synty.meta

@@ -160,6 +160,9 @@ No reflection cameras or render textures. Mirrors are faked with copied geometry
   "texts": {
     "intro": "PLACEHOLDER",
     "doorOpened": "PLACEHOLDER",
+    "turnLeft": "Links drehen",
+    "turnRight": "Rechts drehen",
+    "jump": "Springen",
     "goToDoor": "Zur Tür",
     "talk": "Ansprechen",
     "npcGreeting": "PLACEHOLDER",
@@ -195,12 +198,13 @@ Fallback: if config fails to load, use built-in defaults so the game never break
 Assets/
   Scripts/
     Core/        GameFlow.cs, GameState.cs, Config.cs, ConfigLoader.cs, UrlParams.cs
-    Tutorial/    TutorialController.cs, PlayerActions.cs
+    Tutorial/    TutorialController.cs, TutorialProgress.cs, PlayerActions.cs
+    World/       Door.cs, WalkPath.cs
     Mirror/      MirrorWorld.cs, MirrorAvatarSync.cs
     Avatar/      AvatarDatabase.cs (ScriptableObject), AvatarSpawner.cs
     Dialog/      UltimatumController.cs, SplitInputUI.cs, BalanceUI.cs
     Data/        SessionData.cs, IResultSubmitter.cs, ResultSubmitter.cs, ResultJson.cs, Redirector.cs
-    UI/          UIManager.cs, OrientationOverlay.cs, DebugOverlay.cs
+    UI/          UIManager.cs, ActionButtonsUI.cs, OrientationOverlay.cs, DebugOverlay.cs
   Plugins/WebGL/ Redirect.jslib
   Editor/        BuildScript.cs
   StreamingAssets/config.json
@@ -208,6 +212,8 @@ Assets/
 ```
 
 One scene. Room 1, Room 2, mirror worlds and NPC all live in `Main.unity`.
+
+**Scene layout** (greybox, milestone 2): both rooms 4 x 4 m interior, 3 m high, walls 0.2 m. Room 1 centred at the origin, mirrors on -x (left), +z (top), -z (bottom), door (1.2 x 2.2 m) in the +x wall. Room 2 directly behind it, centre x = 4.2. Player rig (`PlayerRig`, with `PlayerActions`, camera at 1.6 m and the avatar as children) starts at the origin facing +z. `WalkPath` waypoints: door (2.1, 0, 0), then (4.0, 0, 0) facing +x; NPC at (5.4, 0, 0) facing -x. The mirror surfaces are still placeholder panels (`World/Room1/Mirrors`).
 
 **GameFlow states:** `Init -> Tutorial -> DoorOpen -> WalkToNPC -> Dialog -> Submit -> Redirect`
 
@@ -297,10 +303,10 @@ Note: "Evenly Present" counts assignments, not completions. Dropouts can unbalan
 
 ## 13. Milestones
 
-Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> Survey B verified 2026-10-29. Next: milestone 2.
+Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> Survey B verified 2026-10-29. Milestone 2 done (2026-10-29). Next: milestone 3.
 
 1. **Foundation** (done): BuildScript, config loading, URL params, GameFlow with placeholder UI, ultimatum logic, SessionData, submit + redirect. Primitives only. Goal: full run Qualtrics -> Game -> Sheet -> Qualtrics works end to end.
-2. **Rooms and movement**: Room 1 and 2 greybox, door, turn/jump buttons, tutorial steps from config, walk to NPC.
+2. **Rooms and movement** (done): Room 1 and 2 greybox, door, turn/jump buttons, tutorial steps from config, walk to NPC.
 3. **Mirrors**: mirror worlds, avatar clones, first-person head hiding.
 4. **Avatars and NPC**: asset store characters, AvatarDatabase, 8 avatars, neutral NPC.
 5. **Polish**: final texts from thesis author, UI styling, orientation overlay, mobile testing, performance pass.
@@ -338,4 +344,4 @@ Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> S
 - Test setup runs on the developer's Google account (Sheet + Apps Script) and free Qualtrics account (Survey A "Mirror Game – Teil A": https://qualtricsxmbxwbdbh7v.qualtrics.com/jfe/form/SV_5iPvenZKKZp0isC, Survey B "Mirror Game – Teil B"). Before the pilot, move everything (Sheet, Apps Script, Qualtrics surveys, e.g. via .qsf export/import) to the thesis author's account and update `appsScriptUrl` and `returnUrlTemplate` in config.json.
 - Thesis author should check whether the university has a Qualtrics license with URL redirect (otherwise keep the link workaround from section 11).
 - Before the pilot, delete all test rows/responses in the Sheet, Survey A and Survey B.
-- Decisions to confirm with the thesis author: split slider starts at 50:50 (possible anchoring); round intro text is shown together with the options, so decision time includes reading time; decision time starts when options appear, including the 0.4 s input lock.
+- Decisions to confirm with the thesis author: split slider starts at 50:50 (possible anchoring); round intro text is shown together with the options, so decision time includes reading time; decision time starts when options appear, including the 0.4 s input lock. Tutorial: actions other than the requested one are performed but not counted; the NPC greeting is shown as the first dialog line after "Ansprechen".

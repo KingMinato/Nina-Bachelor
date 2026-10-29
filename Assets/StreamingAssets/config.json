@@ -18,6 +18,9 @@
   "texts": {
     "intro": "PLACEHOLDER",
     "doorOpened": "PLACEHOLDER",
+    "turnLeft": "Links drehen",
+    "turnRight": "Rechts drehen",
+    "jump": "Springen",
     "goToDoor": "Zur Tür",
     "talk": "Ansprechen",
     "npcGreeting": "PLACEHOLDER",

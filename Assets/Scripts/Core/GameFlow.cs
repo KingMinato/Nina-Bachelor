@@ -6,6 +6,10 @@ public class GameFlow : MonoBehaviour
     [SerializeField] UIManager ui;
     [SerializeField] DebugOverlay debugOverlay;
     [SerializeField] UltimatumController ultimatum;
+    [SerializeField] TutorialController tutorial;
+    [SerializeField] PlayerActions playerActions;
+    [SerializeField] Door door;
+    [SerializeField] WalkPath walkPath;
 
     [Tooltip("Used in the Editor instead of the browser URL, e.g. ?pid=R_test&g=w&s=2&debug=1")]
     [SerializeField] string editorQuery = "";
@@ -30,18 +34,21 @@ public class GameFlow : MonoBehaviour
         config = await ConfigLoader.LoadAsync();
         session = new SessionData(urlParams, config.version, Application.isMobilePlatform, Time.realtimeSinceStartupAsDouble);
         submitter = new ResultSubmitter(config.appsScriptUrl);
+        playerActions.TurnAngle = config.turnAngle;
 
         if (!urlParams.Debug)
         {
             SetState(GameState.Tutorial);
-            await ui.ShowPrompt("Tutorial (Platzhalter)", "Weiter");
+            await tutorial.Run(config);
         }
 
         SetState(GameState.DoorOpen);
+        await door.Open();
         await ui.ShowPrompt(config.texts.doorOpened, config.texts.goToDoor);
 
         SetState(GameState.WalkToNPC);
-        await ui.ShowPrompt(config.texts.npcGreeting, config.texts.talk);
+        await walkPath.Walk(playerActions.transform);
+        await ui.ShowButton(config.texts.talk);
 
         SetState(GameState.Dialog);
         await ultimatum.Run(config, session);

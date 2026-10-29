@@ -2,7 +2,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-// Placeholder UI: one prompt panel with a message and one or two buttons.
+// Placeholder UI: one prompt panel with a message and one or two buttons,
+// plus a single button without text for in-world actions like "Ansprechen".
 public class UIManager : MonoBehaviour
 {
     [SerializeField] GameObject promptPanel;
@@ -11,6 +12,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] TMP_Text promptButtonLabel;
     [SerializeField] Button secondButton;
     [SerializeField] TMP_Text secondButtonLabel;
+    [SerializeField] Button soloButton;
+    [SerializeField] TMP_Text soloButtonLabel;
 
     [Tooltip("Buttons stay disabled this long after a prompt appears, so a double tap cannot skip the next prompt.")]
     [SerializeField] float inputDelaySeconds = 0.4f;
@@ -18,6 +21,7 @@ public class UIManager : MonoBehaviour
     void Awake()
     {
         promptPanel.SetActive(false);
+        soloButton.gameObject.SetActive(false);
     }
 
     // Shows the message and completes when the button is pressed.
@@ -30,6 +34,25 @@ public class UIManager : MonoBehaviour
     public async Awaitable<bool> ShowChoice(string message, string firstLabel, string secondLabel)
     {
         return await Ask(message, firstLabel, secondLabel) == 0;
+    }
+
+    // Shows only a button and completes when it is pressed.
+    public async Awaitable ShowButton(string label)
+    {
+        soloButtonLabel.text = label;
+        soloButton.interactable = false;
+        soloButton.gameObject.SetActive(true);
+        await Awaitable.WaitForSecondsAsync(inputDelaySeconds);
+        soloButton.interactable = true;
+
+        var clicked = new AwaitableCompletionSource();
+        void OnClick() => clicked.TrySetResult();
+        soloButton.onClick.AddListener(OnClick);
+        await clicked.Awaitable;
+        soloButton.onClick.RemoveListener(OnClick);
+
+        soloButton.interactable = false;
+        soloButton.gameObject.SetActive(false);
     }
 
     // Shows a message without a button, e.g. the end text.

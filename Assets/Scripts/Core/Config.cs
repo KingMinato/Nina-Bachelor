@@ -68,6 +68,9 @@ public class Texts
 {
     public string intro = "PLACEHOLDER";
     public string doorOpened = "PLACEHOLDER";
+    public string turnLeft = "Links drehen";
+    public string turnRight = "Rechts drehen";
+    public string jump = "Springen";
     public string goToDoor = "Zur Tür";
     public string talk = "Ansprechen";
     public string npcGreeting = "PLACEHOLDER";

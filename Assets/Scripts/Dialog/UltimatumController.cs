@@ -12,6 +12,7 @@ public class UltimatumController : MonoBehaviour
     {
         var texts = config.texts;
         balanceUI.Show(texts.balance, session.Balance);
+        await ui.ShowPrompt(texts.npcGreeting, texts.next);
 
         for (int round = 1; round <= SessionData.RoundCount; round++)
         {

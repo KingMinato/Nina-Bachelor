@@ -268,6 +268,7 @@ In the Editor, log the URL instead of redirecting. URL-encode all values.
 3. Survey Flow: Randomizer with 4 Embedded Data elements (`species = 1`, `2`, `3`, `4`), "Randomly present 1 of the following elements", **Evenly Present Elements** enabled.
 4. End of Survey: Redirect to URL
    `https://<host>/?pid=${e://Field/ResponseID}&g=${e://Field/gender}&s=${e://Field/species}`
+   Free Qualtrics accounts cannot redirect ("Für Ihre Instanz nicht verfügbar"). Workaround used in the test setup: End of Survey -> Customize -> "Nachricht zum Umfragenende aus der Bibliothek" with a link (`<a href="<URL above>" target="_self">`). Piped fields work in that message. Switch back to a real redirect on a licensed account.
 
 **Survey B**
 1. First element in Survey Flow: Embedded Data block with fields `pid, g, ag, s, r1, r2, r3, r4, t1, t2, t3, t4, bal, dev, dur, test, ver` (values left empty, Qualtrics fills them from the URL).
@@ -296,7 +297,9 @@ Note: "Evenly Present" counts assignments, not completions. Dropouts can unbalan
 
 ## 13. Milestones
 
-1. **Foundation**: BuildScript, config loading, URL params, GameFlow with placeholder UI, ultimatum logic, SessionData, submit + redirect. Primitives only. Goal: full run Qualtrics -> Game -> Sheet -> Qualtrics works end to end.
+Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> Survey B verified 2026-10-29. Next: milestone 2.
+
+1. **Foundation** (done): BuildScript, config loading, URL params, GameFlow with placeholder UI, ultimatum logic, SessionData, submit + redirect. Primitives only. Goal: full run Qualtrics -> Game -> Sheet -> Qualtrics works end to end.
 2. **Rooms and movement**: Room 1 and 2 greybox, door, turn/jump buttons, tutorial steps from config, walk to NPC.
 3. **Mirrors**: mirror worlds, avatar clones, first-person head hiding.
 4. **Avatars and NPC**: asset store characters, AvatarDatabase, 8 avatars, neutral NPC.
@@ -332,4 +335,7 @@ Note: "Evenly Present" counts assignments, not completions. Dropouts can unbalan
 - Final texts (intro, tutorial, NPC dialog) will be written by the thesis author.
 - Data storage rules of the university unknown. Google Sheet is the working assumption.
 - Asset store characters to be chosen.
-- Test setup runs on the developer's Google account (Sheet + Apps Script). Before the pilot, move everything (Sheet, Apps Script, Qualtrics surveys) to the thesis author's account and update `appsScriptUrl` and `returnUrlTemplate` in config.json.
+- Test setup runs on the developer's Google account (Sheet + Apps Script) and free Qualtrics account (Survey A "Mirror Game – Teil A": https://qualtricsxmbxwbdbh7v.qualtrics.com/jfe/form/SV_5iPvenZKKZp0isC, Survey B "Mirror Game – Teil B"). Before the pilot, move everything (Sheet, Apps Script, Qualtrics surveys, e.g. via .qsf export/import) to the thesis author's account and update `appsScriptUrl` and `returnUrlTemplate` in config.json.
+- Thesis author should check whether the university has a Qualtrics license with URL redirect (otherwise keep the link workaround from section 11).
+- Before the pilot, delete all test rows/responses in the Sheet, Survey A and Survey B.
+- Decisions to confirm with the thesis author: split slider starts at 50:50 (possible anchoring); round intro text is shown together with the options, so decision time includes reading time; decision time starts when options appear, including the 0.4 s input lock.

@@ -62,7 +62,7 @@ Parse from `Application.absoluteURL`. If `pid` is missing, generate `test-<times
 - Player sees their own avatar in all three mirrors.
 - Tutorial: a sequence of instructions shown as text. Player completes each with UI buttons (click adventure style, identical on PC and mobile).
   - Buttons: **arrow left** at the left screen edge and **arrow right** at the right edge (turn), **jump** at the bottom.
-  - Example steps: "Dreh dich nach links", "Spring einmal", "Dreh dich einmal komplett um". Steps are defined in config (text + required action + count).
+  - Example steps: "Dreh dich nach links", "Spring einmal", "Dreh dich einmal komplett um". Steps are defined in config (text + required action + count). Actions: `turnLeft`, `turnRight`, `jump`, `turnAround` (a full 360 deg turn in either direction, independent of `turnAngle`; count = number of full turns). Turns in the wrong direction are performed but not counted.
 - After the last step: door opens, the doorway itself becomes a tappable button **"Zur Tür"** (world-space UI). The turn arrows stay visible so the player can turn towards the door.
 
 ### Transition
@@ -127,7 +127,7 @@ No reflection cameras or render textures. Mirrors are faked with copied geometry
 ## 6. Controls and UI
 
 - Only UI buttons that are tapped/clicked, identical on PC and mobile. No keyboard input, no mouse look, no joysticks. Interactions with objects in the world (door) are tappable world-space UI buttons on the object.
-- Turn left/right: smooth rotation by a fixed angle (configurable, default 45 deg).
+- Turn left/right: smooth rotation by a fixed angle (configurable, default 90 deg).
 - Jump: simple jump with animation.
 - Buttons large enough for touch (min ~80 px at 1080p reference, Canvas Scaler "Scale With Screen Size").
 - Orientation: design for landscape. In portrait on mobile, show an overlay "Bitte Gerät drehen" until rotated.
@@ -147,7 +147,7 @@ No reflection cameras or render textures. Mirrors are faked with copied geometry
   "npcAcceptMaxPlayerKeeps": 90,
   "round2NpcKeeps": 50,
   "round4NpcKeeps": 75,
-  "turnAngle": 45,
+  "turnAngle": 90,
   "submitTimeoutSeconds": 5,
   "appsScriptUrl": "https://script.google.com/macros/s/XXXX/exec",
   "returnUrlTemplate": "https://XXXX.qualtrics.com/jfe/form/SV_XXXX?pid={pid}&g={g}&ag={ag}&s={s}&r1={r1}&r2={r2}&r3={r3}&r4={r4}&t1={t1}&t2={t2}&t3={t3}&t4={t4}&bal={bal}&dev={dev}&dur={dur}&test={test}&ver={ver}",
@@ -155,7 +155,7 @@ No reflection cameras or render textures. Mirrors are faked with copied geometry
     { "text": "Dreh dich nach links.", "action": "turnLeft", "count": 2 },
     { "text": "Dreh dich nach rechts.", "action": "turnRight", "count": 2 },
     { "text": "Spring einmal.", "action": "jump", "count": 1 },
-    { "text": "Dreh dich einmal komplett um.", "action": "turnLeft", "count": 8 }
+    { "text": "Dreh dich einmal komplett um.", "action": "turnAround", "count": 1 }
   ],
   "texts": {
     "intro": "PLACEHOLDER",

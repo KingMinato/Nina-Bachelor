@@ -14,7 +14,7 @@ public class TutorialController : MonoBehaviour
     {
         await ui.ShowPrompt(config.texts.intro, config.texts.next);
 
-        progress = new TutorialProgress(config.tutorialSteps);
+        progress = new TutorialProgress(config.turnAngle, config.tutorialSteps);
         if (progress.IsFinished)
             return;
 
@@ -42,6 +42,8 @@ public class TutorialController : MonoBehaviour
     void UpdateInstruction()
     {
         string count = progress.Required > 1 ? $"{progress.Done} / {progress.Required}" : "";
+        if (progress.Current.action == TutorialStep.TurnAround)
+            count = $"{Mathf.Abs(progress.TurnedDegrees):0}° / 360°" + (count == "" ? "" : $"  ({count})");
         ui.ShowInstruction(progress.Current.text, count);
     }
 }

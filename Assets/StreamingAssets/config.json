@@ -5,7 +5,7 @@
   "npcAcceptMaxPlayerKeeps": 90,
   "round2NpcKeeps": 50,
   "round4NpcKeeps": 75,
-  "turnAngle": 45,
+  "turnAngle": 90,
   "submitTimeoutSeconds": 5,
   "appsScriptUrl": "https://script.google.com/macros/s/AKfycbxSzp_JSOD9seyMz0s4_OTsAFD7WxqrvOFcRndbEbzNJ9SjKMJgF96rdgxavEkB4VI/exec",
   "returnUrlTemplate": "https://qualtricsxmbxwbdbh7v.qualtrics.com/jfe/form/SV_afuLYLkSWdZEeoK?pid={pid}&g={g}&ag={ag}&s={s}&r1={r1}&r2={r2}&r3={r3}&r4={r4}&t1={t1}&t2={t2}&t3={t3}&t4={t4}&bal={bal}&dev={dev}&dur={dur}&test={test}&ver={ver}",
@@ -13,7 +13,7 @@
     { "text": "Dreh dich nach links.", "action": "turnLeft", "count": 2 },
     { "text": "Dreh dich nach rechts.", "action": "turnRight", "count": 2 },
     { "text": "Spring einmal.", "action": "jump", "count": 1 },
-    { "text": "Dreh dich einmal komplett um.", "action": "turnLeft", "count": 8 }
+    { "text": "Dreh dich einmal komplett um.", "action": "turnAround", "count": 1 }
   ],
   "texts": {
     "intro": "PLACEHOLDER",

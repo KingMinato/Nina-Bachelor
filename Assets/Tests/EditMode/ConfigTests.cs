@@ -42,7 +42,7 @@ public class ConfigTests
         Assert.IsNotEmpty(c.tutorialSteps);
         foreach (var step in c.tutorialSteps)
         {
-            CollectionAssert.Contains(new[] { TutorialStep.TurnLeft, TutorialStep.TurnRight, TutorialStep.Jump }, step.action);
+            CollectionAssert.Contains(new[] { TutorialStep.TurnLeft, TutorialStep.TurnRight, TutorialStep.TurnAround, TutorialStep.Jump }, step.action);
             Assert.Greater(step.count, 0);
         }
         StringAssert.Contains("{pid}", c.returnUrlTemplate);

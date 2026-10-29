@@ -13,7 +13,7 @@ public class PlayerActions : MonoBehaviour
     public event Action<string> Performed;
 
     public bool IsBusy { get; private set; }
-    public float TurnAngle { get; set; } = 45f;
+    public float TurnAngle { get; set; } = 90f;
 
     public void TurnLeft() => Run(TutorialStep.TurnLeft);
     public void TurnRight() => Run(TutorialStep.TurnRight);

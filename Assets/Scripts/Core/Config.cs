@@ -12,7 +12,7 @@ public class Config
     public int npcAcceptMaxPlayerKeeps = 90;
     public int round2NpcKeeps = 50;
     public int round4NpcKeeps = 75;
-    public float turnAngle = 45f;
+    public float turnAngle = 90f;
     public float submitTimeoutSeconds = 5f;
     public string appsScriptUrl = "";
     public string returnUrlTemplate = "";
@@ -21,7 +21,7 @@ public class Config
         new TutorialStep("Dreh dich nach links.", TutorialStep.TurnLeft, 2),
         new TutorialStep("Dreh dich nach rechts.", TutorialStep.TurnRight, 2),
         new TutorialStep("Spring einmal.", TutorialStep.Jump, 1),
-        new TutorialStep("Dreh dich einmal komplett um.", TutorialStep.TurnLeft, 8),
+        new TutorialStep("Dreh dich einmal komplett um.", TutorialStep.TurnAround, 1),
     };
     public Texts texts = new Texts();
 
@@ -47,6 +47,8 @@ public class TutorialStep
 {
     public const string TurnLeft = "turnLeft";
     public const string TurnRight = "turnRight";
+    // One full 360 degree turn, left or right, made of any number of turn steps.
+    public const string TurnAround = "turnAround";
     public const string Jump = "jump";
 
     public string text;

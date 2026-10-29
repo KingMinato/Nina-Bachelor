@@ -211,7 +211,7 @@ Assets/
 
 One scene. Room 1, Room 2, mirror worlds and NPC all live in `Main.unity`.
 
-**Scene layout** (greybox, milestone 2): both rooms 4 x 4 m interior, 3 m high, walls 0.2 m. Room 1 centred at the origin, mirrors on -x (left), +z (top), -z (bottom), door (1.2 x 2.2 m) in the +x wall. Room 2 directly behind it, centre x = 4.2. Player rig (`PlayerRig`, with `PlayerActions`, camera at 1.6 m and the avatar as children) starts at the origin facing +z. `WalkPath` waypoints: door (2.1, 0, 0), then (4.0, 0, 0) facing +x; NPC at (5.4, 0, 0) facing -x. The mirror surfaces are still placeholder panels (`World/Room1/Mirrors`).
+**Scene layout** (greybox, milestone 2): both rooms 6 x 6 m interior, 3 m high, walls 0.2 m. Room 1 centred at the origin, mirrors on -x (left), +z (top), -z (bottom), door (1.2 x 2.2 m) in the +x wall. Room 2 directly behind it, centre x = 6.2. Player rig (`PlayerRig`, with `PlayerActions`, camera at 1.6 m and the avatar as children) starts at the origin facing +z. `WalkPath` waypoints: door (3.1, 0, 0), then (6.0, 0, 0) facing +x; NPC at (7.4, 0, 0) facing -x. The mirror surfaces are still placeholder panels (`World/Room1/Mirrors`).
 
 **GameFlow states:** `Init -> Tutorial -> DoorOpen -> WalkToNPC -> Dialog -> Submit -> Redirect`
 

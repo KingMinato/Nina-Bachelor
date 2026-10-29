@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // Placeholder UI: one prompt panel with a message and one or two buttons,
-// plus a single button without text for in-world actions like "Ansprechen".
+// a single button without text for "Ansprechen", and an instruction line at the top.
 public class UIManager : MonoBehaviour
 {
     [SerializeField] GameObject promptPanel;
@@ -14,6 +14,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] TMP_Text secondButtonLabel;
     [SerializeField] Button soloButton;
     [SerializeField] TMP_Text soloButtonLabel;
+    [SerializeField] GameObject instructionPanel;
+    [SerializeField] TMP_Text instructionText;
+    [SerializeField] TMP_Text instructionCount;
 
     [Tooltip("Buttons stay disabled this long after a prompt appears, so a double tap cannot skip the next prompt.")]
     [SerializeField] float inputDelaySeconds = 0.4f;
@@ -22,6 +25,20 @@ public class UIManager : MonoBehaviour
     {
         promptPanel.SetActive(false);
         soloButton.gameObject.SetActive(false);
+        instructionPanel.SetActive(false);
+    }
+
+    // Instruction at the top of the screen, stays until hidden. count is e.g. "1 / 2" or empty.
+    public void ShowInstruction(string text, string count = "")
+    {
+        instructionText.text = text;
+        instructionCount.text = count;
+        instructionPanel.SetActive(true);
+    }
+
+    public void HideInstruction()
+    {
+        instructionPanel.SetActive(false);
     }
 
     // Shows the message and completes when the button is pressed.

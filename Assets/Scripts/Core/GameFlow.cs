@@ -8,7 +8,9 @@ public class GameFlow : MonoBehaviour
     [SerializeField] UltimatumController ultimatum;
     [SerializeField] TutorialController tutorial;
     [SerializeField] PlayerActions playerActions;
+    [SerializeField] ActionButtonsUI actionButtons;
     [SerializeField] Door door;
+    [SerializeField] WorldButton doorButton;
     [SerializeField] WalkPath walkPath;
 
     [Tooltip("Used in the Editor instead of the browser URL, e.g. ?pid=R_test&g=w&s=2&debug=1")]
@@ -42,9 +44,16 @@ public class GameFlow : MonoBehaviour
             await tutorial.Run(config);
         }
 
+        // The player may still be facing a mirror, so the arrows stay available to turn towards the door.
         SetState(GameState.DoorOpen);
+        actionButtons.Show(config.texts, withJump: false);
+        ui.ShowInstruction(config.texts.doorOpened);
         await door.Open();
-        await ui.ShowPrompt(config.texts.doorOpened, config.texts.goToDoor);
+        await doorButton.WaitForClick(config.texts.goToDoor);
+        actionButtons.Hide();
+        ui.HideInstruction();
+        while (playerActions.IsBusy)
+            await Awaitable.NextFrameAsync();
 
         SetState(GameState.WalkToNPC);
         await walkPath.Walk(playerActions.transform);

@@ -61,12 +61,12 @@ Parse from `Application.absoluteURL`. If `pid` is missing, generate `test-<times
 - Mirrors on three walls (left, top, bottom in the design sketch). Door on the fourth wall (right), closed.
 - Player sees their own avatar in all three mirrors.
 - Tutorial: a sequence of instructions shown as text. Player completes each with UI buttons (click adventure style, identical on PC and mobile).
-  - Buttons: **turn left**, **turn right**, **jump**.
+  - Buttons: **arrow left** at the left screen edge and **arrow right** at the right edge (turn), **jump** at the bottom.
   - Example steps: "Dreh dich nach links", "Spring einmal", "Dreh dich einmal komplett um". Steps are defined in config (text + required action + count).
-- After the last step: door opens, a **"Zur Tür"** button appears.
+- After the last step: door opens, the doorway itself becomes a tappable button **"Zur Tür"** (world-space UI). The turn arrows stay visible so the player can turn towards the door.
 
 ### Transition
-- Pressing "Zur Tür": automatic movement (scripted camera path or simple lerp) through the door into Room 2, ending in front of the NPC.
+- Tapping the door: automatic movement (scripted camera path or simple lerp) through the door into Room 2, ending in front of the NPC.
 - Button **"Ansprechen"** appears. Pressing it starts the dialog.
 
 ### Scene 2: NPC Room (Room 2)
@@ -126,7 +126,7 @@ No reflection cameras or render textures. Mirrors are faked with copied geometry
 
 ## 6. Controls and UI
 
-- Only UI buttons, no keyboard/mouse look or joysticks required. Optional: keyboard shortcuts on PC (A/D turn, Space jump) as a convenience.
+- Only UI buttons that are tapped/clicked, identical on PC and mobile. No keyboard input, no mouse look, no joysticks. Interactions with objects in the world (door) are tappable world-space UI buttons on the object.
 - Turn left/right: smooth rotation by a fixed angle (configurable, default 45 deg).
 - Jump: simple jump with animation.
 - Buttons large enough for touch (min ~80 px at 1080p reference, Canvas Scaler "Scale With Screen Size").
@@ -160,8 +160,6 @@ No reflection cameras or render textures. Mirrors are faked with copied geometry
   "texts": {
     "intro": "PLACEHOLDER",
     "doorOpened": "PLACEHOLDER",
-    "turnLeft": "Links drehen",
-    "turnRight": "Rechts drehen",
     "jump": "Springen",
     "goToDoor": "Zur Tür",
     "talk": "Ansprechen",
@@ -204,7 +202,7 @@ Assets/
     Avatar/      AvatarDatabase.cs (ScriptableObject), AvatarSpawner.cs
     Dialog/      UltimatumController.cs, SplitInputUI.cs, BalanceUI.cs
     Data/        SessionData.cs, IResultSubmitter.cs, ResultSubmitter.cs, ResultJson.cs, Redirector.cs
-    UI/          UIManager.cs, ActionButtonsUI.cs, OrientationOverlay.cs, DebugOverlay.cs
+    UI/          UIManager.cs, ActionButtonsUI.cs, WorldButton.cs, OrientationOverlay.cs, DebugOverlay.cs
   Plugins/WebGL/ Redirect.jslib
   Editor/        BuildScript.cs
   StreamingAssets/config.json

@@ -58,15 +58,15 @@ Parse from `Application.absoluteURL`. If `pid` is missing, generate `test-<times
 
 ### Scene 1: Mirror Room (Room 1)
 - First person. Plain, minimal room.
-- Mirrors on three walls (left, top, bottom in the design sketch). Door on the fourth wall (right), closed.
+- Mirrors on three walls (left, top, bottom in the design sketch). Body-sized, not wall-wide: just large enough for the player to see themselves fully, including jumps. Door on the fourth wall (right), closed.
 - Player sees their own avatar in all three mirrors.
 - Tutorial: a sequence of instructions shown as text. Player completes each with UI buttons (click adventure style, identical on PC and mobile).
   - Buttons: **arrow left** at the left screen edge and **arrow right** at the right edge (turn), **jump** at the bottom.
   - Example steps: "Dreh dich nach links", "Spring einmal", "Dreh dich einmal komplett um". Steps are defined in config (text + required action + count). Actions: `turnLeft`, `turnRight`, `jump`, `turnAround` (a full 360 deg turn in either direction, independent of `turnAngle`; count = number of full turns). Turns in the wrong direction are performed but not counted.
-- After the last step: door opens, the doorway itself becomes a tappable button **"Zur Tür"** (world-space UI). The turn arrows stay visible so the player can turn towards the door.
+- After the last step: the door stays closed and becomes a tappable button **"Zur Tür"** (world-space UI on the door). The turn arrows stay visible so the player can turn towards the door.
 
 ### Transition
-- Tapping the door: automatic movement (scripted camera path or simple lerp) through the door into Room 2, ending in front of the NPC.
+- Tapping the door: the player walks up to the door, the door opens, then automatic movement continues (scripted camera path or simple lerp) through the door into Room 2, ending in front of the NPC.
 - Button **"Ansprechen"** appears. Pressing it starts the dialog.
 
 ### Scene 2: NPC Room (Room 2)
@@ -159,7 +159,7 @@ No reflection cameras or render textures. Mirrors are faked with copied geometry
   ],
   "texts": {
     "intro": "PLACEHOLDER",
-    "doorOpened": "PLACEHOLDER",
+    "goToDoorHint": "PLACEHOLDER",
     "jump": "Springen",
     "goToDoor": "Zur Tür",
     "talk": "Ansprechen",
@@ -211,9 +211,9 @@ Assets/
 
 One scene. Room 1, Room 2, mirror worlds and NPC all live in `Main.unity`.
 
-**Scene layout** (greybox, milestone 2): both rooms 6 x 6 m interior, 3 m high, walls 0.2 m. Room 1 centred at the origin, mirrors on -x (left), +z (top), -z (bottom), door (1.2 x 2.2 m) in the +x wall. Room 2 directly behind it, centre x = 6.2. Player rig (`PlayerRig`, with `PlayerActions`, camera at 1.6 m and the avatar as children) starts at the origin facing +z. `WalkPath` waypoints: door (3.1, 0, 0), then (6.0, 0, 0) facing +x; NPC at (7.4, 0, 0) facing -x. The mirror surfaces are still placeholder panels (`World/Room1/Mirrors`).
+**Scene layout** (greybox, milestone 2): both rooms 6 x 6 m interior, 3 m high, walls 0.2 m. Room 1 centred at the origin, mirrors on -x (left), +z (top), -z (bottom), door (1.2 x 2.2 m) in the +x wall. Room 2 directly behind it, centre x = 6.2. Player rig (`PlayerRig`, with `PlayerActions`, camera at 1.6 m and the avatar as children) starts at the origin facing +z. `WalkToDoor` stops at (2.2, 0, 0) facing the door, then the door opens; `WalkToNpc`: doorway (3.1, 0, 0), then (6.0, 0, 0) facing +x; NPC at (7.4, 0, 0) facing -x. Mirrors are body-sized (1.5 x 2.4 m, bottom edge 0.15 m above the floor) centred on each mirror wall, with a dark frame; the surfaces are still placeholder panels (`World/Room1/Mirrors`).
 
-**GameFlow states:** `Init -> Tutorial -> DoorOpen -> WalkToNPC -> Dialog -> Submit -> Redirect`
+**GameFlow states:** `Init -> Tutorial -> GoToDoor -> WalkToNPC -> Dialog -> Submit -> Redirect`
 
 `SessionData` holds all recorded values and the start timestamp. Only `ResultSubmitter` and `Redirector` read it at the end.
 

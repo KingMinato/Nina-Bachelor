@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// Runs the whole sequence: Init -> Tutorial -> DoorOpen -> WalkToNPC -> Dialog -> Submit -> Redirect.
+// Runs the whole sequence: Init -> Tutorial -> GoToDoor -> WalkToNPC -> Dialog -> Submit -> Redirect.
 public class GameFlow : MonoBehaviour
 {
     [SerializeField] UIManager ui;
@@ -11,7 +11,8 @@ public class GameFlow : MonoBehaviour
     [SerializeField] ActionButtonsUI actionButtons;
     [SerializeField] Door door;
     [SerializeField] WorldButton doorButton;
-    [SerializeField] WalkPath walkPath;
+    [SerializeField] WalkPath walkToDoor;
+    [SerializeField] WalkPath walkToNpc;
 
     [Tooltip("Used in the Editor instead of the browser URL, e.g. ?pid=R_test&g=w&s=2&debug=1")]
     [SerializeField] string editorQuery = "";
@@ -44,11 +45,10 @@ public class GameFlow : MonoBehaviour
             await tutorial.Run(config);
         }
 
-        // The player may still be facing a mirror, so the arrows stay available to turn towards the door.
-        SetState(GameState.DoorOpen);
+        // The player may still be facing a mirror, so the arrows stay available to turn towards the closed door.
+        SetState(GameState.GoToDoor);
         actionButtons.Show(config.texts, withJump: false);
-        ui.ShowInstruction(config.texts.doorOpened);
-        await door.Open();
+        ui.ShowInstruction(config.texts.goToDoorHint);
         await doorButton.WaitForClick(config.texts.goToDoor);
         actionButtons.Hide();
         ui.HideInstruction();
@@ -56,7 +56,9 @@ public class GameFlow : MonoBehaviour
             await Awaitable.NextFrameAsync();
 
         SetState(GameState.WalkToNPC);
-        await walkPath.Walk(playerActions.transform);
+        await walkToDoor.Walk(playerActions.transform);
+        await door.Open();
+        await walkToNpc.Walk(playerActions.transform);
         await ui.ShowButton(config.texts.talk);
 
         SetState(GameState.Dialog);

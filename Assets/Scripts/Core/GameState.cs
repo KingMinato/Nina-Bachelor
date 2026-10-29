@@ -2,7 +2,7 @@ public enum GameState
 {
     Init,
     Tutorial,
-    DoorOpen,
+    GoToDoor,
     WalkToNPC,
     Dialog,
     Submit,

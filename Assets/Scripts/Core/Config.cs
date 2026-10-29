@@ -69,7 +69,8 @@ public class TutorialStep
 public class Texts
 {
     public string intro = "PLACEHOLDER";
-    public string doorOpened = "PLACEHOLDER";
+    // Shown after the tutorial while the closed door can be tapped.
+    public string goToDoorHint = "PLACEHOLDER";
     public string jump = "Springen";
     public string goToDoor = "Zur Tür";
     public string talk = "Ansprechen";

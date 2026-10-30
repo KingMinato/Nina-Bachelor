@@ -40,13 +40,6 @@ public class GameFlow : MonoBehaviour
         urlParams = UrlParams.Parse(GetUrl(), new System.Random());
         if (urlParams.Debug)
             debugOverlay.Show(urlParams);
-        // Available in the Unity Editor and in test runs (no pid or ?debug=1). Participants always come with a pid.
-        if (urlParams.IsTest || Application.isEditor)
-        {
-            avatarSwitcher.gameObject.SetActive(true);
-            roomSwitcher.gameObject.SetActive(true);
-            uiSwitcher.gameObject.SetActive(true);
-        }
         if (urlParams.RoomOverride != "" && !rooms.Apply(urlParams.RoomOverride))
             Debug.LogWarning("Unknown room variant: " + urlParams.RoomOverride);
         if (urlParams.UiOverride != "" && !uiStyles.Apply(urlParams.UiOverride))
@@ -62,6 +55,15 @@ public class GameFlow : MonoBehaviour
         session = new SessionData(urlParams, config.version, Application.isMobilePlatform, Time.realtimeSinceStartupAsDouble);
         submitter = new ResultSubmitter(config.appsScriptUrl);
         playerActions.TurnAngle = config.turnAngle;
+
+        // Available in the Unity Editor, in test runs (no pid or ?debug=1) and, while config.debugTools is on,
+        // also in runs coming from the survey. Turn debugTools off before the pilot.
+        if (urlParams.IsTest || config.debugTools || Application.isEditor)
+        {
+            avatarSwitcher.gameObject.SetActive(true);
+            roomSwitcher.gameObject.SetActive(true);
+            uiSwitcher.gameObject.SetActive(true);
+        }
 
         string avatarId = urlParams.AvatarOverride != "" ? urlParams.AvatarOverride : config.SpeciesId(urlParams.Species);
         avatarSpawner.Spawn(avatarId, urlParams.AvatarGender);

@@ -18,6 +18,8 @@ public class Config
     public float submitTimeoutSeconds = 5f;
     public string appsScriptUrl = "";
     public string returnUrlTemplate = "";
+    // Shows the debug switchers also to runs with a pid (testing via the survey). Must be false for the pilot.
+    public bool debugTools;
     public TutorialStep[] tutorialSteps =
     {
         new TutorialStep("Dreh dich nach links.", TutorialStep.TurnLeft, 2),

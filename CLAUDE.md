@@ -29,7 +29,7 @@ Data is linked across all three via `pid` (Qualtrics ResponseID from Survey A).
 | `pid` | string | Qualtrics ResponseID |
 | `g` | `m`, `w`, anything else | Gender from survey. `m`/`w` used directly, anything else or missing -> random 50/50 |
 | `s` | `1`-`4` | Species, assigned and balanced by Qualtrics. Missing/invalid -> random |
-| `debug` | `1` | Skips tutorial, shows the debug overlay, does NOT post to Google Sheet. The debug switchers (buttons "Avatar": all species, m/w, jump; "Raum"; "UI") are shown in every test run (no `pid` or `debug=1`) and always in the Unity Editor, never to participants |
+| `debug` | `1` | Skips tutorial, shows the debug overlay, does NOT post to Google Sheet. The debug switchers (buttons "Avatar": all species, m/w, jump; "Raum"; "UI") are shown in every test run (no `pid` or `debug=1`), always in the Unity Editor and, while `debugTools` is `true` in config.json, also in runs coming from Survey A. `debugTools` must be `false` for the pilot |
 | `a` | avatar species id | Test runs only (no `pid` or `debug=1`): shows this avatar regardless of `s`, e.g. `?a=slime&g=w`. Ignored in real runs |
 | `room` | room variant name | Test runs only: starts with this furnishing variant (see section 5a), e.g. `?debug=1&room=Holz`. Ignored in real runs |
 | `ui` | UI style name | Test runs only: starts with this UI style (see section 6a), e.g. `?debug=1&ui=Skizze`. Ignored in real runs |
@@ -213,6 +213,7 @@ Three styles from the prototype round (Mockup Viewer, rated "Gut"), switchable a
   "species": ["humanC", "goblin", "robot", "cow"],
   "submitTimeoutSeconds": 5,
   "appsScriptUrl": "https://script.google.com/macros/s/XXXX/exec",
+  "debugTools": true,
   "returnUrlTemplate": "https://XXXX.qualtrics.com/jfe/form/SV_XXXX?pid={pid}&g={g}&ag={ag}&s={s}&r1={r1}&r2={r2}&r3={r3}&r4={r4}&t1={t1}&t2={t2}&t3={t3}&t4={t4}&bal={bal}&dev={dev}&dur={dur}&test={test}&ver={ver}",
   "tutorialSteps": [
     { "text": "Dreh dich nach links.", "action": "turnLeft", "count": 2 },
@@ -417,5 +418,6 @@ Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> S
 - Texture sizes of the character packs not yet limited to 1024 (performance pass, milestone 5).
 - Test setup runs on the developer's Google account (Sheet + Apps Script) and free Qualtrics account (Survey A "Mirror Game – Teil A": https://qualtricsxmbxwbdbh7v.qualtrics.com/jfe/form/SV_5iPvenZKKZp0isC, Survey B "Mirror Game – Teil B"). Before the pilot, move everything (Sheet, Apps Script, Qualtrics surveys, e.g. via .qsf export/import) to the thesis author's account and update `appsScriptUrl` and `returnUrlTemplate` in config.json.
 - Thesis author should check whether the university has a Qualtrics license with URL redirect (otherwise keep the link workaround from section 11).
+- Before the pilot, set `debugTools` to `false` in config.json (debug switchers are shown to runs with a pid while it is on).
 - Before the pilot, delete all test rows/responses in the Sheet, Survey A and Survey B.
 - Decisions to confirm with the thesis author: decision time starts when the buttons appear after the typed-out text (so it no longer includes most of the reading time), still including the 0.4 s input lock; split slider starts at 50:50 (possible anchoring); Tutorial: actions other than the requested one are performed but not counted; the NPC greeting is shown as the first dialog line after "Ansprechen".

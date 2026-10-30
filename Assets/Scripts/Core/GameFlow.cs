@@ -6,6 +6,8 @@ public class GameFlow : MonoBehaviour
     [SerializeField] UIManager ui;
     [SerializeField] DebugOverlay debugOverlay;
     [SerializeField] DebugAvatarSwitcher avatarSwitcher;
+    [SerializeField] DebugRoomSwitcher roomSwitcher;
+    [SerializeField] RoomVariants rooms;
     [SerializeField] UltimatumController ultimatum;
     [SerializeField] TutorialController tutorial;
     [SerializeField] PlayerActions playerActions;
@@ -38,7 +40,14 @@ public class GameFlow : MonoBehaviour
             debugOverlay.Show(urlParams);
         // Always available while testing in the Unity Editor, in builds only with ?debug=1.
         if (urlParams.Debug || Application.isEditor)
+        {
             avatarSwitcher.gameObject.SetActive(true);
+            roomSwitcher.gameObject.SetActive(true);
+        }
+        if (urlParams.RoomOverride != "" && !rooms.Apply(urlParams.RoomOverride))
+            Debug.LogWarning("Unknown room variant: " + urlParams.RoomOverride);
+        if (urlParams.Debug)
+            debugOverlay.ShowRoom(rooms.Current.DisplayName);
 
         SetState(GameState.Init);
         config = await ConfigLoader.LoadAsync();

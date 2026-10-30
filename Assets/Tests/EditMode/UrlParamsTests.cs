@@ -111,4 +111,13 @@ public class UrlParamsTests
         Assert.AreEqual("", Parse("?pid=R_1&a=cow").AvatarOverride);
         Assert.AreEqual("", Parse("?debug=1").AvatarOverride);
     }
+
+    [Test]
+    public void RoomOverride_OnlyInTestRuns()
+    {
+        Assert.AreEqual("Stein", Parse("?room=Stein").RoomOverride);
+        Assert.AreEqual("Buero", Parse("?pid=R_1&debug=1&room=Buero").RoomOverride);
+        Assert.AreEqual("", Parse("?pid=R_1&room=Buero").RoomOverride);
+        Assert.AreEqual("", Parse("?debug=1").RoomOverride);
+    }
 }

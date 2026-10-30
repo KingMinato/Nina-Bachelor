@@ -19,19 +19,38 @@ public class MirrorWorld : MonoBehaviour
 
     readonly List<(Transform source, Transform copy)> synced = new List<(Transform, Transform)>();
     GameObject avatarClone;
+    GameObject roomCopy;
 
     void Start()
     {
+        if (roomCopy == null)
+            CopyRoom();
+        if (avatar != null)
+            SetAvatar(avatar);
+    }
+
+    // Copies Room 1 again, e.g. after switching the room variant. Before Start this does nothing,
+    // Start makes the first copy.
+    public void RebuildRoom()
+    {
+        if (roomCopy == null)
+            return;
+        Destroy(roomCopy);
+        CopyRoom();
+    }
+
+    void CopyRoom()
+    {
         var copy = Instantiate(room.gameObject, transform).transform;
+        roomCopy = copy.gameObject;
         copy.name = room.name + " (Mirror)";
         Place(room, copy);
         AdaptMirrors(copy);
+        RemoveInactive(copy);
 
+        synced.Clear();
         foreach (var part in movingParts)
             synced.Add((part, copy.Find(PathFrom(room, part))));
-
-        if (avatar != null)
-            SetAvatar(avatar);
     }
 
     // Replaces the previous clone, so the avatar can be switched at runtime (debug UI).
@@ -82,6 +101,14 @@ public class MirrorWorld : MonoBehaviour
             else
                 copyWalls[i].ShowAsDark();
         }
+    }
+
+    // Inactive objects (the unused room variants) are invisible anyway, the copies don't need them.
+    static void RemoveInactive(Transform copy)
+    {
+        foreach (var t in copy.GetComponentsInChildren<Transform>(true))
+            if (!t.gameObject.activeSelf)
+                Destroy(t.gameObject);
     }
 
     static string PathFrom(Transform root, Transform part)

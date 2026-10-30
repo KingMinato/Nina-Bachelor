@@ -13,6 +13,7 @@ public class UrlParams
     public bool Debug;
     public bool IsTest;          // no pid provided or debug mode
     public string AvatarOverride; // avatar species id from "a", test runs only, "" otherwise
+    public string RoomOverride;   // room variant name from "room", test runs only, "" otherwise
 
     public static UrlParams Parse(string url, Random rng)
     {
@@ -22,6 +23,7 @@ public class UrlParams
         query.TryGetValue("s", out string s);
         query.TryGetValue("debug", out string debug);
         query.TryGetValue("a", out string avatar);
+        query.TryGetValue("room", out string room);
 
         var p = new UrlParams
         {
@@ -36,6 +38,7 @@ public class UrlParams
         p.IsTest = !hasPid || p.Debug;
         // Lets testers look at any avatar, also those not mapped to a species. Never in real runs.
         p.AvatarOverride = p.IsTest ? avatar?.Trim() ?? "" : "";
+        p.RoomOverride = p.IsTest ? room?.Trim() ?? "" : "";
         return p;
     }
 

@@ -31,6 +31,7 @@ Data is linked across all three via `pid` (Qualtrics ResponseID from Survey A).
 | `s` | `1`-`4` | Species, assigned and balanced by Qualtrics. Missing/invalid -> random |
 | `debug` | `1` | Skips tutorial, shows debug overlay and the avatar switcher (button "Avatar": all species, m/w, jump; in the Unity Editor the switcher is always shown), does NOT post to Google Sheet |
 | `a` | avatar species id | Test runs only (no `pid` or `debug=1`): shows this avatar regardless of `s`, e.g. `?a=slime&g=w`. Ignored in real runs |
+| `room` | room variant name | Test runs only: starts with this furnishing variant (see section 5a), e.g. `?debug=1&room=Holz`. Ignored in real runs |
 
 Parse from `Application.absoluteURL`. If `pid` is missing, generate `test-<timestamp>` and treat as a test run (still playable, flagged in data).
 
@@ -141,7 +142,7 @@ No reflection cameras or render textures. Mirrors are faked with copied geometry
 - Turning and jumping must be clearly visible in the mirrors, that is the point of the tutorial.
 
 **Implementation (milestone 3):**
-- `MirrorWorld` (one per mirror, under `World/MirrorWorlds`) sits on the mirror plane (inner wall face) with local z into the wall and scale (1, 1, -1). At startup it instantiates a copy of `World/Room1` under itself, removes its own `MirrorWall` from the copy and switches the other mirrors in the copy to an opaque dark material (`MirrorWall.ShowAsDark`). Moving parts of Room 1 (door hinge) are synced every `LateUpdate`.
+- `MirrorWorld` (one per mirror, under `World/MirrorWorlds`) sits on the mirror plane (inner wall face) with local z into the wall and scale (1, 1, -1). At startup it instantiates a copy of `World/Room1` under itself, removes its own `MirrorWall` from the copy and switches the other mirrors in the copy to an opaque dark material (`MirrorWall.ShowAsDark`). Moving parts of Room 1 (door hinge) are synced every `LateUpdate`. `RebuildRoom()` replaces the copy (room variant switch); inactive objects (unused variants) are left out of the copies.
 - Everything that should appear in the mirrors must be a child of `Room1`. Room 1 objects must not be static-batched (instantiated copies of batched renderers keep drawing at the original position).
 - `MirrorWorld.SetAvatar` clones the player avatar, moves layer `FirstPersonHidden` parts to Default, disables Animators and adds `MirrorAvatarSync`, which reflects the root pose and copies all bone local transforms. `AvatarSpawner` calls `SetAvatar` after spawning.
 - Mirror walls are thin (0.02 m) so the opening has no depth that would hide part of the reflection.
@@ -149,6 +150,25 @@ No reflection cameras or render textures. Mirrors are faked with copied geometry
 - Through the reflected door, Room 2 is not shown (dark). Only visible if the player looks into a mirror while the door is open, which the flow does not allow.
 
 ---
+
+## 5a. Room Variants (furnishing mockups, 2026-10-30)
+
+Several furnishing variants of both rooms live in `Main.unity` at the same time, so the look can be compared in game. Built by `Editor/RoomVariantBuilder.cs` (menu **Mirror Game/Build Room Variants**, rebuild replaces all variants; requires Synty Office, Dungeon and Western Frontier).
+
+| Name | Packs | Look |
+|---|---|---|
+| `Grau` | none | the greybox, reference |
+| `Buero` | Office + Generic | carpet, light grey plaster, ceiling panel lights, office door |
+| `Holz` | Office (+1 Western chair) | wooden floor, warm white walls, rug in Room 1, wooden shelf/table |
+| `Stein` | Dungeon + Generic | stone floor tiles, light stone walls, plank door, hanging lanterns (no light) |
+| `Beton` | Office + Generic | grey concrete floor and walls, almost empty |
+| `Huette` | Western + Generic | wooden planks on walls/floor/ceiling, simple wooden furniture |
+
+- The shell (walls, mirror openings, door, waypoints, NPC position) is the same for all variants. Shell renderers carry `RoomSurface` (Floor/Wall/Ceiling/Door) and use generated meshes with UVs in metres (`Art/Environment/ShellMeshes`), so tiling textures have the same scale everywhere. Materials: `Art/Environment/Rooms/<Variant>_<Kind>.mat` (URP Lit referencing Synty textures).
+- Each variant (`World/RoomVariants/<Name>`, component `RoomVariant`) holds the four shell materials (empty = scene original) and its parts: `World/Room1/Variants/<Name>` (mirrored), `World/Room2/Variants/<Name>`, `World/Room1/DoorHinge/Variants/<Name>` (door model fitted into the opening; variants without one use the plain `DoorLeaf`).
+- `RoomVariants` (start index 0 = `Grau`) applies the start variant in `Awake`, before the mirror worlds copy Room 1; switching later rebuilds the mirror copies. Debug switcher `DebugRoomSwitcher` (button "Raum" below "Avatar"; in the Editor always, in builds with `?debug=1`), URL `room=` in test runs.
+- No colliders, lights or particles in the props (stripped by the builder), no static flags, nothing in the walk path or in front of the mirrors. Colours above 1 in some materials brighten darker textures, because the walls only get ambient light.
+- Cost (build 2026-10-30): all five variants together +1.2 MB compressed (Stein ~0.5 MB, the others 0.1-0.2 MB), +2 to +10 draw calls and at most +6k triangles over `Grau`. Their textures are limited to 1024 and compressed on WebGL (platform override).
 
 ## 6. Controls and UI
 
@@ -224,14 +244,14 @@ Assets/
   Scripts/
     Core/        GameFlow.cs, GameState.cs, Config.cs, ConfigLoader.cs, UrlParams.cs
     Tutorial/    TutorialController.cs, TutorialProgress.cs, PlayerActions.cs
-    World/       Door.cs, WalkPath.cs
+    World/       Door.cs, WalkPath.cs, CameraAim.cs, NpcLookAt.cs, RoomSurface.cs, RoomVariant.cs, RoomVariants.cs
     Mirror/      MirrorWorld.cs, MirrorWall.cs, MirrorAvatarSync.cs
     Avatar/      AvatarDatabase.cs (ScriptableObject), AvatarSpawner.cs, AvatarBody.cs
     Dialog/      UltimatumController.cs, SplitInputUI.cs, BalanceUI.cs
     Data/        SessionData.cs, IResultSubmitter.cs, ResultSubmitter.cs, ResultJson.cs, Redirector.cs
-    UI/          UIManager.cs, ActionButtonsUI.cs, WorldButton.cs, OrientationOverlay.cs, DebugOverlay.cs, DebugAvatarSwitcher.cs
+    UI/          UIManager.cs, ActionButtonsUI.cs, WorldButton.cs, OrientationOverlay.cs, DebugOverlay.cs, DebugAvatarSwitcher.cs, DebugRoomSwitcher.cs
   Plugins/WebGL/ Redirect.jslib
-  Editor/        BuildScript.cs, HumanoidClipBuilder.cs, AvatarBuilder.cs, MockupViewer/ (MockupViewerWindow.cs, MockupGUI.cs)
+  Editor/        BuildScript.cs, HumanoidClipBuilder.cs, AvatarBuilder.cs, RoomVariantBuilder.cs, MockupViewer/ (MockupViewerWindow.cs, MockupGUI.cs)
   Animations/    Avatar.controller, Humanoid_Idle/Jump.anim, *.overrideController
   Prefabs/       Avatars/Avatar_<id>[_m|_w].prefab, NPC.prefab
   Data/          AvatarDatabase.asset
@@ -333,7 +353,7 @@ Note: "Evenly Present" counts assignments, not completions. Dropouts can unbalan
 
 ## 13. Milestones
 
-Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> Survey B verified 2026-10-29. Milestone 2 done (2026-10-29). Milestone 3 done (2026-10-29). Milestone 4 built 2026-10-30 (all 8 candidates and the NPC checked in the mirrors in play mode), waiting for review in Unity and the thesis author's final 4 species. Next: milestone 5.
+Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> Survey B verified 2026-10-29. Milestone 2 done (2026-10-29). Milestone 3 done (2026-10-29). Milestone 4 built 2026-10-30 (all 8 candidates and the NPC checked in the mirrors in play mode), waiting for review in Unity and the thesis author's final 4 species. Room furnishing mockups (6 variants, section 5a) built 2026-10-30, waiting for the developer's rating. Next: milestone 5.
 
 1. **Foundation** (done): BuildScript, config loading, URL params, GameFlow with placeholder UI, ultimatum logic, SessionData, submit + redirect. Primitives only. Goal: full run Qualtrics -> Game -> Sheet -> Qualtrics works end to end.
 2. **Rooms and movement** (done): Room 1 and 2 greybox, door, turn/jump buttons, tutorial steps from config, walk to NPC.
@@ -368,6 +388,8 @@ Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> S
 ## 15. Open Points
 
 - Final 4 species not decided yet (8 candidates built, mapping in `config.json`).
+- Room variant not chosen yet (section 5a). After the choice: set `startIndex`, remove the other variants (and unused packs) from the builder.
+- Build size 2026-10-30: 38.4 MB (37.2 MB without room variants), over the 30 MB target. Main causes are avatar textures at 4096: mushroom (`T_Mushroom_*`, ~64 MB uncompressed), `Generic_Normals_01`, `Generic_01_A`, `Generic_Emissive_01_A`.
 - Final texts (intro, tutorial, NPC dialog) will be written by the thesis author.
 - Data storage rules of the university unknown. Google Sheet is the working assumption.
 - Texture sizes of the character packs not yet limited to 1024 (performance pass, milestone 5).

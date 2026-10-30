@@ -79,8 +79,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game::AvatarBody
   animator: {fileID: 4829013421683584447}
   eyes: {fileID: 1403157576059558024}
-  firstPersonHidden:
-  - {fileID: 1243838289101912208}
   jumpClipSeconds: 0.6
 --- !u!1001 &1328156955537806650
 PrefabInstance:
@@ -147,11 +145,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 078ba6e40193ecb59347357fbbc112c8, type: 3}
---- !u!4 &1243838289101912208 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 228997363991670186, guid: 078ba6e40193ecb59347357fbbc112c8, type: 3}
-  m_PrefabInstance: {fileID: 1328156955537806650}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1577446017852700613 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 543450653699957503, guid: 078ba6e40193ecb59347357fbbc112c8, type: 3}

@@ -7,7 +7,7 @@ using UnityEngine;
 // placed under it with plane-relative coordinates appears reflected. Unity fixes the triangle winding.
 public class MirrorWorld : MonoBehaviour
 {
-    // Layer of the player's own head, hidden from the first-person camera. Mirror clones use Default.
+    // Layer of the player's own avatar, hidden from the first-person camera. Mirror clones use Default.
     public const string FirstPersonHiddenLayer = "FirstPersonHidden";
 
     [SerializeField] Transform room;
@@ -49,8 +49,6 @@ public class MirrorWorld : MonoBehaviour
         // Bones are copied from the player avatar, so the clone must not animate itself.
         foreach (var animator in clone.GetComponentsInChildren<Animator>(true))
             animator.enabled = false;
-        foreach (var hider in clone.GetComponentsInChildren<FirstPersonHider>(true))
-            DestroyImmediate(hider);
         clone.AddComponent<MirrorAvatarSync>().Init(source, this);
     }
 

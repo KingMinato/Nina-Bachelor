@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1199305068614472899
+--- !u!1 &2089745780894475131
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,7 +8,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 341879409023526739}
+  - component: {fileID: 3652990110549870825}
   m_Layer: 0
   m_Name: Eyes
   m_TagString: Untagged
@@ -16,13 +16,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &341879409023526739
+--- !u!4 &3652990110549870825
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1199305068614472899}
+  m_GameObject: {fileID: 2089745780894475131}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1.6691123, z: 0}
@@ -62,7 +62,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5278647506215906220}
-  - {fileID: 341879409023526739}
+  - {fileID: 3652990110549870825}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &9065006868087415737
@@ -78,9 +78,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game::AvatarBody
   animator: {fileID: 5188917528506756812}
-  eyes: {fileID: 341879409023526739}
-  firstPersonHidden:
-  - {fileID: 5278525369520830562}
+  eyes: {fileID: 3652990110549870825}
   jumpClipSeconds: 0.95
 --- !u!1001 &5283053969276422530
 PrefabInstance:
@@ -162,11 +160,6 @@ PrefabInstance:
 --- !u!95 &5188917528506756812 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 95579000025458510, guid: 3a07a1305adf7464bbd22995e1a94b51, type: 3}
-  m_PrefabInstance: {fileID: 5283053969276422530}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &5278525369520830562 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4568759849021920, guid: 3a07a1305adf7464bbd22995e1a94b51, type: 3}
   m_PrefabInstance: {fileID: 5283053969276422530}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &5278647506215906220 stripped

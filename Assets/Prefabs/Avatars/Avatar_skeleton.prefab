@@ -31,7 +31,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 9115263388497543668}
-  - {fileID: 9077064605256833058}
+  - {fileID: 8645239448271688329}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3516453572123694439
@@ -47,11 +47,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game::AvatarBody
   animator: {fileID: 6354566451869689204}
-  eyes: {fileID: 9077064605256833058}
-  firstPersonHidden:
-  - {fileID: 6148021371305985871}
+  eyes: {fileID: 8645239448271688329}
   jumpClipSeconds: 0.95
---- !u!1 &6881502766202313484
+--- !u!1 &9016605554250874191
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -59,7 +57,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 9077064605256833058}
+  - component: {fileID: 8645239448271688329}
   m_Layer: 0
   m_Name: Eyes
   m_TagString: Untagged
@@ -67,13 +65,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &9077064605256833058
+--- !u!4 &8645239448271688329
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6881502766202313484}
+  m_GameObject: {fileID: 9016605554250874191}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1.6691123, z: 0}
@@ -159,11 +157,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5f1e3ed9628a12543adb9c996e045e24, type: 3}
---- !u!4 &6148021371305985871 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2201631936145362304, guid: 5f1e3ed9628a12543adb9c996e045e24, type: 3}
-  m_PrefabInstance: {fileID: 5467348274621811407}
-  m_PrefabAsset: {fileID: 0}
 --- !u!95 &6354566451869689204 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 1436675549834719163, guid: 5f1e3ed9628a12543adb9c996e045e24, type: 3}

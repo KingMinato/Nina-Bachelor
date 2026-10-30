@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
 
-// Spawns the player avatar into the player rig, puts the camera at its eyes,
-// hides its head from the camera and hands it to the mirror worlds.
+// Spawns the player avatar into the player rig, puts the camera at its eyes, hides it from the
+// first-person camera (only its mirror clones are visible) and hands it to the mirror worlds.
 // Spawning again replaces the current avatar (debug avatar switcher).
 public class AvatarSpawner : MonoBehaviour
 {
@@ -36,9 +36,11 @@ public class AvatarSpawner : MonoBehaviour
         };
         playerActions.Started += onActionStarted;
 
+        int hidden = LayerMask.NameToLayer(MirrorWorld.FirstPersonHiddenLayer);
+        foreach (var t in body.GetComponentsInChildren<Transform>(true))
+            t.gameObject.layer = hidden;
         foreach (var world in mirrorWorlds)
             world.SetAvatar(body.transform);
-        body.gameObject.AddComponent<FirstPersonHider>().Init(body.FirstPersonHidden);
 
         current = body;
         SpeciesId = speciesId;

@@ -35,10 +35,8 @@ public static class AvatarBuilder
         public string id;
         public string male, female;      // prefab paths, female == male for single-variant species
         public float scale = 1f;
-        public Vector3? eyes;            // in model space (unscaled), null = humanoid head bone + offset
-        public string[] eyeBones;        // midpoint of these bones, alternative to eyes
-        public string[] hidden;          // bone names collapsed in first person, null = humanoid head
-        public string[] hiddenRenderers = new string[0]; // renderers moved to the first-person-hidden layer
+        public Vector3? eyes;            // in model space (unscaled)
+        public string[] eyeBones;        // midpoint of these bones; neither set = humanoid head bone + offset
         public string[] removeComponents = new string[0];
         public string overrideController; // null = shared humanoid controller
     }
@@ -52,12 +50,12 @@ public static class AvatarBuilder
         new Spec { id = "skeleton", male = Gen + "SM_Gen_Chr_Skeleton_01.prefab" },
         // 1.0 m wide and 0.65 m high unscaled.
         new Spec { id = "slime", male = Slime + "Resources/Prefabs/slime.prefab", scale = 1.8f,
-            eyeBones = new[] { "Eye.L", "Eye.R" }, hidden = new[] { "Head" },
+            eyeBones = new[] { "Eye.L", "Eye.R" },
             removeComponents = new[] { "CharacterController", "SlimeScript" }, overrideController = "Slime" },
         new Spec { id = "mushroom", male = Mushroom + "Prefabs/Mushroom_1.prefab", eyes = new Vector3(0f, 0.9f, 0.19f),
-            hidden = new string[0], hiddenRenderers = new[] { "Hat", "Eyebrow" }, overrideController = "Mushroom" },
+            overrideController = "Mushroom" },
         new Spec { id = "cow", male = Cow + "Prefabs/Cow_Holstein.prefab", eyes = new Vector3(0f, 1.17f, 1.18f),
-            hidden = new[] { "Head" }, overrideController = "Cow" },
+            overrideController = "Cow" },
     };
 
     // NPC "V": grey hood with face cloth and a long robe from the Modular Fantasy Hero kit.
@@ -226,30 +224,17 @@ public static class AvatarBuilder
             var animator = model.GetComponent<Animator>();
             animator.runtimeAnimatorController = controller;
             animator.applyRootMotion = false;
-            // The player's own body is mostly outside the camera view, but must keep animating for the mirrors.
+            // The player's own body is never rendered by the main camera, but must keep animating for the mirrors.
             animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
 
             var bones = model.GetComponentsInChildren<Transform>(true);
             Vector3 eyes;
-            Transform[] hidden;
-            if (spec.hidden == null)
-            {
-                var head = animator.GetBoneTransform(HumanBodyBones.Head);
-                eyes = head.position + HumanEyeOffset * spec.scale;
-                hidden = new[] { head };
-            }
+            if (spec.eyeBones != null)
+                eyes = spec.eyeBones.Select(n => Find(bones, n).position).Aggregate(Vector3.zero, (a, b) => a + b) / spec.eyeBones.Length;
+            else if (spec.eyes != null)
+                eyes = spec.eyes.Value * spec.scale;
             else
-            {
-                eyes = spec.eyeBones != null
-                    ? spec.eyeBones.Select(n => Find(bones, n).position).Aggregate(Vector3.zero, (a, b) => a + b) / spec.eyeBones.Length
-                    : spec.eyes.Value * spec.scale;
-                hidden = spec.hidden.Select(n => Find(bones, n)).ToArray();
-            }
-
-            // Separate meshes (hat, eyebrows) are simply not rendered by the first-person camera.
-            int hiddenLayer = LayerMask.NameToLayer(MirrorWorld.FirstPersonHiddenLayer);
-            foreach (var r in model.GetComponentsInChildren<Renderer>(true).Where(r => spec.hiddenRenderers.Contains(r.name)))
-                r.gameObject.layer = hiddenLayer;
+                eyes = animator.GetBoneTransform(HumanBodyBones.Head).position + HumanEyeOffset * spec.scale;
 
             // Root on the ground below the eyes.
             model.transform.localPosition = new Vector3(-eyes.x, 0f, -eyes.z);
@@ -262,10 +247,6 @@ public static class AvatarBuilder
             var so = new SerializedObject(body);
             so.FindProperty("animator").objectReferenceValue = animator;
             so.FindProperty("eyes").objectReferenceValue = eyesMarker;
-            var list = so.FindProperty("firstPersonHidden");
-            list.arraySize = hidden.Length;
-            for (int i = 0; i < hidden.Length; i++)
-                list.GetArrayElementAtIndex(i).objectReferenceValue = hidden[i];
             so.FindProperty("jumpClipSeconds").floatValue = jumpClip.length;
             so.ApplyModifiedPropertiesWithoutUndo();
 

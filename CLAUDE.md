@@ -122,7 +122,7 @@ Target total duration: about 5 minutes.
 - Player cannot choose an avatar. Selected from `ag` + `s`.
 - Characters will come from the Unity Asset Store (free if possible). Build the avatar system so models can be swapped easily: an `AvatarDatabase` ScriptableObject mapping (species, gender) -> prefab.
 - All avatar prefabs share `Animations/Avatar.controller` (Idle, Jump with trigger `Jump` and speed parameter `JumpSpeed`). Humanoids and the NPC use the generated clips `Humanoid_Idle` / `Humanoid_Jump`; slime, mushroom and cow use `AnimatorOverrideController`s with their own clips (cow: Run as jump). No turn animation.
-- Avatar prefab layout: root (`AvatarBody`) on the ground directly below the eyes, child `Eyes` marker, the model as nested prefab offset so its eyes sit above the root. `AvatarBody` lists the bones collapsed in first person; separate meshes (mushroom hat, eyebrows) are on layer `FirstPersonHidden` instead.
+- Avatar prefab layout: root (`AvatarBody`) on the ground directly below the eyes, child `Eyes` marker, the model as nested prefab offset so its eyes sit above the root. The spawned player avatar is entirely on layer `FirstPersonHidden`, only its mirror clones are visible.
 - Editor tools (menu **Mirror Game**): `Build Humanoid Clips` (`Editor/HumanoidClipBuilder.cs`, poses as muscle values, jump timing matches `PlayerActions`), `Build Avatars` (`Editor/AvatarBuilder.cs`: controller, overrides, all prefabs, NPC, `Data/AvatarDatabase.asset`). Rerun after changing a model, scale or eye position.
 - Licensing: Synty, Creatures_3D, Lil Pupinduy and Backrock folders are git-ignored (public repo). Prefabs/controllers in the repo only reference them, so a fresh clone cannot build without the packs.
 
@@ -137,14 +137,13 @@ No reflection cameras or render textures. Mirrors are faked with copied geometry
 - The mirror surface itself is an opening in the wall, optionally with a very subtle transparent tinted glass quad and a frame for readability.
 - Only first-order reflections are needed. Opposite mirrors (top/bottom walls) do not need infinite reflections: inside each copied room, the other mirror walls are rendered as plain darkened mirror surfaces.
 - Mirror worlds must not be visible from anywhere except through their mirror. Make sure the copy behind the left mirror does not overlap Room 2.
-- First person: the real player avatar's head is hidden from the main camera. Mirror clones render the full avatar including head. Synty models are one skinned mesh, so `FirstPersonHider` scales the head bone to zero in `LateUpdate` (after `MirrorAvatarSync` copied the real scale) and restores it in `Update` (before the Animator). Separate renderers can use layer `FirstPersonHidden` (6).
+- First person: the whole real player avatar is on layer `FirstPersonHidden` (6), which the main camera does not render (`AvatarSpawner`). It still animates (Animator culling mode Always Animate) and drives the mirror clones, which render on Default.
 - Turning and jumping must be clearly visible in the mirrors, that is the point of the tutorial.
 
 **Implementation (milestone 3):**
 - `MirrorWorld` (one per mirror, under `World/MirrorWorlds`) sits on the mirror plane (inner wall face) with local z into the wall and scale (1, 1, -1). At startup it instantiates a copy of `World/Room1` under itself, removes its own `MirrorWall` from the copy and switches the other mirrors in the copy to an opaque dark material (`MirrorWall.ShowAsDark`). Moving parts of Room 1 (door hinge) are synced every `LateUpdate`.
 - Everything that should appear in the mirrors must be a child of `Room1`. Room 1 objects must not be static-batched (instantiated copies of batched renderers keep drawing at the original position).
-- `MirrorWorld.SetAvatar` clones the player avatar, moves layer `FirstPersonHidden` parts to Default, disables Animators, removes `FirstPersonHider` and adds `MirrorAvatarSync`, which reflects the root pose and copies all bone local transforms. `AvatarSpawner` calls `SetAvatar` after spawning.
-- First person: see `FirstPersonHider` above (bones) and layer `FirstPersonHidden` (6, not rendered by the main camera) for separate meshes.
+- `MirrorWorld.SetAvatar` clones the player avatar, moves layer `FirstPersonHidden` parts to Default, disables Animators and adds `MirrorAvatarSync`, which reflects the root pose and copies all bone local transforms. `AvatarSpawner` calls `SetAvatar` after spawning.
 - Mirror walls are thin (0.02 m) so the opening has no depth that would hide part of the reflection.
 - Lighting must look the same in the reflection: the directional light points straight down (unchanged by reflection at vertical planes). Baked lighting later must also be symmetric or be baked into the copies.
 - Through the reflected door, Room 2 is not shown (dark). Only visible if the player looks into a mirror while the door is open, which the flow does not allow.
@@ -227,7 +226,7 @@ Assets/
     Tutorial/    TutorialController.cs, TutorialProgress.cs, PlayerActions.cs
     World/       Door.cs, WalkPath.cs
     Mirror/      MirrorWorld.cs, MirrorWall.cs, MirrorAvatarSync.cs
-    Avatar/      AvatarDatabase.cs (ScriptableObject), AvatarSpawner.cs, AvatarBody.cs, FirstPersonHider.cs
+    Avatar/      AvatarDatabase.cs (ScriptableObject), AvatarSpawner.cs, AvatarBody.cs
     Dialog/      UltimatumController.cs, SplitInputUI.cs, BalanceUI.cs
     Data/        SessionData.cs, IResultSubmitter.cs, ResultSubmitter.cs, ResultJson.cs, Redirector.cs
     UI/          UIManager.cs, ActionButtonsUI.cs, WorldButton.cs, OrientationOverlay.cs, DebugOverlay.cs, DebugAvatarSwitcher.cs

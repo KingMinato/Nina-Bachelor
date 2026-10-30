@@ -79,7 +79,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Game::AvatarBody
   animator: {fileID: 5444772009026972648}
   eyes: {fileID: 7671893622526473989}
-  firstPersonHidden: []
   jumpClipSeconds: 0.96666527
 --- !u!1001 &8298355306427639304
 PrefabInstance:
@@ -89,10 +88,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5863496161590727469}
     m_Modifications:
-    - target: {fileID: 409948955384990429, guid: 8d58c28f554cfce46943745e8a0f09f8, type: 3}
-      propertyPath: m_Layer
-      value: 6
-      objectReference: {fileID: 0}
     - target: {fileID: 1031605565399612477, guid: 8d58c28f554cfce46943745e8a0f09f8, type: 3}
       propertyPath: m_LocalRotation.x
       value: -0.005708684
@@ -120,10 +115,6 @@ PrefabInstance:
     - target: {fileID: 4081978030259572192, guid: 8d58c28f554cfce46943745e8a0f09f8, type: 3}
       propertyPath: m_ApplyRootMotion
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6742845183917681048, guid: 8d58c28f554cfce46943745e8a0f09f8, type: 3}
-      propertyPath: m_Layer
-      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 6803482173524374286, guid: 8d58c28f554cfce46943745e8a0f09f8, type: 3}
       propertyPath: m_LocalRotation.x

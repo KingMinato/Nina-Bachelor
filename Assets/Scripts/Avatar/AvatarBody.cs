@@ -9,13 +9,10 @@ public class AvatarBody : MonoBehaviour
 
     [SerializeField] Animator animator;
     [SerializeField] Transform eyes;
-    [Tooltip("Bones collapsed for the first-person camera (head, hat, ...). Mirror clones show them.")]
-    [SerializeField] Transform[] firstPersonHidden;
     [Tooltip("Length of the jump clip, used to stretch it to the duration of the player's jump.")]
     [SerializeField] float jumpClipSeconds = 1f;
 
     public float EyeHeight => eyes.localPosition.y;
-    public Transform[] FirstPersonHidden => firstPersonHidden;
 
     public void PlayJump(float seconds)
     {

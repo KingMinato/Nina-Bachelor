@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1066009473589087679
+--- !u!1 &1587625183479912126
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,7 +8,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8772034889063983850}
+  - component: {fileID: 7384072706516930412}
   m_Layer: 0
   m_Name: Eyes
   m_TagString: Untagged
@@ -16,13 +16,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8772034889063983850
+--- !u!4 &7384072706516930412
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1066009473589087679}
+  m_GameObject: {fileID: 1587625183479912126}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1.6691123, z: 0}
@@ -62,7 +62,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2634833284793878296}
-  - {fileID: 8772034889063983850}
+  - {fileID: 7384072706516930412}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4991788963454853709
@@ -78,9 +78,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game::AvatarBody
   animator: {fileID: 3708629766123859088}
-  eyes: {fileID: 8772034889063983850}
-  firstPersonHidden:
-  - {fileID: 341117619495958578}
+  eyes: {fileID: 7384072706516930412}
   jumpClipSeconds: 0.95
 --- !u!1001 &7589028980409176431
 PrefabInstance:
@@ -159,11 +157,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a7543fce49601494489b3edcae2284ae, type: 3}
---- !u!4 &341117619495958578 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 7920214418233878877, guid: a7543fce49601494489b3edcae2284ae, type: 3}
-  m_PrefabInstance: {fileID: 7589028980409176431}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2634833284793878296 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5602877401323066999, guid: a7543fce49601494489b3edcae2284ae, type: 3}

@@ -179,7 +179,7 @@ Several furnishing variants of both rooms live in `Main.unity` at the same time,
 - Turn left/right: smooth rotation by a fixed angle (configurable, default 90 deg).
 - Jump: simple jump with animation.
 - Buttons large enough for touch (min ~80 px at 1080p reference, Canvas Scaler "Scale With Screen Size").
-- Orientation: design for landscape. In portrait on mobile, show an overlay "Bitte Gerät drehen" until rotated.
+- Orientation: design for landscape. In portrait on mobile, show an overlay "Bitte Gerät drehen" until rotated. Implemented by `OrientationOverlay` (last child of the `UI` canvas, built by the UI style builder): covers everything and blocks input whenever the screen is taller than wide, on every device; text `texts.rotateDevice`.
 - Language: Standard German (Hochdeutsch). All texts come from config, final wording will be written by the thesis author.
 
 ---

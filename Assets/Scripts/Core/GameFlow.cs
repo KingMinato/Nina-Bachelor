@@ -5,6 +5,7 @@ public class GameFlow : MonoBehaviour
 {
     [SerializeField] UIManager ui;
     [SerializeField] DebugOverlay debugOverlay;
+    [SerializeField] OrientationOverlay orientationOverlay;
     [SerializeField] DebugAvatarSwitcher avatarSwitcher;
     [SerializeField] DebugRoomSwitcher roomSwitcher;
     [SerializeField] DebugUiSwitcher uiSwitcher;
@@ -55,6 +56,7 @@ public class GameFlow : MonoBehaviour
         session = new SessionData(urlParams, config.version, Application.isMobilePlatform, Time.realtimeSinceStartupAsDouble);
         submitter = new ResultSubmitter(config.appsScriptUrl);
         playerActions.TurnAngle = config.turnAngle;
+        orientationOverlay.SetText(config.texts.rotateDevice);
 
         // Available in the Unity Editor, in test runs (no pid or ?debug=1) and, while config.debugTools is on,
         // also in runs coming from the survey. Turn debugTools off before the pilot.

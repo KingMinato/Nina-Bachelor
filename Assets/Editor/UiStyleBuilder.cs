@@ -635,6 +635,7 @@ public static class UiStyleBuilder
         uiSwitcher.gameObject.SetActive(false);
 
         LayoutDebug(ui);
+        BuildOrientationOverlay(ui);
 
         var flow = Object.FindFirstObjectByType<GameFlow>(FindObjectsInactive.Include);
         Set(flow, "uiSwitcher", switcher);
@@ -826,6 +827,29 @@ public static class UiStyleBuilder
         overlay.sizeDelta = new Vector2(1000, 60);
         var label = SmallText(overlay, 18);
         label.alignment = TextAlignmentOptions.BottomLeft;
+    }
+
+    // Portrait cover on top of everything (last child), shown by OrientationOverlay while the screen is taller than wide.
+    static void BuildOrientationOverlay(Transform ui)
+    {
+        var root = Node(ui, "OrientationOverlay", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+        root.SetAsLastSibling();
+        var cover = Node(root, "Cover", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+        var image = AddImage(cover);
+        image.color = new UnityEngine.Color(0.08f, 0.08f, 0.1f, 1);
+        image.raycastTarget = true;
+        var label = Label(cover, "Label", 90);
+        label.textWrappingMode = TextWrappingModes.Normal;
+        label.color = UnityEngine.Color.white;
+        label.text = "Bitte Gerät drehen";
+        var rect = label.rectTransform;
+        rect.offsetMin = new Vector2(60, 0);
+        rect.offsetMax = new Vector2(-60, 0);
+        cover.gameObject.SetActive(false);
+        var overlay = GetOrAdd<OrientationOverlay>(root.gameObject);
+        Set(overlay, "cover", cover.gameObject);
+        Set(overlay, "label", label);
+        Set(Object.FindFirstObjectByType<GameFlow>(FindObjectsInactive.Include), "orientationOverlay", overlay);
     }
 
     static TMP_Text SmallText(Transform t, float size)

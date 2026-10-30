@@ -1667,6 +1667,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4672766124581407221, guid: 3bbdb251a2ac63b419270b6d5fd67058, type: 3}
   m_PrefabInstance: {fileID: 318357679}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &318357681 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2558301166223827601, guid: 3bbdb251a2ac63b419270b6d5fd67058, type: 3}
+  m_PrefabInstance: {fileID: 318357679}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfd665383b32e2344a11c1528aa9e8f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::NpcLookAt
 --- !u!1 &326512215
 GameObject:
   m_ObjectHideFlags: 0
@@ -1769,6 +1780,7 @@ GameObject:
   - component: {fileID: 330585545}
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
+  - component: {fileID: 330585548}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1894,6 +1906,19 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &330585548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eecc6f56ff6ffce4f8c5001e36d6a4a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::CameraAim
+  sharpness: 4
 --- !u!1 &334634791
 GameObject:
   m_ObjectHideFlags: 0
@@ -7338,6 +7363,8 @@ MonoBehaviour:
   walkToDoor: {fileID: 1407694269}
   walkToNpc: {fileID: 1991440955}
   avatarSpawner: {fileID: 1603114378}
+  npc: {fileID: 318357681}
+  cameraAim: {fileID: 330585548}
   editorQuery: 
   minEndSeconds: 1.5
 --- !u!114 &1603114375

@@ -50,8 +50,8 @@ public static class AvatarBuilder
         new Spec { id = "goblin", male = Dungeon + "SM_Chr_Goblin_Male_01.prefab", female = Dungeon + "SM_Chr_Goblin_Female_01.prefab" },
         new Spec { id = "robot", male = Gen + "SM_Gen_Chr_Robot_01.prefab" },
         new Spec { id = "skeleton", male = Gen + "SM_Gen_Chr_Skeleton_01.prefab" },
-        // 1.0 m wide unscaled, 1.4 keeps it narrow enough to be seen whole in the mirror.
-        new Spec { id = "slime", male = Slime + "Resources/Prefabs/slime.prefab", scale = 1.4f,
+        // 1.0 m wide and 0.65 m high unscaled.
+        new Spec { id = "slime", male = Slime + "Resources/Prefabs/slime.prefab", scale = 1.8f,
             eyeBones = new[] { "Eye.L", "Eye.R" }, hidden = new[] { "Head" },
             removeComponents = new[] { "CharacterController", "SlimeScript" }, overrideController = "Slime" },
         new Spec { id = "mushroom", male = Mushroom + "Prefabs/Mushroom_1.prefab", eyes = new Vector3(0f, 0.9f, 0.19f),
@@ -139,6 +139,10 @@ public static class AvatarBuilder
             return p;
         }).ToArray();
 
+        // IK pass for the NPC's head look-at (NpcLookAt); avatars without IK targets are unaffected.
+        var layers = controller.layers;
+        layers[0].iKPass = true;
+        controller.layers = layers;
         var sm = controller.layers[0].stateMachine;
         var idle = sm.AddState("Idle");
         idle.motion = Clip(Anim + "Humanoid_Idle.anim");
@@ -321,6 +325,10 @@ public static class AvatarBuilder
             var animator = go.GetComponent<Animator>();
             animator.runtimeAnimatorController = controller;
             animator.applyRootMotion = false;
+            var lookAt = go.AddComponent<NpcLookAt>();
+            var so = new SerializedObject(lookAt);
+            so.FindProperty("animator").objectReferenceValue = animator;
+            so.ApplyModifiedPropertiesWithoutUndo();
             PrefabUtility.SaveAsPrefabAsset(go, "Assets/Prefabs/NPC.prefab");
         }
         finally

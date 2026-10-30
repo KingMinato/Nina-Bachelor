@@ -15,6 +15,8 @@ public class GameFlow : MonoBehaviour
     [SerializeField] WalkPath walkToDoor;
     [SerializeField] WalkPath walkToNpc;
     [SerializeField] AvatarSpawner avatarSpawner;
+    [SerializeField] NpcLookAt npc;
+    [SerializeField] CameraAim cameraAim;
 
     [Tooltip("Used in the Editor instead of the browser URL, e.g. ?pid=R_test&g=w&s=2&debug=1")]
     [SerializeField] string editorQuery = "";
@@ -69,6 +71,8 @@ public class GameFlow : MonoBehaviour
         await walkToDoor.Walk(playerActions.transform);
         await door.Open();
         await walkToNpc.Walk(playerActions.transform);
+        npc.LookAt(cameraAim.transform);
+        cameraAim.Aim(npc.Face);
         await ui.ShowButton(config.texts.talk);
 
         SetState(GameState.Dialog);

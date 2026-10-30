@@ -110,13 +110,14 @@ Target total duration: about 5 minutes.
   | `goblin` | Synty Dungeon `SM_Chr_Goblin_Male_01` / `_Female_01` (L) | m/w |
   | `robot` | Synty `SM_Gen_Chr_Robot_01` (R) | one, used for m and w |
   | `skeleton` | Synty `SM_Gen_Chr_Skeleton_01` | one |
-  | `slime` | Creatures_3D slime, scaled 1.4 | one |
+  | `slime` | Creatures_3D slime, scaled 1.8 | one |
   | `mushroom` | Lil Pupinduy `Mushroom_1` | one |
   | `cow` | Backrock Low Poly Animals `Cow_Holstein` | one |
 
   Default mapping: 1 `humanC`, 2 `goblin`, 3 `robot`, 4 `cow`.
-- Size (decided 2026-10-30): humanoids keep their size, creatures are roughly human-sized, the camera sits at each avatar's own eyes (humans 1.67 m, cow 1.17 m, mushroom 0.9 m, slime 0.66 m).
+- Size (decided 2026-10-30): humanoids keep their size, creatures are roughly human-sized, the camera sits at each avatar's own eyes (humans 1.67 m, cow 1.17 m, mushroom 0.9 m, slime 0.85 m).
 - NPC: "V" from the Modular Fantasy Hero kit, grey hood + face cloth + long robe (`Assets/Prefabs/NPC.prefab`, material `Art/NPC/NPC_Grey.mat`).
+- Eye contact: when the player arrives in front of the NPC, `CameraAim` (on the main camera) tilts the camera towards the NPC's face, and `NpcLookAt` (on the NPC, humanoid look-at IK, IK Pass on in `Avatar.controller`) turns the NPC's head towards the player's eyes, so it looks down at small avatars.
 - No exaggerated gender features. Neutral colors. Differences only through e.g. long/short hair, angular/round face shape, broad/narrow shoulders.
 - Player cannot choose an avatar. Selected from `ag` + `s`.
 - Characters will come from the Unity Asset Store (free if possible). Build the avatar system so models can be swapped easily: an `AvatarDatabase` ScriptableObject mapping (species, gender) -> prefab.

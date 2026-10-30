@@ -534,6 +534,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4672766124581407221}
   - component: {fileID: 1148419346876215464}
+  - component: {fileID: 2558301166223827601}
   m_Layer: 0
   m_Name: NPC
   m_TagString: Untagged
@@ -580,6 +581,21 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &2558301166223827601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291999886170140239}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfd665383b32e2344a11c1528aa9e8f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::NpcLookAt
+  animator: {fileID: 1148419346876215464}
+  faceOffset: {x: 0, y: 0.1, z: 0.08}
+  blendSeconds: 0.6
 --- !u!1 &1359468852385376932
 GameObject:
   m_ObjectHideFlags: 0

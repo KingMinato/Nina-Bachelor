@@ -30,6 +30,7 @@ Data is linked across all three via `pid` (Qualtrics ResponseID from Survey A).
 | `g` | `m`, `w`, anything else | Gender from survey. `m`/`w` used directly, anything else or missing -> random 50/50 |
 | `s` | `1`-`4` | Species, assigned and balanced by Qualtrics. Missing/invalid -> random |
 | `debug` | `1` | Skips tutorial, shows debug overlay, does NOT post to Google Sheet |
+| `a` | avatar species id | Test runs only (no `pid` or `debug=1`): shows this avatar regardless of `s`, e.g. `?a=slime&g=w`. Ignored in real runs |
 
 Parse from `Application.absoluteURL`. If `pid` is missing, generate `test-<timestamp>` and treat as a test run (still playable, flagged in data).
 
@@ -100,13 +101,29 @@ Target total duration: about 5 minutes.
 
 ## 4. Avatars
 
-- 4 species x 2 genders = 8 player avatars.
-  - Species 1: Human
-  - Species 2-4: TBD (ideas: orc, animal, robot). Use placeholders until decided.
+- 4 species x 2 genders. The thesis author has not fixed the 4 species yet, so 8 candidates are built and `config.json` (`species`) maps `s` = 1-4 to candidate ids:
+
+  | id | Model | Variants |
+  |---|---|---|
+  | `humanC` | Synty `SM_Gen_Chr_Street_Male_02` / `_Female_02` (PDF letter C) | m/w |
+  | `humanI` | Synty Office `SM_Chr_Business_Male_02` / `_Female_02` (I) | m/w |
+  | `goblin` | Synty Dungeon `SM_Chr_Goblin_Male_01` / `_Female_01` (L) | m/w |
+  | `robot` | Synty `SM_Gen_Chr_Robot_01` (R) | one, used for m and w |
+  | `skeleton` | Synty `SM_Gen_Chr_Skeleton_01` | one |
+  | `slime` | Creatures_3D slime, scaled 1.4 | one |
+  | `mushroom` | Lil Pupinduy `Mushroom_1` | one |
+  | `cow` | Backrock Low Poly Animals `Cow_Charolais` | one |
+
+  Default mapping: 1 `humanC`, 2 `goblin`, 3 `robot`, 4 `cow`.
+- Size (decided 2026-10-30): humanoids keep their size, creatures are roughly human-sized, the camera sits at each avatar's own eyes (humans 1.67 m, cow 1.17 m, mushroom 0.9 m, slime 0.66 m).
+- NPC: "V" from the Modular Fantasy Hero kit, grey hood + face cloth + long robe (`Assets/Prefabs/NPC.prefab`, material `Art/NPC/NPC_Grey.mat`).
 - No exaggerated gender features. Neutral colors. Differences only through e.g. long/short hair, angular/round face shape, broad/narrow shoulders.
 - Player cannot choose an avatar. Selected from `ag` + `s`.
 - Characters will come from the Unity Asset Store (free if possible). Build the avatar system so models can be swapped easily: an `AvatarDatabase` ScriptableObject mapping (species, gender) -> prefab.
-- All avatar prefabs must share one humanoid Animator Controller (idle, turn, jump).
+- All avatar prefabs share `Animations/Avatar.controller` (Idle, Jump with trigger `Jump` and speed parameter `JumpSpeed`). Humanoids and the NPC use the generated clips `Humanoid_Idle` / `Humanoid_Jump`; slime, mushroom and cow use `AnimatorOverrideController`s with their own clips (cow: Run as jump). No turn animation.
+- Avatar prefab layout: root (`AvatarBody`) on the ground directly below the eyes, child `Eyes` marker, the model as nested prefab offset so its eyes sit above the root. `AvatarBody` lists the bones collapsed in first person; separate meshes (mushroom hat, eyebrows) are on layer `FirstPersonHidden` instead.
+- Editor tools (menu **Mirror Game**): `Build Humanoid Clips` (`Editor/HumanoidClipBuilder.cs`, poses as muscle values, jump timing matches `PlayerActions`), `Build Avatars` (`Editor/AvatarBuilder.cs`: controller, overrides, all prefabs, NPC, `Data/AvatarDatabase.asset`). Rerun after changing a model, scale or eye position.
+- Licensing: Synty, Creatures_3D, Lil Pupinduy and Backrock folders are git-ignored (public repo). Prefabs/controllers in the repo only reference them, so a fresh clone cannot build without the packs.
 
 ---
 
@@ -119,14 +136,14 @@ No reflection cameras or render textures. Mirrors are faked with copied geometry
 - The mirror surface itself is an opening in the wall, optionally with a very subtle transparent tinted glass quad and a frame for readability.
 - Only first-order reflections are needed. Opposite mirrors (top/bottom walls) do not need infinite reflections: inside each copied room, the other mirror walls are rendered as plain darkened mirror surfaces.
 - Mirror worlds must not be visible from anywhere except through their mirror. Make sure the copy behind the left mirror does not overlap Room 2.
-- First person: the real player avatar's head (and hair) renderers are hidden from the main camera (separate layer excluded from culling mask, or ShadowsOnly). Mirror clones render the full avatar including head.
+- First person: the real player avatar's head is hidden from the main camera. Mirror clones render the full avatar including head. Synty models are one skinned mesh, so `FirstPersonHider` scales the head bone to zero in `LateUpdate` (after `MirrorAvatarSync` copied the real scale) and restores it in `Update` (before the Animator). Separate renderers can use layer `FirstPersonHidden` (6).
 - Turning and jumping must be clearly visible in the mirrors, that is the point of the tutorial.
 
 **Implementation (milestone 3):**
 - `MirrorWorld` (one per mirror, under `World/MirrorWorlds`) sits on the mirror plane (inner wall face) with local z into the wall and scale (1, 1, -1). At startup it instantiates a copy of `World/Room1` under itself, removes its own `MirrorWall` from the copy and switches the other mirrors in the copy to an opaque dark material (`MirrorWall.ShowAsDark`). Moving parts of Room 1 (door hinge) are synced every `LateUpdate`.
 - Everything that should appear in the mirrors must be a child of `Room1`. Room 1 objects must not be static-batched (instantiated copies of batched renderers keep drawing at the original position).
-- `MirrorWorld.SetAvatar` clones the player avatar, moves layer `FirstPersonHidden` parts to Default, disables Animators and adds `MirrorAvatarSync`, which reflects the root pose and copies all bone local transforms. In milestone 4 the avatar spawner calls `SetAvatar` after spawning.
-- First person: head renderers of the real avatar are on layer `FirstPersonHidden` (6), which the main camera does not render.
+- `MirrorWorld.SetAvatar` clones the player avatar, moves layer `FirstPersonHidden` parts to Default, disables Animators, removes `FirstPersonHider` and adds `MirrorAvatarSync`, which reflects the root pose and copies all bone local transforms. `AvatarSpawner` calls `SetAvatar` after spawning.
+- First person: see `FirstPersonHider` above (bones) and layer `FirstPersonHidden` (6, not rendered by the main camera) for separate meshes.
 - Mirror walls are thin (0.02 m) so the opening has no depth that would hide part of the reflection.
 - Lighting must look the same in the reflection: the directional light points straight down (unchanged by reflection at vertical planes). Baked lighting later must also be symmetric or be baked into the copies.
 - Through the reflected door, Room 2 is not shown (dark). Only visible if the player looks into a mirror while the door is open, which the flow does not allow.
@@ -157,6 +174,7 @@ No reflection cameras or render textures. Mirrors are faked with copied geometry
   "round2NpcKeeps": 50,
   "round4NpcKeeps": 75,
   "turnAngle": 90,
+  "species": ["humanC", "goblin", "robot", "cow"],
   "submitTimeoutSeconds": 5,
   "appsScriptUrl": "https://script.google.com/macros/s/XXXX/exec",
   "returnUrlTemplate": "https://XXXX.qualtrics.com/jfe/form/SV_XXXX?pid={pid}&g={g}&ag={ag}&s={s}&r1={r1}&r2={r2}&r3={r3}&r4={r4}&t1={t1}&t2={t2}&t3={t3}&t4={t4}&bal={bal}&dev={dev}&dur={dur}&test={test}&ver={ver}",
@@ -208,19 +226,22 @@ Assets/
     Tutorial/    TutorialController.cs, TutorialProgress.cs, PlayerActions.cs
     World/       Door.cs, WalkPath.cs
     Mirror/      MirrorWorld.cs, MirrorWall.cs, MirrorAvatarSync.cs
-    Avatar/      AvatarDatabase.cs (ScriptableObject), AvatarSpawner.cs
+    Avatar/      AvatarDatabase.cs (ScriptableObject), AvatarSpawner.cs, AvatarBody.cs, FirstPersonHider.cs
     Dialog/      UltimatumController.cs, SplitInputUI.cs, BalanceUI.cs
     Data/        SessionData.cs, IResultSubmitter.cs, ResultSubmitter.cs, ResultJson.cs, Redirector.cs
     UI/          UIManager.cs, ActionButtonsUI.cs, WorldButton.cs, OrientationOverlay.cs, DebugOverlay.cs
   Plugins/WebGL/ Redirect.jslib
-  Editor/        BuildScript.cs
+  Editor/        BuildScript.cs, HumanoidClipBuilder.cs, AvatarBuilder.cs
+  Animations/    Avatar.controller, Humanoid_Idle/Jump.anim, *.overrideController
+  Prefabs/       Avatars/Avatar_<id>[_m|_w].prefab, NPC.prefab
+  Data/          AvatarDatabase.asset
   StreamingAssets/config.json
   Scenes/        Main.unity
 ```
 
 One scene. Room 1, Room 2, mirror worlds and NPC all live in `Main.unity`.
 
-**Scene layout** (greybox, milestone 2): both rooms 6 x 6 m interior, 3 m high, walls 0.2 m. Room 1 centred at the origin, mirrors on -x (left), +z (top), -z (bottom), door (1.2 x 2.2 m) in the +x wall. Room 2 directly behind it, centre x = 6.2. Player rig (`PlayerRig`, with `PlayerActions`, camera at 1.6 m and the avatar as children) starts at the origin facing +z. `WalkToDoor` stops at (2.2, 0, 0) facing the door, then the door opens; `WalkToNpc`: doorway (3.1, 0, 0), then (6.0, 0, 0) facing +x; NPC at (7.4, 0, 0) facing -x. Mirrors are body-sized (1.5 x 2.4 m, bottom edge 0.15 m above the floor) centred on each mirror wall (`World/Room1/MirrorWall*`), with a dark frame and a subtle glass tint. The door hinge is part of Room 1. Placeholder avatar: capsule body, sphere head with a "nose" cube showing the facing direction.
+**Scene layout** (greybox, milestone 2): both rooms 6 x 6 m interior, 3 m high, walls 0.2 m. Room 1 centred at the origin, mirrors on -x (left), +z (top), -z (bottom), door (1.2 x 2.2 m) in the +x wall. Room 2 directly behind it, centre x = 6.2. Player rig (`PlayerRig`, with `PlayerActions`, camera at 1.6 m and the avatar as children) starts at the origin facing +z. `WalkToDoor` stops at (2.2, 0, 0) facing the door, then the door opens; `WalkToNpc`: doorway (3.1, 0, 0), then (6.0, 0, 0) facing +x; NPC at (7.4, 0, 0) facing -x. Mirrors are body-sized (1.5 x 2.4 m, bottom edge 0.15 m above the floor) centred on each mirror wall (`World/Room1/MirrorWall*`), with a dark frame and a subtle glass tint. The door hinge is part of Room 1. The avatar is spawned into `PlayerRig` at startup (`Game/AvatarSpawner`), which also moves the camera to the avatar's eye height. The NPC prefab sits under `NPC`. Jump: 0.15 s windup, 0.6 s in the air, 0.2 s landing (`PlayerActions`); the avatar's jump clip is stretched to that duration.
 
 **GameFlow states:** `Init -> Tutorial -> GoToDoor -> WalkToNPC -> Dialog -> Submit -> Redirect`
 
@@ -310,12 +331,12 @@ Note: "Evenly Present" counts assignments, not completions. Dropouts can unbalan
 
 ## 13. Milestones
 
-Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> Survey B verified 2026-10-29. Milestone 2 done (2026-10-29). Milestone 3 done (2026-10-29). Next: milestone 4.
+Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> Survey B verified 2026-10-29. Milestone 2 done (2026-10-29). Milestone 3 done (2026-10-29). Milestone 4 built 2026-10-30 (all 8 candidates and the NPC checked in the mirrors in play mode), waiting for review in Unity and the thesis author's final 4 species. Next: milestone 5.
 
 1. **Foundation** (done): BuildScript, config loading, URL params, GameFlow with placeholder UI, ultimatum logic, SessionData, submit + redirect. Primitives only. Goal: full run Qualtrics -> Game -> Sheet -> Qualtrics works end to end.
 2. **Rooms and movement** (done): Room 1 and 2 greybox, door, turn/jump buttons, tutorial steps from config, walk to NPC.
 3. **Mirrors** (done): mirror worlds, avatar clones, first-person head hiding.
-4. **Avatars and NPC**: asset store characters, AvatarDatabase, 8 avatars, neutral NPC.
+4. **Avatars and NPC** (built): asset store characters, AvatarDatabase, 8 candidate species, neutral NPC.
 5. **Polish**: final texts from thesis author, UI styling, orientation overlay, mobile testing, performance pass.
 6. **Pilot**: test with a few people, check timing (~5 min) and data in Sheet and Qualtrics.
 
@@ -344,10 +365,10 @@ Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> S
 
 ## 15. Open Points
 
-- Species 2-4 not decided yet.
+- Final 4 species not decided yet (8 candidates built, mapping in `config.json`).
 - Final texts (intro, tutorial, NPC dialog) will be written by the thesis author.
 - Data storage rules of the university unknown. Google Sheet is the working assumption.
-- Asset store characters to be chosen.
+- Texture sizes of the character packs not yet limited to 1024 (performance pass, milestone 5).
 - Test setup runs on the developer's Google account (Sheet + Apps Script) and free Qualtrics account (Survey A "Mirror Game – Teil A": https://qualtricsxmbxwbdbh7v.qualtrics.com/jfe/form/SV_5iPvenZKKZp0isC, Survey B "Mirror Game – Teil B"). Before the pilot, move everything (Sheet, Apps Script, Qualtrics surveys, e.g. via .qsf export/import) to the thesis author's account and update `appsScriptUrl` and `returnUrlTemplate` in config.json.
 - Thesis author should check whether the university has a Qualtrics license with URL redirect (otherwise keep the link workaround from section 11).
 - Before the pilot, delete all test rows/responses in the Sheet, Survey A and Survey B.

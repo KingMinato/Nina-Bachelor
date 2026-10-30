@@ -16,6 +16,8 @@ public class AvatarDatabase : ScriptableObject
 
     [SerializeField] Species[] species;
 
+    public string[] Ids => Array.ConvertAll(species, s => s.id);
+
     // Unknown ids fall back to the first species, so a typo in the config never breaks the game.
     public AvatarBody Get(string id, string gender)
     {

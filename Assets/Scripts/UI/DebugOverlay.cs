@@ -6,22 +6,35 @@ using UnityEngine;
 public class DebugOverlay : MonoBehaviour
 {
     [SerializeField] TMP_Text label;
+    [Tooltip("Debug tools (e.g. the avatar switcher), activated together with the overlay.")]
+    [SerializeField] GameObject tools;
 
     string paramsLine = "";
+    string avatarLine = "";
+    GameState state;
 
     public void Show(UrlParams p)
     {
         paramsLine = $"pid={p.Pid}  g='{p.RawGender}'  ag={p.AvatarGender}  s={p.Species}  test={p.IsTest}";
         gameObject.SetActive(true);
+        if (tools != null)
+            tools.SetActive(true);
     }
 
-    public void ShowAvatar(string speciesId)
+    public void ShowAvatar(string speciesId, string gender)
     {
-        paramsLine += $"  avatar={speciesId}";
+        avatarLine = $"  avatar={speciesId} {gender}";
+        Refresh();
     }
 
     public void SetState(GameState state)
     {
-        label.text = $"{state}\n{paramsLine}";
+        this.state = state;
+        Refresh();
+    }
+
+    void Refresh()
+    {
+        label.text = $"{state}\n{paramsLine}{avatarLine}";
     }
 }

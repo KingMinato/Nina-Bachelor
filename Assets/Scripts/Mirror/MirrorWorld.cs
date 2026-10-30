@@ -18,6 +18,7 @@ public class MirrorWorld : MonoBehaviour
     [SerializeField] Transform avatar;
 
     readonly List<(Transform source, Transform copy)> synced = new List<(Transform, Transform)>();
+    GameObject avatarClone;
 
     void Start()
     {
@@ -33,9 +34,13 @@ public class MirrorWorld : MonoBehaviour
             SetAvatar(avatar);
     }
 
+    // Replaces the previous clone, so the avatar can be switched at runtime (debug UI).
     public void SetAvatar(Transform source)
     {
+        if (avatarClone != null)
+            Destroy(avatarClone);
         var clone = Instantiate(source.gameObject, transform);
+        avatarClone = clone;
         clone.name = source.name + " (Mirror)";
         int hidden = LayerMask.NameToLayer(FirstPersonHiddenLayer);
         foreach (var t in clone.GetComponentsInChildren<Transform>(true))

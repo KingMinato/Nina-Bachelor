@@ -43,7 +43,7 @@ public class GameFlow : MonoBehaviour
         string avatarId = urlParams.AvatarOverride != "" ? urlParams.AvatarOverride : config.SpeciesId(urlParams.Species);
         avatarSpawner.Spawn(avatarId, urlParams.AvatarGender);
         if (urlParams.Debug)
-            debugOverlay.ShowAvatar(avatarId);
+            debugOverlay.ShowAvatar(avatarId, urlParams.AvatarGender);
 
         if (!urlParams.Debug)
         {

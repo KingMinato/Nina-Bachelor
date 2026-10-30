@@ -595,7 +595,6 @@ public static class UiStyleBuilder
         }
         var switcher = GetOrAdd<DebugUiSwitcher>(uiSwitcher.gameObject);
         var toggle = uiSwitcher.Find("Toggle");
-        ((RectTransform)toggle).anchoredPosition = new Vector2(20, -350);
         toggle.GetComponentInChildren<TMP_Text>().text = "UI";
         Set(switcher, "styles", uiStyles);
         Set(switcher, "overlay", Object.FindFirstObjectByType<DebugOverlay>(FindObjectsInactive.Include));
@@ -604,6 +603,8 @@ public static class UiStyleBuilder
         Set(switcher, "grid", uiSwitcher.Find("Panel"));
         Set(switcher, "template", uiSwitcher.Find("ButtonTemplate").GetComponent<Button>());
         uiSwitcher.gameObject.SetActive(false);
+
+        LayoutDebug(ui);
 
         var flow = Object.FindFirstObjectByType<GameFlow>(FindObjectsInactive.Include);
         Set(flow, "uiSwitcher", switcher);
@@ -760,5 +761,48 @@ public static class UiStyleBuilder
         for (int i = 0; i < values.Length; i++)
             prop.GetArrayElementAtIndex(i).objectReferenceValue = values[i];
         so.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    // Debug tools small in the bottom-left corner: toggles stacked (UI, Raum, Avatar from the bottom),
+    // overlay text above them, the opened grid right next to the toggles.
+    static void LayoutDebug(Transform ui)
+    {
+        string[] switchers = { "DebugUiSwitcher", "DebugRoomSwitcher", "DebugAvatarSwitcher" };
+        for (int i = 0; i < switchers.Length; i++)
+        {
+            var root = ui.Find(switchers[i]);
+            var toggle = (RectTransform)root.Find("Toggle");
+            toggle.anchorMin = toggle.anchorMax = toggle.pivot = Vector2.zero;
+            toggle.anchoredPosition = new Vector2(16, 16 + i * 52);
+            toggle.sizeDelta = new Vector2(120, 44);
+            SmallText(toggle, 22);
+
+            var panel = (RectTransform)root.Find("Panel");
+            panel.anchorMin = panel.anchorMax = panel.pivot = Vector2.zero;
+            panel.anchoredPosition = new Vector2(148, 16);
+            var grid = panel.GetComponent<GridLayoutGroup>();
+            grid.cellSize = new Vector2(170, 48);
+            grid.spacing = new Vector2(8, 8);
+            grid.padding = new RectOffset(10, 10, 10, 10);
+            var fitter = GetOrAdd<ContentSizeFitter>(panel.gameObject);
+            fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            SmallText(root.Find("ButtonTemplate"), 20);
+        }
+
+        var overlay = (RectTransform)ui.Find("DebugOverlay");
+        overlay.anchorMin = overlay.anchorMax = overlay.pivot = Vector2.zero;
+        overlay.anchoredPosition = new Vector2(16, 172);
+        overlay.sizeDelta = new Vector2(1000, 60);
+        var label = SmallText(overlay, 18);
+        label.alignment = TextAlignmentOptions.BottomLeft;
+    }
+
+    static TMP_Text SmallText(Transform t, float size)
+    {
+        var text = t.GetComponentInChildren<TMP_Text>(true);
+        text.enableAutoSizing = false;
+        text.fontSize = size;
+        return text;
     }
 }

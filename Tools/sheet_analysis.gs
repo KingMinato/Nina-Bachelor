@@ -10,7 +10,8 @@
  * Only real runs (test = 0) are used, and only the first run per pid.
  *
  * Everything is computed here, no sheet formulas (formulas break in sheets with a German locale).
- * Setup: Erweiterungen > Apps Script > "+" > Skript > paste this file > save > select updateAnalysis > Ausführen.
+ * Setup: Erweiterungen > Apps Script > "+" > Skript > paste this file > save > select updateAnalysis (not onOpen)
+ * in the toolbar > Ausführen.
  * Afterwards the menu "Mirror Game > Auswertung aktualisieren" appears, and the analysis refreshes on every open.
  */
 
@@ -33,15 +34,6 @@ const COLOR_SUB = "#f1f3f8";
 const COLOR_BORDER = "#c3cad8";
 const COLOR_GOOD = [183, 225, 205], COLOR_MID = [252, 232, 178], COLOR_BAD = [244, 199, 195];
 
-function onOpen() {
-  SpreadsheetApp.getUi().createMenu("Mirror Game").addItem("Auswertung aktualisieren", "updateAnalysis").addToUi();
-  try {
-    updateAnalysis();
-  } catch (e) {
-    console.warn(e);
-  }
-}
-
 function updateAnalysis() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const raw = rawSheet(ss);
@@ -51,6 +43,20 @@ function updateAnalysis() {
   writeAnalysis(sheetNamed(ss, STATS_NAME), raw.getName(), data, comma);
   writeClean(sheetNamed(ss, CLEAN_NAME), data.runs);
   ss.toast("Auswertung aktualisiert (" + data.runs.length + " Durchgänge).");
+}
+
+// Runs when the spreadsheet is opened: adds the menu and refreshes the analysis. Not meant to be run from the editor.
+function onOpen() {
+  try {
+    SpreadsheetApp.getUi().createMenu("Mirror Game").addItem("Auswertung aktualisieren", "updateAnalysis").addToUi();
+  } catch (e) {
+    console.warn(e);
+  }
+  try {
+    updateAnalysis();
+  } catch (e) {
+    console.warn(e);
+  }
 }
 
 // ------------------------------------------------------------ data
@@ -401,8 +407,8 @@ function writer(width, columnWidths) {
       const o = c !== null && typeof c === "object" ? c : { v: c };
       values.push(o.v);
       fmt.push(o.f || "@");
-      bg.push(o.bg || null);
-      fc.push(o.fc || null);
+      bg.push(o.bg || "#ffffff");
+      fc.push(o.fc || "#000000");
       fw.push(o.b ? "bold" : "normal");
     }
     rows.push(values);

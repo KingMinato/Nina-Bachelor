@@ -56,7 +56,7 @@ public static class AvatarBuilder
             removeComponents = new[] { "CharacterController", "SlimeScript" }, overrideController = "Slime" },
         new Spec { id = "mushroom", male = Mushroom + "Prefabs/Mushroom_1.prefab", eyes = new Vector3(0f, 0.9f, 0.19f),
             hidden = new string[0], hiddenRenderers = new[] { "Hat", "Eyebrow" }, overrideController = "Mushroom" },
-        new Spec { id = "cow", male = Cow + "Prefabs/Cow_Charolais.prefab", eyes = new Vector3(0f, 1.17f, 1.18f),
+        new Spec { id = "cow", male = Cow + "Prefabs/Cow_Holstein.prefab", eyes = new Vector3(0f, 1.17f, 1.18f),
             hidden = new[] { "Head" }, overrideController = "Cow" },
     };
 

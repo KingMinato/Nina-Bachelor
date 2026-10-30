@@ -112,7 +112,7 @@ Target total duration: about 5 minutes.
   | `skeleton` | Synty `SM_Gen_Chr_Skeleton_01` | one |
   | `slime` | Creatures_3D slime, scaled 1.4 | one |
   | `mushroom` | Lil Pupinduy `Mushroom_1` | one |
-  | `cow` | Backrock Low Poly Animals `Cow_Charolais` | one |
+  | `cow` | Backrock Low Poly Animals `Cow_Holstein` | one |
 
   Default mapping: 1 `humanC`, 2 `goblin`, 3 `robot`, 4 `cow`.
 - Size (decided 2026-10-30): humanoids keep their size, creatures are roughly human-sized, the camera sits at each avatar's own eyes (humans 1.67 m, cow 1.17 m, mushroom 0.9 m, slime 0.66 m).

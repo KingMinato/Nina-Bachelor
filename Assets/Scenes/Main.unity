@@ -6920,7 +6920,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad868656ca8f1ba469def790fb61e12f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game::PlayerActions
-  turnSeconds: 0.4
+  turnSeconds: 0.8
   jumpWindupSeconds: 0.15
   jumpSeconds: 0.6
   jumpLandSeconds: 0.2

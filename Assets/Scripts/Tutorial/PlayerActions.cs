@@ -5,7 +5,7 @@ using UnityEngine;
 // Sits on the rig root, so camera and avatar move together.
 public class PlayerActions : MonoBehaviour
 {
-    [SerializeField] float turnSeconds = 0.4f;
+    [SerializeField] float turnSeconds = 0.8f;
     [Tooltip("Crouch before take-off, the rig stays on the ground.")]
     [SerializeField] float jumpWindupSeconds = 0.15f;
     [SerializeField] float jumpSeconds = 0.6f;

@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5aec33af6897ba42833c466b5902a51, type: 3}
+  m_Name: AvatarDatabase
+  m_EditorClassIdentifier: Game::AvatarDatabase
+  species:
+  - id: humanC
+    male: {fileID: 1201350426484125363, guid: b0184f35b6a63504f941daccdd2e754d, type: 3}
+    female: {fileID: 4173341124824203697, guid: fcebde1e6f9d1634aa41ab3eb298e384, type: 3}
+  - id: humanI
+    male: {fileID: 9065006868087415737, guid: 4c750b7a23fbcbf429ab7125e9a69ba1, type: 3}
+    female: {fileID: 6015991372445997639, guid: b5ed4f425f611b14fa55fadd93f01aee, type: 3}
+  - id: goblin
+    male: {fileID: 1194770747260449104, guid: 726c5ead938a2ad4f8d28c1e0b92969c, type: 3}
+    female: {fileID: 7489656355162957306, guid: 58bf4a6e613e51e45a742c3844377103, type: 3}
+  - id: robot
+    male: {fileID: 4991788963454853709, guid: 36f7213a588e82b47b1be8da57febe9d, type: 3}
+    female: {fileID: 4991788963454853709, guid: 36f7213a588e82b47b1be8da57febe9d, type: 3}
+  - id: skeleton
+    male: {fileID: 3516453572123694439, guid: 5f2555cb52936ed4d824186a29772f83, type: 3}
+    female: {fileID: 3516453572123694439, guid: 5f2555cb52936ed4d824186a29772f83, type: 3}
+  - id: slime
+    male: {fileID: 150714868248998369, guid: c1fa5c7fbec047840b7206c4b902fc63, type: 3}
+    female: {fileID: 150714868248998369, guid: c1fa5c7fbec047840b7206c4b902fc63, type: 3}
+  - id: mushroom
+    male: {fileID: 154260948868704171, guid: e92726068b71cf24b98194d8528504ea, type: 3}
+    female: {fileID: 154260948868704171, guid: e92726068b71cf24b98194d8528504ea, type: 3}
+  - id: cow
+    male: {fileID: 6084984957756528620, guid: 6d85eb0afa0d4b7448a5366476adeb1a, type: 3}
+    female: {fileID: 6084984957756528620, guid: 6d85eb0afa0d4b7448a5366476adeb1a, type: 3}

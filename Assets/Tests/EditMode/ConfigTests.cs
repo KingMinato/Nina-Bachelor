@@ -47,4 +47,15 @@ public class ConfigTests
         }
         StringAssert.Contains("{pid}", c.returnUrlTemplate);
     }
+
+    [Test]
+    public void SpeciesId_MapsSpeciesValue_AndHandlesOutOfRange()
+    {
+        var c = Config.FromJson("{ \"species\": [\"a\", \"b\", \"c\", \"d\"] }");
+        Assert.AreEqual("a", c.SpeciesId(1));
+        Assert.AreEqual("d", c.SpeciesId(4));
+        Assert.AreEqual("", c.SpeciesId(0));
+        Assert.AreEqual("", c.SpeciesId(5));
+        Assert.AreEqual("humanC", new Config().SpeciesId(1));
+    }
 }

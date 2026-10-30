@@ -1,0 +1,164 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &486415848974494650
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1403157576059558024}
+  m_Layer: 0
+  m_Name: Eyes
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1403157576059558024
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 486415848974494650}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.17, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5303046029194830809}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7574518269126550594
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5303046029194830809}
+  - component: {fileID: 6084984957756528620}
+  m_Layer: 0
+  m_Name: Avatar_cow
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5303046029194830809
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7574518269126550594}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1577446017852700613}
+  - {fileID: 1403157576059558024}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6084984957756528620
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7574518269126550594}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a02c1d72ec858204e92f55b8e4417343, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game::AvatarBody
+  animator: {fileID: 4829013421683584447}
+  eyes: {fileID: 1403157576059558024}
+  firstPersonHidden:
+  - {fileID: 1243838289101912208}
+  jumpClipSeconds: 0.6
+--- !u!1001 &1328156955537806650
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 5303046029194830809}
+    m_Modifications:
+    - target: {fileID: 543450653699957503, guid: ef9daea4ca7727d4b9279f0ec671819e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 543450653699957503, guid: ef9daea4ca7727d4b9279f0ec671819e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 543450653699957503, guid: ef9daea4ca7727d4b9279f0ec671819e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.18
+      objectReference: {fileID: 0}
+    - target: {fileID: 543450653699957503, guid: ef9daea4ca7727d4b9279f0ec671819e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 543450653699957503, guid: ef9daea4ca7727d4b9279f0ec671819e, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 543450653699957503, guid: ef9daea4ca7727d4b9279f0ec671819e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 543450653699957503, guid: ef9daea4ca7727d4b9279f0ec671819e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 543450653699957503, guid: ef9daea4ca7727d4b9279f0ec671819e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 543450653699957503, guid: ef9daea4ca7727d4b9279f0ec671819e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 543450653699957503, guid: ef9daea4ca7727d4b9279f0ec671819e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155444805, guid: ef9daea4ca7727d4b9279f0ec671819e, type: 3}
+      propertyPath: m_Name
+      value: Cow_Charolais
+      objectReference: {fileID: 0}
+    - target: {fileID: 5866666021909215365, guid: ef9daea4ca7727d4b9279f0ec671819e, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 22100000, guid: 981cdcffd212ef54bb91694f6b46ec20, type: 2}
+    - target: {fileID: 5866666021909215365, guid: ef9daea4ca7727d4b9279f0ec671819e, type: 3}
+      propertyPath: m_CullingMode
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: ef9daea4ca7727d4b9279f0ec671819e, type: 3}
+--- !u!4 &1243838289101912208 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 228997363991670186, guid: ef9daea4ca7727d4b9279f0ec671819e, type: 3}
+  m_PrefabInstance: {fileID: 1328156955537806650}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1577446017852700613 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 543450653699957503, guid: ef9daea4ca7727d4b9279f0ec671819e, type: 3}
+  m_PrefabInstance: {fileID: 1328156955537806650}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &4829013421683584447 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909215365, guid: ef9daea4ca7727d4b9279f0ec671819e, type: 3}
+  m_PrefabInstance: {fileID: 1328156955537806650}
+  m_PrefabAsset: {fileID: 0}

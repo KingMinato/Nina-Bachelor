@@ -13,6 +13,7 @@ public class GameFlow : MonoBehaviour
     [SerializeField] WorldButton doorButton;
     [SerializeField] WalkPath walkToDoor;
     [SerializeField] WalkPath walkToNpc;
+    [SerializeField] AvatarSpawner avatarSpawner;
 
     [Tooltip("Used in the Editor instead of the browser URL, e.g. ?pid=R_test&g=w&s=2&debug=1")]
     [SerializeField] string editorQuery = "";
@@ -38,6 +39,11 @@ public class GameFlow : MonoBehaviour
         session = new SessionData(urlParams, config.version, Application.isMobilePlatform, Time.realtimeSinceStartupAsDouble);
         submitter = new ResultSubmitter(config.appsScriptUrl);
         playerActions.TurnAngle = config.turnAngle;
+
+        string avatarId = urlParams.AvatarOverride != "" ? urlParams.AvatarOverride : config.SpeciesId(urlParams.Species);
+        avatarSpawner.Spawn(avatarId, urlParams.AvatarGender);
+        if (urlParams.Debug)
+            debugOverlay.ShowAvatar(avatarId);
 
         if (!urlParams.Debug)
         {

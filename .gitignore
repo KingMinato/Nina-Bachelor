@@ -110,3 +110,11 @@ InitTestScene*.unity*
 # Synty POLYGON assets: licensed, must not be redistributed in this public repo
 /[Aa]ssets/Synty/
 /[Aa]ssets/Synty.meta
+
+# Asset Store character packs: licensed, must not be redistributed in this public repo
+/[Aa]ssets/Creatures_3D/
+/[Aa]ssets/Creatures_3D.meta
+/[Aa]ssets/Lil Pupinduy/
+/[Aa]ssets/Lil Pupinduy.meta
+/[Aa]ssets/Backrock/
+/[Aa]ssets/Backrock.meta

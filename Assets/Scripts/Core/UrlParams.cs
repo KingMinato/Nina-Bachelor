@@ -12,6 +12,7 @@ public class UrlParams
     public int Species;          // 1..SpeciesCount
     public bool Debug;
     public bool IsTest;          // no pid provided or debug mode
+    public string AvatarOverride; // avatar species id from "a", test runs only, "" otherwise
 
     public static UrlParams Parse(string url, Random rng)
     {
@@ -20,6 +21,7 @@ public class UrlParams
         query.TryGetValue("g", out string g);
         query.TryGetValue("s", out string s);
         query.TryGetValue("debug", out string debug);
+        query.TryGetValue("a", out string avatar);
 
         var p = new UrlParams
         {
@@ -32,6 +34,8 @@ public class UrlParams
         bool hasPid = !string.IsNullOrWhiteSpace(pid);
         p.Pid = hasPid ? pid.Trim() : $"test-{DateTime.UtcNow:yyyyMMddHHmmss}";
         p.IsTest = !hasPid || p.Debug;
+        // Lets testers look at any avatar, also those not mapped to a species. Never in real runs.
+        p.AvatarOverride = p.IsTest ? avatar?.Trim() ?? "" : "";
         return p;
     }
 

@@ -6,11 +6,19 @@ using UnityEngine;
 public class PlayerActions : MonoBehaviour
 {
     [SerializeField] float turnSeconds = 0.4f;
+    [Tooltip("Crouch before take-off, the rig stays on the ground.")]
+    [SerializeField] float jumpWindupSeconds = 0.15f;
     [SerializeField] float jumpSeconds = 0.6f;
+    [Tooltip("Landing, the rig stays on the ground while the avatar absorbs the impact.")]
+    [SerializeField] float jumpLandSeconds = 0.2f;
     [SerializeField] float jumpHeight = 0.5f;
 
-    // Fired when an action has finished, with one of the TutorialStep action names.
+    // Fired when an action starts and when it has finished, with one of the TutorialStep action names.
+    public event Action<string> Started;
     public event Action<string> Performed;
+
+    // Whole jump including windup and landing, so the avatar's jump animation can match it.
+    public float JumpTotalSeconds => jumpWindupSeconds + jumpSeconds + jumpLandSeconds;
 
     public bool IsBusy { get; private set; }
     public float TurnAngle { get; set; } = 90f;
@@ -25,6 +33,7 @@ public class PlayerActions : MonoBehaviour
             return;
 
         IsBusy = true;
+        Started?.Invoke(action);
         if (action == TutorialStep.Jump)
             await DoJump();
         else
@@ -48,6 +57,7 @@ public class PlayerActions : MonoBehaviour
     async Awaitable DoJump()
     {
         Vector3 ground = transform.position;
+        await Awaitable.WaitForSecondsAsync(jumpWindupSeconds);
         for (float t = 0f; t < jumpSeconds; t += Time.deltaTime)
         {
             float x = t / jumpSeconds;
@@ -55,5 +65,6 @@ public class PlayerActions : MonoBehaviour
             await Awaitable.NextFrameAsync();
         }
         transform.position = ground;
+        await Awaitable.WaitForSecondsAsync(jumpLandSeconds);
     }
 }

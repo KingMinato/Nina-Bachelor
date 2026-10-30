@@ -15,6 +15,11 @@ public class DebugOverlay : MonoBehaviour
         gameObject.SetActive(true);
     }
 
+    public void ShowAvatar(string speciesId)
+    {
+        paramsLine += $"  avatar={speciesId}";
+    }
+
     public void SetState(GameState state)
     {
         label.text = $"{state}\n{paramsLine}";

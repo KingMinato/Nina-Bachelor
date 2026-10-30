@@ -44,6 +44,8 @@ public class MirrorWorld : MonoBehaviour
         // Bones are copied from the player avatar, so the clone must not animate itself.
         foreach (var animator in clone.GetComponentsInChildren<Animator>(true))
             animator.enabled = false;
+        foreach (var hider in clone.GetComponentsInChildren<FirstPersonHider>(true))
+            DestroyImmediate(hider);
         clone.AddComponent<MirrorAvatarSync>().Init(source, this);
     }
 

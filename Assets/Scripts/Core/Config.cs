@@ -13,6 +13,8 @@ public class Config
     public int round2NpcKeeps = 50;
     public int round4NpcKeeps = 75;
     public float turnAngle = 90f;
+    // Avatar species id (from the AvatarDatabase) for each Qualtrics species value s = 1..4.
+    public string[] species = { "humanC", "goblin", "robot", "cow" };
     public float submitTimeoutSeconds = 5f;
     public string appsScriptUrl = "";
     public string returnUrlTemplate = "";
@@ -24,6 +26,8 @@ public class Config
         new TutorialStep("Dreh dich einmal komplett um.", TutorialStep.TurnAround, 1),
     };
     public Texts texts = new Texts();
+
+    public string SpeciesId(int s) => species != null && s >= 1 && s <= species.Length ? species[s - 1] : "";
 
     public static Config FromJson(string json)
     {

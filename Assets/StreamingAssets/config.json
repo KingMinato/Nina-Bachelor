@@ -6,6 +6,7 @@
   "round2NpcKeeps": 50,
   "round4NpcKeeps": 75,
   "turnAngle": 90,
+  "species": ["humanC", "goblin", "robot", "cow"],
   "submitTimeoutSeconds": 5,
   "appsScriptUrl": "https://script.google.com/macros/s/AKfycbxSzp_JSOD9seyMz0s4_OTsAFD7WxqrvOFcRndbEbzNJ9SjKMJgF96rdgxavEkB4VI/exec",
   "returnUrlTemplate": "https://qualtricsxmbxwbdbh7v.qualtrics.com/jfe/form/SV_afuLYLkSWdZEeoK?pid={pid}&g={g}&ag={ag}&s={s}&r1={r1}&r2={r2}&r3={r3}&r4={r4}&t1={t1}&t2={t2}&t3={t3}&t4={t4}&bal={bal}&dev={dev}&dur={dur}&test={test}&ver={ver}",

@@ -102,4 +102,13 @@ public class UrlParamsTests
         StringAssert.StartsWith("test-", p.Pid);
         Assert.That(p.Species, Is.InRange(1, UrlParams.SpeciesCount));
     }
+
+    [Test]
+    public void AvatarOverride_OnlyInTestRuns()
+    {
+        Assert.AreEqual("slime", Parse("?a=slime").AvatarOverride);
+        Assert.AreEqual("cow", Parse("?pid=R_1&debug=1&a=cow").AvatarOverride);
+        Assert.AreEqual("", Parse("?pid=R_1&a=cow").AvatarOverride);
+        Assert.AreEqual("", Parse("?debug=1").AvatarOverride);
+    }
 }

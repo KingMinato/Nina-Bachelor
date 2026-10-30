@@ -1,8 +1,10 @@
 /**
  * Mirror Game: analysis of the game results for the thesis, inside the results spreadsheet.
  *
- * Creates two sheets next to the raw data (sheet 1, written by doPost):
- *   "Auswertung"         sample, descriptive statistics per group, group comparisons (tests + effect sizes), legend
+ * Creates three sheets next to the raw data (sheet 1, written by doPost):
+ *   "Auswertung"         at a glance: colour-coded summary per species and avatar gender, then every participant
+ *                        with avatar, gender and all four decisions in plain words
+ *   "Statistik"          sample, descriptive statistics per group, group comparisons (tests + effect sizes), legend
  *   "Daten (bereinigt)"  one row per participant with readable column names and derived variables,
  *                        ready to download as CSV for SPSS / jamovi / R and to merge with Survey B via pid
  * Only real runs (test = 0) are used, and only the first run per pid.
@@ -14,18 +16,22 @@
 
 // Game parameters, keep in sync with config.json.
 const SPECIES = ["humanC", "goblin", "robot", "cow"]; // "species": s = 1-4
+const SPECIES_NAMES = { humanC: "Mensch (C)", humanI: "Mensch (I)", goblin: "Goblin", robot: "Roboter", skeleton: "Skelett",
+  slime: "Schleim", mushroom: "Pilz", cow: "Kuh" };
 const MONEY = 100;          // moneyPerRound
 const NPC_ACCEPT_MAX = 90;  // npcAcceptMaxPlayerKeeps: the NPC accepts if the player keeps at most this
 const R2_OFFER = 50;        // MONEY - round2NpcKeeps
 const R4_OFFER = 25;        // MONEY - round4NpcKeeps
 
-const ANALYSIS_NAME = "Auswertung";
+const OVERVIEW_NAME = "Auswertung";
+const STATS_NAME = "Statistik";
 const CLEAN_NAME = "Daten (bereinigt)";
 const WIDTH = 9; // columns A-I of the analysis sheet
 const COLOR_SECTION = "#2f3e5c";
 const COLOR_HEADER = "#dde3ee";
 const COLOR_SUB = "#f1f3f8";
 const COLOR_BORDER = "#c3cad8";
+const COLOR_GOOD = [183, 225, 205], COLOR_MID = [252, 232, 178], COLOR_BAD = [244, 199, 195];
 
 function onOpen() {
   SpreadsheetApp.getUi().createMenu("Mirror Game").addItem("Auswertung aktualisieren", "updateAnalysis").addToUi();
@@ -41,8 +47,9 @@ function updateAnalysis() {
   const raw = rawSheet(ss);
   const data = readRuns(raw);
   const comma = String(ss.getSpreadsheetLocale()).startsWith("de");
+  writeOverview(sheetNamed(ss, OVERVIEW_NAME, "Übersicht"), raw.getName(), data);
+  writeAnalysis(sheetNamed(ss, STATS_NAME), raw.getName(), data, comma);
   writeClean(sheetNamed(ss, CLEAN_NAME), data.runs);
-  writeAnalysis(sheetNamed(ss, ANALYSIS_NAME, "Übersicht"), raw.getName(), data, comma);
   ss.toast("Auswertung aktualisiert (" + data.runs.length + " Durchgänge).");
 }
 
@@ -121,15 +128,103 @@ function writeClean(sh, runs) {
   for (let c = 2; c <= header.length; c++) sh.setColumnWidth(c, 105);
 }
 
-// ------------------------------------------------------------ analysis sheet
+// ------------------------------------------------------------ overview sheet
+
+const speciesName = s => SPECIES_NAMES[SPECIES[s - 1]] || SPECIES[s - 1] || "?";
+const genderName = g => (g === "m" ? "männlich" : g === "w" ? "weiblich" : "andere / keine Angabe");
+
+// Red (0) over yellow to green (1).
+function heat(t) {
+  t = Math.max(0, Math.min(1, t));
+  const [a, b, k] = t < 0.5 ? [COLOR_BAD, COLOR_MID, t * 2] : [COLOR_MID, COLOR_GOOD, t * 2 - 1];
+  return "#" + a.map((x, i) => Math.round(x + (b[i] - x) * k).toString(16).padStart(2, "0")).join("");
+}
+const offerColor = offer => heat(Math.min(offer, 50) / 50); // 50:50 and more = green, nothing = red
+
+function writeOverview(sh, rawName, data) {
+  const runs = data.runs;
+  const w = writer(10, [190, 120, 150, 150, 150, 150, 150, 110, 100, 110]);
+  w.title("Mirror Game – Auswertung");
+  w.note(runs.length + " Personen (nur echte Durchgänge aus „" + rawName + "“; " + data.tests + " Testläufe und " +
+    data.duplicates + " doppelte Durchgänge ausgeblendet). Stand: " +
+    Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd.MM.yyyy HH:mm") +
+    ". Grün = fair bzw. angenommen, rot = unfair bzw. abgelehnt. Signifikanztests im Blatt „" + STATS_NAME + "“.");
+  w.blank();
+  if (!runs.length) {
+    w.note("Noch keine echten Durchgänge vorhanden.");
+    w.flush(sh);
+    return;
+  }
+
+  // summary per species and avatar gender
+  w.section("Auf einen Blick: Spezies × Avatar-Geschlecht");
+  w.note("Runde 1 und 3: Die Person teilt 100 CHF auf; angegeben ist, wie viel sie dem Gegenüber im Schnitt abgibt (fair = 50 CHF). " +
+    "Runde 2: Das Gegenüber bietet fair " + R2_OFFER + " CHF an. Runde 4: Das Gegenüber bietet unfair " + R4_OFFER +
+    " CHF an. Angegeben ist jeweils, wie viele Personen annehmen.");
+  w.gridHeader(["Spezies", "Avatar", "Personen", "Runde 1: Ø abgegeben", "Runde 3: Ø abgegeben",
+    "Runde 2: 50:50 angenommen", "Runde 4: 25 CHF angenommen", "Ø Kontostand"]);
+  const summary = (label, gender, group, bold) => {
+    if (!group.length) {
+      w.grid([{ v: label, b: bold }, { v: gender, b: bold }, { v: 0, f: "0", b: bold }, "–", "–", "–", "–", "–"]);
+      return;
+    }
+    const mean = f => Stats.mean(group.map(f));
+    const rate = f => group.filter(f).length / group.length;
+    const o1 = mean(r => r.offer1), o3 = mean(r => r.offer3), a2 = rate(r => r.acc2 === 1), a4 = rate(r => r.acc4 === 1);
+    w.grid([{ v: label, b: bold }, { v: gender, b: bold }, { v: group.length, f: "0", b: bold },
+      { v: o1, f: '0.0 "CHF"', bg: offerColor(o1), b: bold }, { v: o3, f: '0.0 "CHF"', bg: offerColor(o3), b: bold },
+      { v: a2, f: "0%", bg: heat(a2), b: bold }, { v: a4, f: "0%", bg: heat(a4), b: bold },
+      { v: mean(r => r.bal), f: '0 "CHF"', b: bold }]);
+  };
+  SPECIES.forEach((id, i) => {
+    const group = runs.filter(r => r.s === i + 1);
+    summary(speciesName(i + 1), "männlich", group.filter(r => r.ag === "m"));
+    summary("", "weiblich", group.filter(r => r.ag === "w"));
+    summary("", "zusammen", group, true);
+  });
+  summary("Alle", "männlich", runs.filter(r => r.ag === "m"));
+  summary("", "weiblich", runs.filter(r => r.ag === "w"));
+  summary("", "zusammen", runs, true);
+  w.blank();
+
+  // every participant
+  w.section("Alle Personen");
+  w.note("Sortiert nach Spezies und Avatar-Geschlecht. „gibt“ = Betrag, den die Person von 100 CHF dem Gegenüber abgibt; " +
+    "behält sie mehr als " + NPC_ACCEPT_MAX + " CHF, lehnt das Gegenüber ab und beide bekommen nichts.");
+  const header = ["Teilnehmer-ID", "Avatar", "Geschlecht (Umfrage)", "Runde 1: teilt", "Runde 2: 50:50-Angebot",
+    "Runde 3: teilt", "Runde 4: 25-CHF-Angebot", "Kontostand", "Spieldauer", "Gerät"];
+  const split = (offer, accepted) => accepted
+    ? { v: "gibt " + offer + " CHF", bg: offerColor(offer) }
+    : { v: "gibt " + offer + " CHF → abgelehnt", bg: offerColor(offer), fc: "#a50e0e" };
+  const answer = accepted => ({ v: accepted ? "angenommen" : "abgelehnt", bg: heat(accepted ? 1 : 0) });
+  const person = r => w.grid([r.pid, speciesName(r.s) + ", " + (r.ag === "m" ? "männlich" : "weiblich"), genderName(r.gender),
+    split(r.offer1, r.npc1), answer(r.acc2 === 1), split(r.offer3, r.npc3), answer(r.acc4 === 1),
+    { v: r.bal, f: '0 "CHF"' }, { v: r.dur, f: '0.0 "min"' }, r.dev === "mobile" ? "Handy/Tablet" : "Computer"]);
+  SPECIES.forEach((id, i) => {
+    const group = runs.filter(r => r.s === i + 1).sort((a, b) => a.ag.localeCompare(b.ag));
+    w.sub(speciesName(i + 1) + " (" + group.length + (group.length === 1 ? " Person)" : " Personen)"));
+    if (!group.length) return;
+    w.gridHeader(header);
+    group.forEach(person);
+  });
+  const other = runs.filter(r => !(r.s >= 1 && r.s <= SPECIES.length));
+  if (other.length) {
+    w.sub("Unbekannte Spezies (" + other.length + ")");
+    w.gridHeader(header);
+    other.forEach(person);
+  }
+  w.flush(sh);
+}
+
+// ------------------------------------------------------------ statistics sheet
 
 function writeAnalysis(sh, rawName, data, comma) {
   const runs = data.runs;
-  const w = writer();
+  const w = writer(WIDTH, [250].concat(new Array(WIDTH - 1).fill(120)));
   const dec = (x, d) => (comma ? x.toFixed(d).replace(".", ",") : x.toFixed(d));
   const fmtP = p => (p < 0.001 ? "< " + dec(0.001, 3) : "= " + dec(p, 3)).replace(" 0", " ");
 
-  w.title("Mirror Game – Auswertung");
+  w.title("Mirror Game – Statistik");
   w.note("Stand: " + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd.MM.yyyy HH:mm") +
     ". Grundlage: Blatt „" + rawName + "“, nur echte Durchgänge (test = 0), pro Teilnehmer-ID nur der erste Durchgang. " +
     "Ausgeschlossen: " + data.tests + " Testläufe, " + data.duplicates + " doppelte Durchgänge" +
@@ -295,18 +390,26 @@ const LEGEND = [
 
 const num = (x, format) => (isFinite(x) ? { v: x, f: format } : "–");
 
-// Collects the analysis rows and their styles, then writes everything in a few calls.
-function writer() {
-  const rows = [], formats = [], styles = [];
+// Collects rows and their styles, then writes everything in a few calls.
+// A cell is a value or { v, f (number format), bg (background), fc (font colour), b (bold) }.
+function writer(width, columnWidths) {
+  const rows = [], formats = [], backgrounds = [], colors = [], weights = [], styles = [];
   const add = (cells, style) => {
-    const values = [], fmt = [];
-    for (let i = 0; i < WIDTH; i++) {
+    const values = [], fmt = [], bg = [], fc = [], fw = [];
+    for (let i = 0; i < width; i++) {
       const c = i < cells.length ? cells[i] : "";
-      values.push(c !== null && typeof c === "object" ? c.v : c);
-      fmt.push(c !== null && typeof c === "object" ? c.f : "@");
+      const o = c !== null && typeof c === "object" ? c : { v: c };
+      values.push(o.v);
+      fmt.push(o.f || "@");
+      bg.push(o.bg || null);
+      fc.push(o.fc || null);
+      fw.push(o.b ? "bold" : "normal");
     }
     rows.push(values);
     formats.push(fmt);
+    backgrounds.push(bg);
+    colors.push(fc);
+    weights.push(fw);
     styles.push(style);
   };
   return {
@@ -316,49 +419,62 @@ function writer() {
     sub: t => add([t], "sub"),
     header: cells => add(cells, "header"),
     row: cells => add(cells, "row"),
+    gridHeader: cells => add(cells, "gridHeader"),
+    grid: cells => add(cells, "grid"),
     legend: (key, text) => add([key, text], "legend"),
     blank: () => add([], "blank"),
     flush(sh) {
       sh.clear();
       sh.getRange(1, 1, sh.getMaxRows(), sh.getMaxColumns()).breakApart();
       sh.setHiddenGridlines(true);
-      const all = sh.getRange(1, 1, rows.length, WIDTH);
-      all.setNumberFormats(formats).setValues(rows).setVerticalAlignment("middle").setFontSize(10);
+      sh.setFrozenRows(0);
+      const all = sh.getRange(1, 1, rows.length, width);
+      all.setNumberFormats(formats).setValues(rows).setBackgrounds(backgrounds).setFontColors(colors).setFontWeights(weights)
+        .setVerticalAlignment("middle").setFontSize(10);
+      const border = range => range.setBorder(null, null, true, null, null, null, COLOR_BORDER, SpreadsheetApp.BorderStyle.SOLID);
       styles.forEach((style, i) => {
         const r = i + 1;
-        const line = sh.getRange(r, 1, 1, WIDTH);
+        const line = sh.getRange(r, 1, 1, width);
         if (style === "title") {
           line.merge().setFontSize(18).setFontWeight("bold");
           sh.setRowHeight(r, 38);
         } else if (style === "note") {
           line.merge().setWrap(true).setFontColor("#444444");
-          sh.setRowHeight(r, 21 * Math.ceil(String(rows[i][0]).length / 150) + 8);
+          sh.setRowHeight(r, 21 * Math.ceil(String(rows[i][0]).length / (width * 16)) + 8);
         } else if (style === "section") {
           line.merge().setFontSize(12).setFontWeight("bold").setFontColor("#ffffff").setBackground(COLOR_SECTION);
           sh.setRowHeight(r, 30);
         } else if (style === "sub") {
           line.merge().setFontWeight("bold").setBackground(COLOR_SUB);
+          sh.setRowHeight(r, 26);
         } else if (style === "header") {
           line.setFontWeight("bold").setBackground(COLOR_HEADER).setWrap(true);
-          sh.getRange(r, 2, 1, WIDTH - 1).setHorizontalAlignment("right");
-          if (rows[i][1] === "Bedeutung und Werte" || rows[i][1] === "Test") sh.getRange(r, 2, 1, WIDTH - 1).setHorizontalAlignment("left");
-          if (rows[i][1] === "Bedeutung und Werte") sh.getRange(r, 2, 1, WIDTH - 1).merge();
-          if (rows[i][1] === "Test") sh.getRange(r, 6, 1, WIDTH - 5).merge();
+          sh.getRange(r, 2, 1, width - 1).setHorizontalAlignment("right");
+          if (rows[i][1] === "Bedeutung und Werte" || rows[i][1] === "Test") sh.getRange(r, 2, 1, width - 1).setHorizontalAlignment("left");
+          if (rows[i][1] === "Bedeutung und Werte") sh.getRange(r, 2, 1, width - 1).merge();
+          if (rows[i][1] === "Test") sh.getRange(r, 6, 1, width - 5).merge();
           sh.setRowHeight(r, 36);
         } else if (style === "row") {
-          line.setBorder(null, null, true, null, null, null, COLOR_BORDER, SpreadsheetApp.BorderStyle.SOLID);
+          border(line);
           const tests = rows[i][1] !== "" && typeof rows[i][1] === "string" && rows[i][1] !== "–";
-          sh.getRange(r, 2, 1, WIDTH - 1).setHorizontalAlignment(tests ? "left" : "right");
-          if (tests) sh.getRange(r, 6, 1, WIDTH - 5).merge().setWrap(true);
+          sh.getRange(r, 2, 1, width - 1).setHorizontalAlignment(tests ? "left" : "right");
+          if (tests) sh.getRange(r, 6, 1, width - 5).merge().setWrap(true);
+        } else if (style === "gridHeader") {
+          line.setFontWeight("bold").setBackground(COLOR_HEADER).setWrap(true).setHorizontalAlignment("center");
+          sh.getRange(r, 1).setHorizontalAlignment("left");
+          sh.setRowHeight(r, 40);
+        } else if (style === "grid") {
+          border(line.setHorizontalAlignment("center"));
+          sh.getRange(r, 1).setHorizontalAlignment("left");
+          sh.setRowHeight(r, 24);
         } else if (style === "legend") {
           sh.getRange(r, 1).setFontFamily("Roboto Mono");
-          sh.getRange(r, 2, 1, WIDTH - 1).merge().setWrap(true);
-          line.setBorder(null, null, true, null, null, null, COLOR_BORDER, SpreadsheetApp.BorderStyle.SOLID);
+          sh.getRange(r, 2, 1, width - 1).merge().setWrap(true);
+          border(line);
           sh.setRowHeight(r, String(rows[i][1]).length > 130 ? 40 : 24);
         }
       });
-      sh.setColumnWidth(1, 250);
-      for (let c = 2; c <= WIDTH; c++) sh.setColumnWidth(c, 120);
+      columnWidths.forEach((w, c) => sh.setColumnWidth(c + 1, w));
     },
   };
 }

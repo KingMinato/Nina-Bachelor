@@ -231,7 +231,7 @@ Assets/
     Data/        SessionData.cs, IResultSubmitter.cs, ResultSubmitter.cs, ResultJson.cs, Redirector.cs
     UI/          UIManager.cs, ActionButtonsUI.cs, WorldButton.cs, OrientationOverlay.cs, DebugOverlay.cs, DebugAvatarSwitcher.cs
   Plugins/WebGL/ Redirect.jslib
-  Editor/        BuildScript.cs, HumanoidClipBuilder.cs, AvatarBuilder.cs
+  Editor/        BuildScript.cs, HumanoidClipBuilder.cs, AvatarBuilder.cs, MockupViewer/ (MockupViewerWindow.cs, MockupGUI.cs)
   Animations/    Avatar.controller, Humanoid_Idle/Jump.anim, *.overrideController
   Prefabs/       Avatars/Avatar_<id>[_m|_w].prefab, NPC.prefab
   Data/          AvatarDatabase.asset
@@ -240,6 +240,8 @@ Assets/
 ```
 
 One scene. Room 1, Room 2, mirror worlds and NPC all live in `Main.unity`.
+
+**Mockups** (design variants: renders, images, sounds, prefabs) are reviewed in **Mirror Game/Mockup Viewer** (`Editor/MockupViewer/MockupViewerWindow.cs`, ported from WishOfHers). Claude writes `Assets/_Mockups/{Name}/mockup.json` (`title`, `description`, `question`, optional `loop`, `variants[]` with `name`, `description`, `files[]`; file paths relative to the folder or starting with `Assets/`) plus the files. The folder is git-ignored, local only, deleted after the decision. The developer drags variants into Gut / Anpassen / Nein, comments, and presses "Entscheidung abschicken"; Claude reads `feedback.json` next to `mockup.json`. Prefabs render live on a neutral floor next to an avatar for size (default `Avatar_humanC_m`); in Play mode "Im Spiel spawnen" places them 2 m in front of the camera. Self-check a prefab mockup with `MockupViewerWindow.RenderPng(prefabPath, time, outPng)` via `script eval`. Scripts inside `_Mockups` compile into the game, so delete the mockup before a build. A component with `public void MockupSample(float t, Camera cam)` can pose itself for the preview. A `*_anim.png` strip of square frames plays at 8 fps.
 
 **Scene layout** (greybox, milestone 2): both rooms 6 x 6 m interior, 3 m high, walls 0.2 m. Room 1 centred at the origin, mirrors on -x (left), +z (top), -z (bottom), door (1.2 x 2.2 m) in the +x wall. Room 2 directly behind it, centre x = 6.2. Player rig (`PlayerRig`, with `PlayerActions`, camera at 1.6 m and the avatar as children) starts at the origin facing +z. `WalkToDoor` stops at (2.2, 0, 0) facing the door, then the door opens; `WalkToNpc`: doorway (3.1, 0, 0), then (6.0, 0, 0) facing +x; NPC at (7.4, 0, 0) facing -x. Mirrors are body-sized (1.5 x 2.4 m, bottom edge 0.15 m above the floor) centred on each mirror wall (`World/Room1/MirrorWall*`), with a dark frame and a subtle glass tint. The door hinge is part of Room 1. The avatar is spawned into `PlayerRig` at startup (`Game/AvatarSpawner`), which also moves the camera to the avatar's eye height. The NPC prefab sits under `NPC`. Jump: 0.15 s windup, 0.6 s in the air, 0.2 s landing (`PlayerActions`); the avatar's jump clip is stretched to that duration.
 

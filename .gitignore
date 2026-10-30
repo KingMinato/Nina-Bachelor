@@ -118,3 +118,7 @@ InitTestScene*.unity*
 /[Aa]ssets/Lil Pupinduy.meta
 /[Aa]ssets/Backrock/
 /[Aa]ssets/Backrock.meta
+
+# Local mockups for the Mockup Viewer (Mirror Game/Mockup Viewer), never committed
+/[Aa]ssets/_Mockups/
+/[Aa]ssets/_Mockups.meta

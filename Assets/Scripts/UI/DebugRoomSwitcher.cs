@@ -33,7 +33,7 @@ public class DebugRoomSwitcher : MonoBehaviour
 
         toggleButton.onClick.AddListener(() =>
         {
-            panel.SetActive(!panel.activeSelf);
+            DebugPanels.Toggle(panel);
             Highlight();
         });
         panel.SetActive(false);

@@ -269,7 +269,7 @@ Assets/
     Avatar/      AvatarDatabase.cs (ScriptableObject), AvatarSpawner.cs, AvatarBody.cs
     Dialog/      UltimatumController.cs, SplitInputUI.cs, BalanceUI.cs, RoundUI.cs
     Data/        SessionData.cs, IResultSubmitter.cs, ResultSubmitter.cs, ResultJson.cs, Redirector.cs
-    UI/          UIManager.cs, ActionButtonsUI.cs, WorldButton.cs, StepDoneUI.cs, OrientationOverlay.cs, DebugOverlay.cs, DebugAvatarSwitcher.cs, DebugRoomSwitcher.cs, DebugUiSwitcher.cs
+    UI/          UIManager.cs, ActionButtonsUI.cs, WorldButton.cs, StepDoneUI.cs, OrientationOverlay.cs, DebugOverlay.cs, DebugAvatarSwitcher.cs, DebugRoomSwitcher.cs, DebugUiSwitcher.cs, DebugPanels.cs (only one switcher panel open)
     UI/Skin/     UiStyle.cs (ScriptableObject + UiLook), UiStyles.cs, UiSkin.cs, UiSfx.cs, UiMotion.cs, UiTypewriter.cs, UiMaxWidth.cs
   Plugins/WebGL/ Redirect.jslib
   Editor/        BuildScript.cs, HumanoidClipBuilder.cs, AvatarBuilder.cs, RoomVariantBuilder.cs, UiStyleBuilder.cs, MockupViewer/ (MockupViewerWindow.cs, MockupGUI.cs)

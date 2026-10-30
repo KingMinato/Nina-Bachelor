@@ -18,6 +18,7 @@ public class StepDoneUI : MonoBehaviour
         if (gameObject.activeSelf)
             gameObject.SetActive(false);
         UiSkin.Show(gameObject);
+        UiSfx.Play(UiSfx.Done);
         await Awaitable.WaitForSecondsAsync(seconds);
         if (id == shownCount && this != null)
             UiSkin.Hide(gameObject);

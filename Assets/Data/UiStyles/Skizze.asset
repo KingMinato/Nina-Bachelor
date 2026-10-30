@@ -1453,3 +1453,32 @@ MonoBehaviour:
     press: 0
     pulse: 0
     idleDuration: 0
+  sounds:
+  - name: click
+    clip: {fileID: 8300000, guid: 08faa71399dda764d91a489952edec8a, type: 3}
+  - name: coin
+    clip: {fileID: 8300000, guid: 62c382fc5b57fcd41acc7caa60ba792f, type: 3}
+  - name: count
+    clip: {fileID: 8300000, guid: d2cf91dff697fde4b81f53b19d317ca1, type: 3}
+  - name: done
+    clip: {fileID: 8300000, guid: e4b757c983d17414d9f2fd2e7d086109, type: 3}
+  - name: door
+    clip: {fileID: 8300000, guid: f182a1225b3eefe45aa76e4bae3b31e8, type: 3}
+  - name: end
+    clip: {fileID: 8300000, guid: 000c1cc7b24f7e548adac97571ff6711, type: 3}
+  - name: instr
+    clip: {fileID: 8300000, guid: bfd0e9fdeb45d844190b4f996696095d, type: 3}
+  - name: jump
+    clip: {fileID: 8300000, guid: 44b0f2152401cd2469278cd36e4d2c4c, type: 3}
+  - name: land
+    clip: {fileID: 8300000, guid: 2fd4cb7edcd294443aabe0d6815c986f, type: 3}
+  - name: panel
+    clip: {fileID: 8300000, guid: 6d56976eb2ef0694ca0cc7782a37dd30, type: 3}
+  - name: step
+    clip: {fileID: 8300000, guid: 546cc996ace8cfd45a3206a862aaea82, type: 3}
+  - name: tick
+    clip: {fileID: 8300000, guid: 97881ff88ca9494488a5eb7ce63b4d5f, type: 3}
+  - name: turn
+    clip: {fileID: 8300000, guid: 75c4cbf21f8522940bc3d326472e0861, type: 3}
+  - name: type
+    clip: {fileID: 8300000, guid: 8b6d7b4561feab341ac77a1f679b3cd6, type: 3}

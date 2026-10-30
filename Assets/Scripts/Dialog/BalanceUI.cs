@@ -38,6 +38,7 @@ public class BalanceUI : MonoBehaviour
         gainText.gameObject.SetActive(false);
         gainText.gameObject.SetActive(true);
         skin.Pulse();
+        UiSfx.Play(UiSfx.Coin);
         CountUp(shown, balance);
         HideGain();
     }

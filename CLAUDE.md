@@ -169,7 +169,7 @@ Several furnishing variants of both rooms live in `Main.unity` at the same time,
 
 - The shell (walls, mirror openings, door, waypoints, NPC position) is the same for all variants. Shell renderers carry `RoomSurface` (Floor/Wall/Ceiling/Door) and use generated meshes with UVs in metres (`Art/Environment/ShellMeshes`), so tiling textures have the same scale everywhere. Materials: `Art/Environment/Rooms/<Variant>_<Kind>.mat` (URP Lit referencing Synty textures).
 - Each variant (`World/RoomVariants/<Name>`, component `RoomVariant`) holds the four shell materials (empty = scene original) and its parts: `World/Room1/Variants/<Name>` (mirrored), `World/Room2/Variants/<Name>`, `World/Room1/DoorHinge/Variants/<Name>` (door model fitted into the opening; variants without one use the plain `DoorLeaf`).
-- `RoomVariants` (start index 0 = `Grau`) applies the start variant in `Awake`, before the mirror worlds copy Room 1; switching later rebuilds the mirror copies. Debug switcher `DebugRoomSwitcher` (button "Raum" below "Avatar"; in the Editor always, in builds with `?debug=1`), URL `room=` in test runs.
+- `RoomVariants` (start index 0 = `Grau`) applies the start variant in `Awake`, before the mirror worlds copy Room 1; switching later rebuilds the mirror copies. Debug switcher `DebugRoomSwitcher` (button "Raum"; the debug buttons "Avatar", "Raum", "UI" sit small in the bottom-left corner; in the Editor always, in builds with `?debug=1`), URL `room=` in test runs.
 - No colliders, lights or particles in the props (stripped by the builder), no static flags, nothing in the walk path or in front of the mirrors. Colours above 1 in some materials brighten darker textures, because the walls only get ambient light.
 - Cost (build 2026-10-30): all five variants together +1.2 MB compressed (Stein ~0.5 MB, the others 0.1-0.2 MB), +2 to +10 draw calls and at most +6k triangles over `Grau`. Their textures are limited to 1024 and compressed on WebGL (platform override).
 
@@ -186,13 +186,14 @@ Several furnishing variants of both rooms live in `Main.unity` at the same time,
 
 ## 6a. UI Styles (2026-10-30)
 
-Three styles from the prototype round (Mockup Viewer, rated "Gut"), switchable at runtime: `Pixel` (Press Start 2P, navy boxes, stepped motion), `Skizze` (Patrick Hand, paper and felt pen, boiling outlines), `Holz` (Alegreya + Cinzel, wood, parchment, iron). Start style: `UiStyles.startIndex` on the `UI` canvas (0 = Pixel). Debug switcher button "UI" below "Raum" (`DebugUiSwitcher`, Editor always, builds with `?debug=1`), URL `ui=` in test runs.
+Three styles from the prototype round (Mockup Viewer, rated "Gut"), switchable at runtime: `Pixel` (Press Start 2P, navy boxes, stepped motion), `Skizze` (Patrick Hand, paper and felt pen, boiling outlines), `Holz` (Alegreya + Cinzel, wood, parchment, iron). Start style: `UiStyles.startIndex` on the `UI` canvas (0 = Pixel). Debug switcher button "UI" (`DebugUiSwitcher`, Editor always, builds with `?debug=1`), URL `ui=` in test runs.
 
 - `UiStyle` (ScriptableObject, `Data/UiStyles/<Name>.asset`): fonts, typewriter speed and a `UiLook` per skin key (sprites/frames, colours, text size and font, rect override, motions: enter, exit, swap, idle, wantIdle, press, pulse).
 - `UiSkin` on every styled element names a key. It applies the look of `UiStyles.Current` (also to inactive objects) and plays the motions: enter on activation, exit on `UiSkin.Hide`, swap when shown again within 0.06 s (next dialog line), press on tap, idle loops, sprite frame cycling. `decoration` elements (tape, rollers, highlighter, icons) are invisible in styles without a look for their key. Logic scripts keep using `SetActive`; `UiSkin.Show/Hide` only adds transitions.
 - `UiMotions`: the CSS keyframes of the prototypes as code (offsets in canvas px, `UiSkin.motionScale` for the world-space door canvas).
 - Everything is built by `Editor/UiStyleBuilder.cs` (menu **Mirror Game/Build UI Styles**, safe to rerun): sprite import settings, TMP font assets (`Art/UI/Fonts`, dynamic, glyphs cleared on build and generated from the TTF at runtime), font materials (outline/shadow), the three style assets, and the skin keys, decorations and new elements in `Main.unity`. Change looks in the builder, not in the assets.
 - Sprites are drawn from code by `Tools/ui_sprites.py` (Python, numpy + Pillow) into `Art/UI/Styles/<Style>/`, with `sprites.json` (9-slice borders, point filter). Rerun the script, then the builder.
+- Sounds (`UiSfx.Play(name)`, `UiStyle.sounds`): the WebAudio recipes of the prototypes rendered offline by `Tools/ui_sounds.py` (numpy) into `Art/UI/Sounds/<Style>/<name>.wav`: click (skinned buttons), turn, jump, land, step (walk), door, instr (new instruction, "Ansprechen"), count, done, panel, type (every second typed letter), tick (split slider), coin, end. Rerun the script, then the builder.
 - Fonts are Google Fonts under the SIL Open Font License (licence texts next to the TTFs), allowed to ship in the build and the public repo.
 - `CameraAim.pitchDown` (14 deg) keeps the NPC's face in the upper part of the screen, above the dialog panel.
 
@@ -268,10 +269,10 @@ Assets/
     Dialog/      UltimatumController.cs, SplitInputUI.cs, BalanceUI.cs, RoundUI.cs
     Data/        SessionData.cs, IResultSubmitter.cs, ResultSubmitter.cs, ResultJson.cs, Redirector.cs
     UI/          UIManager.cs, ActionButtonsUI.cs, WorldButton.cs, StepDoneUI.cs, OrientationOverlay.cs, DebugOverlay.cs, DebugAvatarSwitcher.cs, DebugRoomSwitcher.cs, DebugUiSwitcher.cs
-    UI/Skin/     UiStyle.cs (ScriptableObject + UiLook), UiStyles.cs, UiSkin.cs, UiMotion.cs, UiTypewriter.cs, UiMaxWidth.cs
+    UI/Skin/     UiStyle.cs (ScriptableObject + UiLook), UiStyles.cs, UiSkin.cs, UiSfx.cs, UiMotion.cs, UiTypewriter.cs, UiMaxWidth.cs
   Plugins/WebGL/ Redirect.jslib
   Editor/        BuildScript.cs, HumanoidClipBuilder.cs, AvatarBuilder.cs, RoomVariantBuilder.cs, UiStyleBuilder.cs, MockupViewer/ (MockupViewerWindow.cs, MockupGUI.cs)
-  Art/UI/        Fonts/ (OFL TTFs + TMP assets), Styles/<Style>/*.png + sprites.json (generated by Tools/ui_sprites.py)
+  Art/UI/        Fonts/ (OFL TTFs + TMP assets), Styles/<Style>/*.png + sprites.json (generated by Tools/ui_sprites.py), Sounds/<Style>/*.wav (Tools/ui_sounds.py)
   Animations/    Avatar.controller, Humanoid_Idle/Jump.anim, *.overrideController
   Prefabs/       Avatars/Avatar_<id>[_m|_w].prefab, NPC.prefab
   Data/          AvatarDatabase.asset, UiStyles/Pixel|Skizze|Holz.asset

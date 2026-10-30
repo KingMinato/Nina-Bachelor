@@ -8,20 +8,22 @@ using UnityEngine.TextCore.LowLevel;
 using UnityEngine.UI;
 
 // Builds the three UI styles (Pixel, Skizze, Holz) from the prototypes in the Mockup Viewer:
-// imports the generated sprites (Tools/ui_sprites.py), creates TMP font assets from the OFL fonts,
-// writes Data/UiStyles/<Style>.asset and adds the skin keys, decorations and new elements to Main.unity.
+// imports the generated sprites (Tools/ui_sprites.py) and sounds (Tools/ui_sounds.py), creates TMP font assets
+// from the OFL fonts, writes Data/UiStyles/<Style>.asset and adds the skin keys, decorations and new elements to Main.unity.
 // Safe to rerun: existing objects are found by name and updated.
 public static class UiStyleBuilder
 {
     const string SpriteDir = "Assets/Art/UI/Styles";
     const string FontDir = "Assets/Art/UI/Fonts";
     const string StyleDir = "Assets/Data/UiStyles";
+    const string SoundDir = "Assets/Art/UI/Sounds";
     const string Charset = " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ÄÖÜäöüßàâçéèêëîïôûùÀÉÈ„“”‚‘’–—…€°·×";
     const float Px3 = 1f / 3f;
 
     [MenuItem("Mirror Game/Build UI Styles")]
     public static void Build()
     {
+        AssetDatabase.Refresh();
         ImportSprites();
         var styles = new[] { Pixel(), Skizze(), Holz() };
         BuildScene(styles);
@@ -136,8 +138,32 @@ public static class UiStyleBuilder
         style.titleFont = title;
         style.charsPerSecond = cps;
         style.looks = looks.ToArray();
+        style.sounds = LoadSounds(name);
         EditorUtility.SetDirty(style);
         return style;
+    }
+
+    // All WAVs in Art/UI/Sounds/<Style> (Tools/ui_sounds.py), named after the file. Short clips: decompressed on load.
+    static UiSound[] LoadSounds(string style)
+    {
+        var sounds = new List<UiSound>();
+        string dir = $"{SoundDir}/{style}";
+        if (!Directory.Exists(dir))
+            return sounds.ToArray();
+        foreach (var file in Directory.GetFiles(dir, "*.wav"))
+        {
+            string path = file.Replace("\\", "/");
+            var importer = (AudioImporter)AssetImporter.GetAtPath(path);
+            var settings = importer.defaultSampleSettings;
+            settings.loadType = AudioClipLoadType.DecompressOnLoad;
+            settings.compressionFormat = AudioCompressionFormat.Vorbis;
+            settings.quality = 0.7f;
+            importer.defaultSampleSettings = settings;
+            importer.forceToMono = true;
+            importer.SaveAndReimport();
+            sounds.Add(new UiSound { name = Path.GetFileNameWithoutExtension(path), clip = AssetDatabase.LoadAssetAtPath<AudioClip>(path) });
+        }
+        return sounds.ToArray();
     }
 
     static Color C(string hex, float a = 1)
@@ -416,6 +442,10 @@ public static class UiStyleBuilder
         // style manager on the canvas
         var uiStyles = GetOrAdd<UiStyles>(ui.gameObject);
         Set(uiStyles, "styles", styles);
+        var source = GetOrAdd<AudioSource>(ui.gameObject);
+        source.playOnAwake = false;
+        source.spatialBlend = 0;
+        GetOrAdd<UiSfx>(ui.gameObject);
 
         // prompt panel
         var prompt = ui.Find("PromptPanel");

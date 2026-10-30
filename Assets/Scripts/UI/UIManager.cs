@@ -47,6 +47,10 @@ public class UIManager : MonoBehaviour
         instructionCount.gameObject.SetActive(count != "");
         // Show also cancels a hide that is still pending (instruction replaced right after the tutorial).
         UiSkin.Show(instructionPanel);
+        if (!wasShown || textChanged)
+            UiSfx.Play(UiSfx.Instruction);
+        else if (countChanged)
+            UiSfx.Play(UiSfx.Count);
         if (!wasShown)
             return;
         if (textChanged)
@@ -78,6 +82,7 @@ public class UIManager : MonoBehaviour
         soloButtonLabel.text = label;
         soloButton.interactable = false;
         UiSkin.Show(soloButton.gameObject);
+        UiSfx.Play(UiSfx.Instruction);
         await Awaitable.WaitForSecondsAsync(inputDelaySeconds);
         soloButton.interactable = true;
 
@@ -98,6 +103,7 @@ public class UIManager : MonoBehaviour
         secondButton.gameObject.SetActive(false);
         speakerTag.SetActive(false);
         UiSkin.Show(promptPanel);
+        UiSfx.Play(UiSfx.End);
         loader.SetActive(true);
         _ = typewriter.Play(promptText, message);
     }
@@ -112,6 +118,8 @@ public class UIManager : MonoBehaviour
         speakerTag.SetActive(!string.IsNullOrEmpty(speaker));
         promptButtonLabel.text = firstLabel;
         secondButtonLabel.text = secondLabel ?? "";
+        if (!promptPanel.activeSelf)
+            UiSfx.Play(UiSfx.Panel);
         UiSkin.Show(promptPanel);
         await typewriter.Play(promptText, message);
 

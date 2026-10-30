@@ -28,7 +28,11 @@ public class SplitInputUI : MonoBehaviour
     void Awake()
     {
         slider.wholeNumbers = true;
-        slider.onValueChanged.AddListener(_ => UpdateShares());
+        slider.onValueChanged.AddListener(_ =>
+        {
+            UpdateShares();
+            UiSfx.Play(UiSfx.Tick);
+        });
         minusButton.onClick.AddListener(() => slider.value -= 1);
         plusButton.onClick.AddListener(() => slider.value += 1);
     }
@@ -49,6 +53,7 @@ public class SplitInputUI : MonoBehaviour
         SetInteractable(false);
         confirmButton.gameObject.SetActive(false);
         UiSkin.Show(gameObject);
+        UiSfx.Play(UiSfx.Panel);
         await typewriter.Play(messageText, message);
         confirmButton.gameObject.SetActive(true);
         OptionsShownAt = Time.realtimeSinceStartupAsDouble;

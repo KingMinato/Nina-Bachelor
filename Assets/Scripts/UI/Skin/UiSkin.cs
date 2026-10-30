@@ -234,7 +234,11 @@ public class UiSkin : MonoBehaviour, IPointerDownHandler
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (look != null && selectable != null && selectable.IsInteractable() && hideAt < 0 && !exiting)
+        if (selectable == null || !selectable.IsInteractable() || hideAt >= 0 || exiting)
+            return;
+        if (selectable is Button)
+            UiSfx.Play(UiSfx.Click);
+        if (look != null)
             Play(look.press);
     }
 

@@ -34,6 +34,7 @@ public class PlayerActions : MonoBehaviour
 
         IsBusy = true;
         Started?.Invoke(action);
+        UiSfx.Play(action == TutorialStep.Jump ? UiSfx.Jump : UiSfx.Turn);
         if (action == TutorialStep.Jump)
             await DoJump();
         else
@@ -65,6 +66,7 @@ public class PlayerActions : MonoBehaviour
             await Awaitable.NextFrameAsync();
         }
         transform.position = ground;
+        UiSfx.Play(UiSfx.Land);
         await Awaitable.WaitForSecondsAsync(jumpLandSeconds);
     }
 }

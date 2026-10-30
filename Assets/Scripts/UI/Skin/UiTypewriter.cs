@@ -31,6 +31,8 @@ public class UiTypewriter : MonoBehaviour, IPointerDownHandler
             {
                 char c = text.textInfo.characterInfo[shown].character;
                 elapsed -= ".,!?:".IndexOf(c) >= 0 ? punctuationPause : 1;
+                if (shown % 2 == 0 && !char.IsWhiteSpace(c))
+                    UiSfx.Play(UiSfx.Type);
                 shown++;
             }
             text.maxVisibleCharacters = shown;

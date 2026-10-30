@@ -8,6 +8,7 @@ public class Door : MonoBehaviour
 
     public async Awaitable Open()
     {
+        UiSfx.Play(UiSfx.Door);
         Quaternion from = transform.localRotation;
         Quaternion to = from * Quaternion.Euler(0f, openAngle, 0f);
         for (float t = 0f; t < openSeconds; t += Time.deltaTime)

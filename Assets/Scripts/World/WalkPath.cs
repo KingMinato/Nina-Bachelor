@@ -7,6 +7,10 @@ public class WalkPath : MonoBehaviour
     [SerializeField] Transform[] waypoints;
     [SerializeField] float walkSpeed = 1.3f;
     [SerializeField] float turnSpeed = 180f;
+    [Tooltip("Distance between two step sounds in metres.")]
+    [SerializeField] float stepLength = 0.65f;
+
+    float sinceStep;
 
     public async Awaitable Walk(Transform rig)
     {
@@ -20,6 +24,12 @@ public class WalkPath : MonoBehaviour
             while (rig.position != target)
             {
                 rig.position = Vector3.MoveTowards(rig.position, target, walkSpeed * Time.deltaTime);
+                sinceStep += walkSpeed * Time.deltaTime;
+                if (sinceStep >= stepLength)
+                {
+                    sinceStep = 0;
+                    UiSfx.Play(UiSfx.Step);
+                }
                 await Awaitable.NextFrameAsync();
             }
         }

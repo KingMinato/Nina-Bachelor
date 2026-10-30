@@ -5,6 +5,7 @@ public class GameFlow : MonoBehaviour
 {
     [SerializeField] UIManager ui;
     [SerializeField] DebugOverlay debugOverlay;
+    [SerializeField] DebugAvatarSwitcher avatarSwitcher;
     [SerializeField] UltimatumController ultimatum;
     [SerializeField] TutorialController tutorial;
     [SerializeField] PlayerActions playerActions;
@@ -33,6 +34,9 @@ public class GameFlow : MonoBehaviour
         urlParams = UrlParams.Parse(GetUrl(), new System.Random());
         if (urlParams.Debug)
             debugOverlay.Show(urlParams);
+        // Always available while testing in the Unity Editor, in builds only with ?debug=1.
+        if (urlParams.Debug || Application.isEditor)
+            avatarSwitcher.gameObject.SetActive(true);
 
         SetState(GameState.Init);
         config = await ConfigLoader.LoadAsync();

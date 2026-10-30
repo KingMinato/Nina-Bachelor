@@ -29,7 +29,7 @@ Data is linked across all three via `pid` (Qualtrics ResponseID from Survey A).
 | `pid` | string | Qualtrics ResponseID |
 | `g` | `m`, `w`, anything else | Gender from survey. `m`/`w` used directly, anything else or missing -> random 50/50 |
 | `s` | `1`-`4` | Species, assigned and balanced by Qualtrics. Missing/invalid -> random |
-| `debug` | `1` | Skips tutorial, shows debug overlay with the avatar switcher (button "Avatar": all species, m/w, jump), does NOT post to Google Sheet |
+| `debug` | `1` | Skips tutorial, shows debug overlay and the avatar switcher (button "Avatar": all species, m/w, jump; in the Unity Editor the switcher is always shown), does NOT post to Google Sheet |
 | `a` | avatar species id | Test runs only (no `pid` or `debug=1`): shows this avatar regardless of `s`, e.g. `?a=slime&g=w`. Ignored in real runs |
 
 Parse from `Application.absoluteURL`. If `pid` is missing, generate `test-<timestamp>` and treat as a test run (still playable, flagged in data).

@@ -6,8 +6,6 @@ using UnityEngine;
 public class DebugOverlay : MonoBehaviour
 {
     [SerializeField] TMP_Text label;
-    [Tooltip("Debug tools (e.g. the avatar switcher), activated together with the overlay.")]
-    [SerializeField] GameObject tools;
 
     string paramsLine = "";
     string avatarLine = "";
@@ -17,8 +15,6 @@ public class DebugOverlay : MonoBehaviour
     {
         paramsLine = $"pid={p.Pid}  g='{p.RawGender}'  ag={p.AvatarGender}  s={p.Species}  test={p.IsTest}";
         gameObject.SetActive(true);
-        if (tools != null)
-            tools.SetActive(true);
     }
 
     public void ShowAvatar(string speciesId, string gender)

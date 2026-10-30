@@ -3,8 +3,8 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-// Debug only (starts inactive, DebugOverlay activates it with ?debug=1): switches the player avatar
-// instantly. The "Avatar" button opens a grid with all species, gender, jump and close.
+// Test tool (starts inactive, GameFlow activates it in the Unity Editor and with ?debug=1):
+// switches the player avatar instantly. The "Avatar" button opens a grid with all species, gender, jump and close.
 // The grid buttons are created from an inactive template button at startup.
 public class DebugAvatarSwitcher : MonoBehaviour
 {

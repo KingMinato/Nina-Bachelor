@@ -21,6 +21,8 @@ public static class RoomVariantBuilder
     const string GenericTextures = "Assets/Synty/PolygonGeneric/Textures/";
     const string MaterialFolder = "Assets/Art/Environment/Rooms/";
     const string MeshFolder = "Assets/Art/Environment/ShellMeshes/";
+    // Variant the game starts with (RoomVariants.startIndex).
+    const string StartVariant = "Stein";
 
     // Room interiors (inner wall faces). Room 1 is centred at the origin, Room 2 behind the door wall.
     // Both rooms span z = -Side..Side, Room 1 also x = -Side..Side.
@@ -80,13 +82,14 @@ public static class RoomVariantBuilder
         SetArray(so.FindProperty("variants"), variants.ToArray());
         SetArray(so.FindProperty("rooms"), new Object[] { room1, room2 });
         SetArray(so.FindProperty("mirrorWorlds"), world.Find("MirrorWorlds").GetComponentsInChildren<MirrorWorld>(true));
-        so.FindProperty("startIndex").intValue = 0;
+        int start = Mathf.Max(0, variants.FindIndex(v => v.name == StartVariant));
+        so.FindProperty("startIndex").intValue = start;
         so.ApplyModifiedPropertiesWithoutUndo();
 
         // The scene shows the start variant, the others stay inactive.
         foreach (var v in variants)
             v.SetPartsActive(false);
-        variants[0].SetPartsActive(true);
+        variants[start].SetPartsActive(true);
 
         foreach (var user in new Object[] { Object.FindFirstObjectByType<GameFlow>(),
                      Object.FindFirstObjectByType<DebugRoomSwitcher>(FindObjectsInactive.Include) })

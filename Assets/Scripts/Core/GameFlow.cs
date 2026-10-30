@@ -40,8 +40,8 @@ public class GameFlow : MonoBehaviour
         urlParams = UrlParams.Parse(GetUrl(), new System.Random());
         if (urlParams.Debug)
             debugOverlay.Show(urlParams);
-        // Always available while testing in the Unity Editor, in builds only with ?debug=1.
-        if (urlParams.Debug || Application.isEditor)
+        // Available in the Unity Editor and in test runs (no pid or ?debug=1). Participants always come with a pid.
+        if (urlParams.IsTest || Application.isEditor)
         {
             avatarSwitcher.gameObject.SetActive(true);
             roomSwitcher.gameObject.SetActive(true);

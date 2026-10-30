@@ -29,7 +29,7 @@ Data is linked across all three via `pid` (Qualtrics ResponseID from Survey A).
 | `pid` | string | Qualtrics ResponseID |
 | `g` | `m`, `w`, anything else | Gender from survey. `m`/`w` used directly, anything else or missing -> random 50/50 |
 | `s` | `1`-`4` | Species, assigned and balanced by Qualtrics. Missing/invalid -> random |
-| `debug` | `1` | Skips tutorial, shows debug overlay and the avatar switcher (button "Avatar": all species, m/w, jump; in the Unity Editor the switcher is always shown), does NOT post to Google Sheet |
+| `debug` | `1` | Skips tutorial, shows the debug overlay, does NOT post to Google Sheet. The debug switchers (buttons "Avatar": all species, m/w, jump; "Raum"; "UI") are shown in every test run (no `pid` or `debug=1`) and always in the Unity Editor, never to participants |
 | `a` | avatar species id | Test runs only (no `pid` or `debug=1`): shows this avatar regardless of `s`, e.g. `?a=slime&g=w`. Ignored in real runs |
 | `room` | room variant name | Test runs only: starts with this furnishing variant (see section 5a), e.g. `?debug=1&room=Holz`. Ignored in real runs |
 | `ui` | UI style name | Test runs only: starts with this UI style (see section 6a), e.g. `?debug=1&ui=Skizze`. Ignored in real runs |
@@ -169,7 +169,7 @@ Several furnishing variants of both rooms live in `Main.unity` at the same time,
 
 - The shell (walls, mirror openings, door, waypoints, NPC position) is the same for all variants. Shell renderers carry `RoomSurface` (Floor/Wall/Ceiling/Door) and use generated meshes with UVs in metres (`Art/Environment/ShellMeshes`), so tiling textures have the same scale everywhere. Materials: `Art/Environment/Rooms/<Variant>_<Kind>.mat` (URP Lit referencing Synty textures).
 - Each variant (`World/RoomVariants/<Name>`, component `RoomVariant`) holds the four shell materials (empty = scene original) and its parts: `World/Room1/Variants/<Name>` (mirrored), `World/Room2/Variants/<Name>`, `World/Room1/DoorHinge/Variants/<Name>` (door model fitted into the opening; variants without one use the plain `DoorLeaf`).
-- `RoomVariants` (start index 0 = `Grau`) applies the start variant in `Awake`, before the mirror worlds copy Room 1; switching later rebuilds the mirror copies. Debug switcher `DebugRoomSwitcher` (button "Raum"; the debug buttons "Avatar", "Raum", "UI" sit small in the bottom-left corner; in the Editor always, in builds with `?debug=1`), URL `room=` in test runs.
+- `RoomVariants` (start index 0 = `Grau`) applies the start variant in `Awake`, before the mirror worlds copy Room 1; switching later rebuilds the mirror copies. Debug switcher `DebugRoomSwitcher` (button "Raum"; the debug buttons "Avatar", "Raum", "UI" sit small in the bottom-left corner; in the Editor always, in builds in test runs: no `pid` or `?debug=1`), URL `room=` in test runs.
 - No colliders, lights or particles in the props (stripped by the builder), no static flags, nothing in the walk path or in front of the mirrors. Colours above 1 in some materials brighten darker textures, because the walls only get ambient light.
 - Cost (build 2026-10-30): all five variants together +1.2 MB compressed (Stein ~0.5 MB, the others 0.1-0.2 MB), +2 to +10 draw calls and at most +6k triangles over `Grau`. Their textures are limited to 1024 and compressed on WebGL (platform override).
 
@@ -186,7 +186,7 @@ Several furnishing variants of both rooms live in `Main.unity` at the same time,
 
 ## 6a. UI Styles (2026-10-30)
 
-Three styles from the prototype round (Mockup Viewer, rated "Gut"), switchable at runtime: `Pixel` (Press Start 2P, navy boxes, stepped motion), `Skizze` (Patrick Hand, paper and felt pen, boiling outlines), `Holz` (Alegreya + Cinzel, wood, parchment, iron). Start style: `UiStyles.startIndex` on the `UI` canvas (0 = Pixel). Debug switcher button "UI" (`DebugUiSwitcher`, Editor always, builds with `?debug=1`), URL `ui=` in test runs.
+Three styles from the prototype round (Mockup Viewer, rated "Gut"), switchable at runtime: `Pixel` (Press Start 2P, navy boxes, stepped motion), `Skizze` (Patrick Hand, paper and felt pen, boiling outlines), `Holz` (Alegreya + Cinzel, wood, parchment, iron). Start style: `UiStyles.startIndex` on the `UI` canvas (0 = Pixel). Debug switcher button "UI" (`DebugUiSwitcher`, Editor always, builds in test runs), URL `ui=` in test runs.
 
 - `UiStyle` (ScriptableObject, `Data/UiStyles/<Name>.asset`): fonts, typewriter speed and a `UiLook` per skin key (sprites/frames, colours, text size and font, rect override, motions: enter, exit, swap, idle, wantIdle, press, pulse).
 - `UiSkin` on every styled element names a key. It applies the look of `UiStyles.Current` (also to inactive objects) and plays the motions: enter on activation, exit on `UiSkin.Hide`, swap when shown again within 0.06 s (next dialog line), press on tap, idle loops, sprite frame cycling. `decoration` elements (tape, rollers, highlighter, icons) are invisible in styles without a look for their key. Logic scripts keep using `SetActive`; `UiSkin.Show/Hide` only adds transitions.

@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-// Test tool (starts inactive, GameFlow activates it in the Unity Editor and with ?debug=1):
+// Test tool (starts inactive, GameFlow activates it in the Unity Editor and in test runs):
 // switches the room variant instantly. The "Raum" button opens a grid with all variants and close.
 // The grid buttons are created from an inactive template button at startup.
 public class DebugRoomSwitcher : MonoBehaviour

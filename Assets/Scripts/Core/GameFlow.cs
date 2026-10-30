@@ -7,7 +7,9 @@ public class GameFlow : MonoBehaviour
     [SerializeField] DebugOverlay debugOverlay;
     [SerializeField] DebugAvatarSwitcher avatarSwitcher;
     [SerializeField] DebugRoomSwitcher roomSwitcher;
+    [SerializeField] DebugUiSwitcher uiSwitcher;
     [SerializeField] RoomVariants rooms;
+    [SerializeField] UiStyles uiStyles;
     [SerializeField] UltimatumController ultimatum;
     [SerializeField] TutorialController tutorial;
     [SerializeField] PlayerActions playerActions;
@@ -43,11 +45,17 @@ public class GameFlow : MonoBehaviour
         {
             avatarSwitcher.gameObject.SetActive(true);
             roomSwitcher.gameObject.SetActive(true);
+            uiSwitcher.gameObject.SetActive(true);
         }
         if (urlParams.RoomOverride != "" && !rooms.Apply(urlParams.RoomOverride))
             Debug.LogWarning("Unknown room variant: " + urlParams.RoomOverride);
+        if (urlParams.UiOverride != "" && !uiStyles.Apply(urlParams.UiOverride))
+            Debug.LogWarning("Unknown UI style: " + urlParams.UiOverride);
         if (urlParams.Debug)
+        {
             debugOverlay.ShowRoom(rooms.Current.DisplayName);
+            debugOverlay.ShowUi(UiStyles.Current.displayName);
+        }
 
         SetState(GameState.Init);
         config = await ConfigLoader.LoadAsync();

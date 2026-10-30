@@ -2,8 +2,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-// A button placed in the world on a world-space canvas, e.g. in the open doorway.
-// The player taps the object itself instead of a screen button. Starts inactive in the scene.
+// A button placed in the world on a world-space canvas covering an object, e.g. the whole door.
+// The player taps the object itself instead of a screen button; an outline shows that it is tappable.
+// Starts inactive in the scene.
 public class WorldButton : MonoBehaviour
 {
     [SerializeField] Button button;

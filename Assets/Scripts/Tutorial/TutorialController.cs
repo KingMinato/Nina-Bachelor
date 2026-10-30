@@ -6,12 +6,15 @@ public class TutorialController : MonoBehaviour
     [SerializeField] UIManager ui;
     [SerializeField] ActionButtonsUI actionButtons;
     [SerializeField] PlayerActions playerActions;
+    [SerializeField] StepDoneUI stepDone;
 
     TutorialProgress progress;
+    Texts texts;
     AwaitableCompletionSource finished;
 
     public async Awaitable Run(Config config)
     {
+        texts = config.texts;
         await ui.ShowPrompt(config.texts.intro, config.texts.next);
 
         progress = new TutorialProgress(config.turnAngle, config.tutorialSteps);
@@ -32,7 +35,10 @@ public class TutorialController : MonoBehaviour
 
     void OnPerformed(string action)
     {
+        int stepIndex = progress.StepIndex;
         progress.Register(action);
+        if (progress.StepIndex != stepIndex)
+            stepDone.Show(texts.stepDone);
         if (progress.IsFinished)
             finished.TrySetResult();
         else
@@ -45,5 +51,6 @@ public class TutorialController : MonoBehaviour
         if (progress.Current.action == TutorialStep.TurnAround)
             count = $"{Mathf.Abs(progress.TurnedDegrees):0}° / 360°" + (count == "" ? "" : $"  ({count})");
         ui.ShowInstruction(progress.Current.text, count);
+        actionButtons.SetWanted(progress.Current.action);
     }
 }

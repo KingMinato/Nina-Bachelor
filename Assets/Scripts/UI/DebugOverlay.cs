@@ -10,6 +10,7 @@ public class DebugOverlay : MonoBehaviour
     string paramsLine = "";
     string avatarLine = "";
     string roomLine = "";
+    string uiLine = "";
     GameState state;
 
     public void Show(UrlParams p)
@@ -30,6 +31,12 @@ public class DebugOverlay : MonoBehaviour
         Refresh();
     }
 
+    public void ShowUi(string name)
+    {
+        uiLine = $"  ui={name}";
+        Refresh();
+    }
+
     public void SetState(GameState state)
     {
         this.state = state;
@@ -38,6 +45,6 @@ public class DebugOverlay : MonoBehaviour
 
     void Refresh()
     {
-        label.text = $"{state}\n{paramsLine}{avatarLine}{roomLine}";
+        label.text = $"{state}\n{paramsLine}{avatarLine}{roomLine}{uiLine}";
     }
 }

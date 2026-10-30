@@ -2,12 +2,17 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-// Placeholder UI: one prompt panel with a message and one or two buttons,
-// a single button without text for "Ansprechen", and an instruction line at the top.
+// Dialog UI: one prompt panel with a message and one or two buttons, a single button for "Ansprechen",
+// and an instruction line at the top. Looks and transitions come from the UI style (UiSkin).
+// Messages are typed out; the buttons appear once the text is complete.
 public class UIManager : MonoBehaviour
 {
     [SerializeField] GameObject promptPanel;
     [SerializeField] TMP_Text promptText;
+    [SerializeField] UiTypewriter typewriter;
+    [SerializeField] GameObject speakerTag;
+    [SerializeField] TMP_Text speakerLabel;
+    [SerializeField] GameObject loader;
     [SerializeField] Button promptButton;
     [SerializeField] TMP_Text promptButtonLabel;
     [SerializeField] Button secondButton;
@@ -18,8 +23,11 @@ public class UIManager : MonoBehaviour
     [SerializeField] TMP_Text instructionText;
     [SerializeField] TMP_Text instructionCount;
 
-    [Tooltip("Buttons stay disabled this long after a prompt appears, so a double tap cannot skip the next prompt.")]
+    [Tooltip("Buttons stay disabled this long after they appear, so a double tap cannot skip the next prompt.")]
     [SerializeField] float inputDelaySeconds = 0.4f;
+
+    // When the buttons of the last prompt appeared (realtime), the start of the decision time.
+    public double OptionsShownAt { get; private set; }
 
     void Awake()
     {
@@ -31,26 +39,37 @@ public class UIManager : MonoBehaviour
     // Instruction at the top of the screen, stays until hidden. count is e.g. "1 / 2" or empty.
     public void ShowInstruction(string text, string count = "")
     {
+        bool wasShown = instructionPanel.activeSelf;
+        bool textChanged = instructionText.text != text;
+        bool countChanged = instructionCount.text != count;
         instructionText.text = text;
         instructionCount.text = count;
-        instructionPanel.SetActive(true);
+        instructionCount.gameObject.SetActive(count != "");
+        // Show also cancels a hide that is still pending (instruction replaced right after the tutorial).
+        UiSkin.Show(instructionPanel);
+        if (!wasShown)
+            return;
+        if (textChanged)
+            Pulse(instructionPanel);
+        else if (countChanged)
+            Pulse(instructionCount.gameObject);
     }
 
     public void HideInstruction()
     {
-        instructionPanel.SetActive(false);
+        UiSkin.Hide(instructionPanel);
     }
 
-    // Shows the message and completes when the button is pressed.
-    public async Awaitable ShowPrompt(string message, string buttonLabel)
+    // Shows the message and completes when the button is pressed. speaker puts a name tag on the panel.
+    public async Awaitable ShowPrompt(string message, string buttonLabel, string speaker = null)
     {
-        await Ask(message, buttonLabel, null);
+        await Ask(message, buttonLabel, null, speaker);
     }
 
     // Shows the message with two buttons. Returns true for the first, false for the second.
-    public async Awaitable<bool> ShowChoice(string message, string firstLabel, string secondLabel)
+    public async Awaitable<bool> ShowChoice(string message, string firstLabel, string secondLabel, string speaker = null)
     {
-        return await Ask(message, firstLabel, secondLabel) == 0;
+        return await Ask(message, firstLabel, secondLabel, speaker) == 0;
     }
 
     // Shows only a button and completes when it is pressed.
@@ -58,7 +77,7 @@ public class UIManager : MonoBehaviour
     {
         soloButtonLabel.text = label;
         soloButton.interactable = false;
-        soloButton.gameObject.SetActive(true);
+        UiSkin.Show(soloButton.gameObject);
         await Awaitable.WaitForSecondsAsync(inputDelaySeconds);
         soloButton.interactable = true;
 
@@ -69,29 +88,37 @@ public class UIManager : MonoBehaviour
         soloButton.onClick.RemoveListener(OnClick);
 
         soloButton.interactable = false;
-        soloButton.gameObject.SetActive(false);
+        UiSkin.Hide(soloButton.gameObject);
     }
 
-    // Shows a message without a button, e.g. the end text.
+    // Shows a message without a button, e.g. the end text, with a small loading animation.
     public void ShowMessage(string message)
     {
-        promptText.text = message;
         promptButton.gameObject.SetActive(false);
         secondButton.gameObject.SetActive(false);
-        promptPanel.SetActive(true);
+        speakerTag.SetActive(false);
+        UiSkin.Show(promptPanel);
+        loader.SetActive(true);
+        _ = typewriter.Play(promptText, message);
     }
 
     // Returns the index of the pressed button. secondLabel null shows only the first button.
-    async Awaitable<int> Ask(string message, string firstLabel, string secondLabel)
+    async Awaitable<int> Ask(string message, string firstLabel, string secondLabel, string speaker)
     {
-        promptText.text = message;
+        promptButton.gameObject.SetActive(false);
+        secondButton.gameObject.SetActive(false);
+        loader.SetActive(false);
+        speakerLabel.text = speaker ?? "";
+        speakerTag.SetActive(!string.IsNullOrEmpty(speaker));
         promptButtonLabel.text = firstLabel;
-        promptButton.gameObject.SetActive(true);
         secondButtonLabel.text = secondLabel ?? "";
-        secondButton.gameObject.SetActive(secondLabel != null);
-        SetInteractable(false);
-        promptPanel.SetActive(true);
+        UiSkin.Show(promptPanel);
+        await typewriter.Play(promptText, message);
 
+        SetInteractable(false);
+        promptButton.gameObject.SetActive(true);
+        secondButton.gameObject.SetActive(secondLabel != null);
+        OptionsShownAt = Time.realtimeSinceStartupAsDouble;
         await Awaitable.WaitForSecondsAsync(inputDelaySeconds);
         SetInteractable(true);
 
@@ -105,7 +132,7 @@ public class UIManager : MonoBehaviour
         secondButton.onClick.RemoveListener(OnSecond);
 
         SetInteractable(false);
-        promptPanel.SetActive(false);
+        UiSkin.Hide(promptPanel);
         return index;
     }
 
@@ -113,5 +140,11 @@ public class UIManager : MonoBehaviour
     {
         promptButton.interactable = value;
         secondButton.interactable = value;
+    }
+
+    static void Pulse(GameObject go)
+    {
+        if (go.TryGetComponent(out UiSkin skin))
+            skin.Pulse();
     }
 }

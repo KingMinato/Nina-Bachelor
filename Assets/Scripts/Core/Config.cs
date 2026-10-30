@@ -76,9 +76,15 @@ public class Texts
     // Shown after the tutorial while the closed door can be tapped.
     public string goToDoorHint = "PLACEHOLDER";
     public string jump = "Springen";
+    // Shown briefly after each completed tutorial step, empty = not shown.
+    public string stepDone = "Geschafft!";
     public string goToDoor = "Zur Tür";
     public string talk = "Ansprechen";
     public string npcGreeting = "PLACEHOLDER";
+    // Name tag above the NPC's dialog lines, empty = no tag.
+    public string speaker = "Gegenüber";
+    // Round label during the dialog, empty = hidden.
+    public string round = "Runde {round} von {total}";
     public string round1Intro = "PLACEHOLDER";
     public string round2Intro = "PLACEHOLDER";
     public string round3Intro = "PLACEHOLDER";

@@ -120,4 +120,13 @@ public class UrlParamsTests
         Assert.AreEqual("", Parse("?pid=R_1&room=Buero").RoomOverride);
         Assert.AreEqual("", Parse("?debug=1").RoomOverride);
     }
+
+    [Test]
+    public void UiOverride_OnlyInTestRuns()
+    {
+        Assert.AreEqual("Holz", Parse("?ui=Holz").UiOverride);
+        Assert.AreEqual("Pixel", Parse("?pid=R_1&debug=1&ui=Pixel").UiOverride);
+        Assert.AreEqual("", Parse("?pid=R_1&ui=Pixel").UiOverride);
+        Assert.AreEqual("", Parse("?debug=1").UiOverride);
+    }
 }

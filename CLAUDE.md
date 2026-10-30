@@ -32,6 +32,7 @@ Data is linked across all three via `pid` (Qualtrics ResponseID from Survey A).
 | `debug` | `1` | Skips tutorial, shows debug overlay and the avatar switcher (button "Avatar": all species, m/w, jump; in the Unity Editor the switcher is always shown), does NOT post to Google Sheet |
 | `a` | avatar species id | Test runs only (no `pid` or `debug=1`): shows this avatar regardless of `s`, e.g. `?a=slime&g=w`. Ignored in real runs |
 | `room` | room variant name | Test runs only: starts with this furnishing variant (see section 5a), e.g. `?debug=1&room=Holz`. Ignored in real runs |
+| `ui` | UI style name | Test runs only: starts with this UI style (see section 6a), e.g. `?debug=1&ui=Skizze`. Ignored in real runs |
 
 Parse from `Application.absoluteURL`. If `pid` is missing, generate `test-<timestamp>` and treat as a test run (still playable, flagged in data).
 
@@ -65,7 +66,8 @@ Parse from `Application.absoluteURL`. If `pid` is missing, generate `test-<times
 - Tutorial: a sequence of instructions shown as text. Player completes each with UI buttons (click adventure style, identical on PC and mobile).
   - Buttons: **arrow left** at the left screen edge and **arrow right** at the right edge (turn), **jump** at the bottom.
   - Example steps: "Dreh dich nach links", "Spring einmal", "Dreh dich einmal komplett um". Steps are defined in config (text + required action + count). Actions: `turnLeft`, `turnRight`, `jump`, `turnAround` (a full 360 deg turn in either direction, independent of `turnAngle`; count = number of full turns). Turns in the wrong direction are performed but not counted.
-- After the last step: the door stays closed and becomes a tappable button **"Zur Tür"** (world-space UI on the door). The turn arrows stay visible so the player can turn towards the door.
+  - The button(s) the current step asks for are highlighted; after each completed step a short "Geschafft!" (`texts.stepDone`) appears without blocking.
+- After the last step: the door stays closed and the whole door becomes tappable (world-space button covering the door, with a style-specific outline and a **"Zur Tür"** tag). The turn arrows stay visible so the player can turn towards the door.
 
 ### Transition
 - Tapping the door: the player walks up to the door, the door opens, then automatic movement continues (scripted camera path or simple lerp) through the door into Room 2, ending in front of the NPC.
@@ -77,7 +79,8 @@ Parse from `Application.absoluteURL`. If `pid` is missing, generate `test-<times
 
 ### Dialog: Ultimatum Game (4 rounds)
 - Dialog cannot be exited. No close button, no movement, no back navigation.
-- Balance displayed permanently. Starts at 0 CHF.
+- Balance displayed permanently. Starts at 0 CHF. Gains count up with a short "+N CHF". Round label "Runde 1 von 4" (`texts.round`, empty hides it). NPC lines carry a name tag (`texts.speaker`).
+- Dialog texts are typed out (speed per UI style, tapping the panel shows the rest); the buttons appear when the text is complete.
 - Each round, 100 CHF of new, neutral money comes into play. The player's share is added to the balance if the split is accepted.
 - After each round, show the result (accepted/rejected, what each received), then continue.
 
@@ -181,6 +184,18 @@ Several furnishing variants of both rooms live in `Main.unity` at the same time,
 
 ---
 
+## 6a. UI Styles (2026-10-30)
+
+Three styles from the prototype round (Mockup Viewer, rated "Gut"), switchable at runtime: `Pixel` (Press Start 2P, navy boxes, stepped motion), `Skizze` (Patrick Hand, paper and felt pen, boiling outlines), `Holz` (Alegreya + Cinzel, wood, parchment, iron). Start style: `UiStyles.startIndex` on the `UI` canvas (0 = Pixel). Debug switcher button "UI" below "Raum" (`DebugUiSwitcher`, Editor always, builds with `?debug=1`), URL `ui=` in test runs.
+
+- `UiStyle` (ScriptableObject, `Data/UiStyles/<Name>.asset`): fonts, typewriter speed and a `UiLook` per skin key (sprites/frames, colours, text size and font, rect override, motions: enter, exit, swap, idle, wantIdle, press, pulse).
+- `UiSkin` on every styled element names a key. It applies the look of `UiStyles.Current` (also to inactive objects) and plays the motions: enter on activation, exit on `UiSkin.Hide`, swap when shown again within 0.06 s (next dialog line), press on tap, idle loops, sprite frame cycling. `decoration` elements (tape, rollers, highlighter, icons) are invisible in styles without a look for their key. Logic scripts keep using `SetActive`; `UiSkin.Show/Hide` only adds transitions.
+- `UiMotions`: the CSS keyframes of the prototypes as code (offsets in canvas px, `UiSkin.motionScale` for the world-space door canvas).
+- Everything is built by `Editor/UiStyleBuilder.cs` (menu **Mirror Game/Build UI Styles**, safe to rerun): sprite import settings, TMP font assets (`Art/UI/Fonts`, dynamic, glyphs cleared on build and generated from the TTF at runtime), font materials (outline/shadow), the three style assets, and the skin keys, decorations and new elements in `Main.unity`. Change looks in the builder, not in the assets.
+- Sprites are drawn from code by `Tools/ui_sprites.py` (Python, numpy + Pillow) into `Art/UI/Styles/<Style>/`, with `sprites.json` (9-slice borders, point filter). Rerun the script, then the builder.
+- Fonts are Google Fonts under the SIL Open Font License (licence texts next to the TTFs), allowed to ship in the build and the public repo.
+- `CameraAim.pitchDown` (14 deg) keeps the NPC's face in the upper part of the screen, above the dialog panel.
+
 ## 7. Config
 
 `Assets/StreamingAssets/config.json`, loaded at startup via UnityWebRequest (WebGL cannot read StreamingAssets with File IO). Allows text and parameter changes without code changes.
@@ -208,9 +223,12 @@ Several furnishing variants of both rooms live in `Main.unity` at the same time,
     "intro": "PLACEHOLDER",
     "goToDoorHint": "PLACEHOLDER",
     "jump": "Springen",
+    "stepDone": "Geschafft!",
     "goToDoor": "Zur Tür",
     "talk": "Ansprechen",
     "npcGreeting": "PLACEHOLDER",
+    "speaker": "Gegenüber",
+    "round": "Runde {round} von {total}",
     "round1Intro": "PLACEHOLDER",
     "round2Intro": "PLACEHOLDER",
     "round3Intro": "PLACEHOLDER",
@@ -247,14 +265,16 @@ Assets/
     World/       Door.cs, WalkPath.cs, CameraAim.cs, NpcLookAt.cs, RoomSurface.cs, RoomVariant.cs, RoomVariants.cs
     Mirror/      MirrorWorld.cs, MirrorWall.cs, MirrorAvatarSync.cs
     Avatar/      AvatarDatabase.cs (ScriptableObject), AvatarSpawner.cs, AvatarBody.cs
-    Dialog/      UltimatumController.cs, SplitInputUI.cs, BalanceUI.cs
+    Dialog/      UltimatumController.cs, SplitInputUI.cs, BalanceUI.cs, RoundUI.cs
     Data/        SessionData.cs, IResultSubmitter.cs, ResultSubmitter.cs, ResultJson.cs, Redirector.cs
-    UI/          UIManager.cs, ActionButtonsUI.cs, WorldButton.cs, OrientationOverlay.cs, DebugOverlay.cs, DebugAvatarSwitcher.cs, DebugRoomSwitcher.cs
+    UI/          UIManager.cs, ActionButtonsUI.cs, WorldButton.cs, StepDoneUI.cs, OrientationOverlay.cs, DebugOverlay.cs, DebugAvatarSwitcher.cs, DebugRoomSwitcher.cs, DebugUiSwitcher.cs
+    UI/Skin/     UiStyle.cs (ScriptableObject + UiLook), UiStyles.cs, UiSkin.cs, UiMotion.cs, UiTypewriter.cs, UiMaxWidth.cs
   Plugins/WebGL/ Redirect.jslib
-  Editor/        BuildScript.cs, HumanoidClipBuilder.cs, AvatarBuilder.cs, RoomVariantBuilder.cs, MockupViewer/ (MockupViewerWindow.cs, MockupGUI.cs)
+  Editor/        BuildScript.cs, HumanoidClipBuilder.cs, AvatarBuilder.cs, RoomVariantBuilder.cs, UiStyleBuilder.cs, MockupViewer/ (MockupViewerWindow.cs, MockupGUI.cs)
+  Art/UI/        Fonts/ (OFL TTFs + TMP assets), Styles/<Style>/*.png + sprites.json (generated by Tools/ui_sprites.py)
   Animations/    Avatar.controller, Humanoid_Idle/Jump.anim, *.overrideController
   Prefabs/       Avatars/Avatar_<id>[_m|_w].prefab, NPC.prefab
-  Data/          AvatarDatabase.asset
+  Data/          AvatarDatabase.asset, UiStyles/Pixel|Skizze|Holz.asset
   StreamingAssets/config.json
   Scenes/        Main.unity
 ```
@@ -353,7 +373,7 @@ Note: "Evenly Present" counts assignments, not completions. Dropouts can unbalan
 
 ## 13. Milestones
 
-Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> Survey B verified 2026-10-29. Milestone 2 done (2026-10-29). Milestone 3 done (2026-10-29). Milestone 4 built 2026-10-30 (all 8 candidates and the NPC checked in the mirrors in play mode), waiting for review in Unity and the thesis author's final 4 species. Room furnishing mockups (6 variants, section 5a) built 2026-10-30, waiting for the developer's rating. Next: milestone 5.
+Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> Survey B verified 2026-10-29. Milestone 2 done (2026-10-29). Milestone 3 done (2026-10-29). Milestone 4 built 2026-10-30 (all 8 candidates and the NPC checked in the mirrors in play mode), waiting for review in Unity and the thesis author's final 4 species. Room furnishing mockups (6 variants, section 5a) built 2026-10-30, waiting for the developer's rating. Three UI styles (section 6a) built into the game 2026-10-30, switchable for comparison, waiting for the choice. Next: milestone 5.
 
 1. **Foundation** (done): BuildScript, config loading, URL params, GameFlow with placeholder UI, ultimatum logic, SessionData, submit + redirect. Primitives only. Goal: full run Qualtrics -> Game -> Sheet -> Qualtrics works end to end.
 2. **Rooms and movement** (done): Room 1 and 2 greybox, door, turn/jump buttons, tutorial steps from config, walk to NPC.
@@ -389,6 +409,7 @@ Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> S
 
 - Final 4 species not decided yet (8 candidates built, mapping in `config.json`).
 - Room variant not chosen yet (section 5a). After the choice: set `startIndex`, remove the other variants (and unused packs) from the builder.
+- UI style not chosen yet (section 6a). After the choice: set `UiStyles.startIndex`, remove the other styles from the builder (fonts, sprites, looks).
 - Build size 2026-10-30: 38.4 MB (37.2 MB without room variants), over the 30 MB target. Main causes are avatar textures at 4096: mushroom (`T_Mushroom_*`, ~64 MB uncompressed), `Generic_Normals_01`, `Generic_01_A`, `Generic_Emissive_01_A`.
 - Final texts (intro, tutorial, NPC dialog) will be written by the thesis author.
 - Data storage rules of the university unknown. Google Sheet is the working assumption.
@@ -396,4 +417,4 @@ Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> S
 - Test setup runs on the developer's Google account (Sheet + Apps Script) and free Qualtrics account (Survey A "Mirror Game – Teil A": https://qualtricsxmbxwbdbh7v.qualtrics.com/jfe/form/SV_5iPvenZKKZp0isC, Survey B "Mirror Game – Teil B"). Before the pilot, move everything (Sheet, Apps Script, Qualtrics surveys, e.g. via .qsf export/import) to the thesis author's account and update `appsScriptUrl` and `returnUrlTemplate` in config.json.
 - Thesis author should check whether the university has a Qualtrics license with URL redirect (otherwise keep the link workaround from section 11).
 - Before the pilot, delete all test rows/responses in the Sheet, Survey A and Survey B.
-- Decisions to confirm with the thesis author: split slider starts at 50:50 (possible anchoring); round intro text is shown together with the options, so decision time includes reading time; decision time starts when options appear, including the 0.4 s input lock. Tutorial: actions other than the requested one are performed but not counted; the NPC greeting is shown as the first dialog line after "Ansprechen".
+- Decisions to confirm with the thesis author: decision time starts when the buttons appear after the typed-out text (so it no longer includes most of the reading time), still including the 0.4 s input lock; split slider starts at 50:50 (possible anchoring); Tutorial: actions other than the requested one are performed but not counted; the NPC greeting is shown as the first dialog line after "Ansprechen".

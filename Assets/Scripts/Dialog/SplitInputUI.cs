@@ -3,10 +3,12 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // Split input for rounds 1 and 3: slider plus -/+ buttons in splitStep steps,
-// live shares label and a confirm button. Starts inactive in the scene.
+// live shares label and a confirm button. The message is typed out, the confirm button appears
+// when it is complete. Starts inactive in the scene.
 public class SplitInputUI : MonoBehaviour
 {
     [SerializeField] TMP_Text messageText;
+    [SerializeField] UiTypewriter typewriter;
     [SerializeField] Slider slider;
     [SerializeField] Button minusButton;
     [SerializeField] Button plusButton;
@@ -18,6 +20,9 @@ public class SplitInputUI : MonoBehaviour
     [SerializeField] float inputDelaySeconds = 0.4f;
 
     Config config;
+
+    // When the controls became usable (realtime), the start of the decision time.
+    public double OptionsShownAt { get; private set; }
 
     // Runs on first activation. The slider works in whole step units, so it can only land on valid amounts.
     void Awake()
@@ -35,7 +40,6 @@ public class SplitInputUI : MonoBehaviour
     public async Awaitable<int> Ask(string message, Config config, int startPlayerKeeps)
     {
         this.config = config;
-        messageText.text = message;
         confirmLabel.text = config.texts.confirm;
         slider.minValue = 0;
         slider.maxValue = config.moneyPerRound / Step;
@@ -43,7 +47,11 @@ public class SplitInputUI : MonoBehaviour
         UpdateShares();
 
         SetInteractable(false);
-        gameObject.SetActive(true);
+        confirmButton.gameObject.SetActive(false);
+        UiSkin.Show(gameObject);
+        await typewriter.Play(messageText, message);
+        confirmButton.gameObject.SetActive(true);
+        OptionsShownAt = Time.realtimeSinceStartupAsDouble;
         await Awaitable.WaitForSecondsAsync(inputDelaySeconds);
         SetInteractable(true);
 
@@ -54,7 +62,7 @@ public class SplitInputUI : MonoBehaviour
         confirmButton.onClick.RemoveListener(OnConfirm);
 
         SetInteractable(false);
-        gameObject.SetActive(false);
+        UiSkin.Hide(gameObject);
         return PlayerKeeps;
     }
 

@@ -1,0 +1,624 @@
+{
+ "sprites": [
+  {
+   "path": "Pixel/box.png",
+   "border": [
+    4,
+    9,
+    4,
+    4
+   ],
+   "point": true
+  },
+  {
+   "path": "Pixel/btn.png",
+   "border": [
+    4,
+    9,
+    4,
+    4
+   ],
+   "point": true
+  },
+  {
+   "path": "Pixel/btn_yel.png",
+   "border": [
+    4,
+    9,
+    4,
+    4
+   ],
+   "point": true
+  },
+  {
+   "path": "Pixel/box_yel.png",
+   "border": [
+    4,
+    9,
+    4,
+    4
+   ],
+   "point": true
+  },
+  {
+   "path": "Pixel/ring_0.png",
+   "border": [
+    7,
+    7,
+    7,
+    7
+   ],
+   "point": true
+  },
+  {
+   "path": "Pixel/ring_1.png",
+   "border": [
+    7,
+    7,
+    7,
+    7
+   ],
+   "point": true
+  },
+  {
+   "path": "Pixel/block_off.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": true
+  },
+  {
+   "path": "Pixel/block_on.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": true
+  },
+  {
+   "path": "Pixel/arrow.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": true
+  },
+  {
+   "path": "Pixel/up.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": true
+  },
+  {
+   "path": "Pixel/talk.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": true
+  },
+  {
+   "path": "Pixel/tri.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": true
+  },
+  {
+   "path": "Pixel/down.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": true
+  },
+  {
+   "path": "Pixel/coin.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": true
+  },
+  {
+   "path": "Pixel/star.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": true
+  },
+  {
+   "path": "Pixel/dot_0.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": true
+  },
+  {
+   "path": "Pixel/dot_1.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": true
+  },
+  {
+   "path": "Skizze/paper_0.png",
+   "border": [
+    36,
+    40,
+    40,
+    36
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/paper_1.png",
+   "border": [
+    36,
+    40,
+    40,
+    36
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/paper_2.png",
+   "border": [
+    36,
+    40,
+    40,
+    36
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/note.png",
+   "border": [
+    24,
+    28,
+    28,
+    24
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/blue.png",
+   "border": [
+    24,
+    28,
+    28,
+    24
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/circle_0.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/ring_0.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/ringrect_0.png",
+   "border": [
+    36,
+    36,
+    36,
+    36
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/rail_0.png",
+   "border": [
+    10,
+    0,
+    10,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/odot_0.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/circle_1.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/ring_1.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/ringrect_1.png",
+   "border": [
+    36,
+    36,
+    36,
+    36
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/rail_1.png",
+   "border": [
+    10,
+    0,
+    10,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/odot_1.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/circle_2.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/ring_2.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/ringrect_2.png",
+   "border": [
+    36,
+    36,
+    36,
+    36
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/rail_2.png",
+   "border": [
+    10,
+    0,
+    10,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/odot_2.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/tape.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/tag.png",
+   "border": [
+    14,
+    10,
+    14,
+    10
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/hl.png",
+   "border": [
+    18,
+    14,
+    18,
+    14
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/lines.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/turn.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/up.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/down.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/check.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Skizze/dots.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Holz/plank.png",
+   "border": [
+    36,
+    46,
+    36,
+    36
+   ],
+   "point": false
+  },
+  {
+   "path": "Holz/panel.png",
+   "border": [
+    56,
+    64,
+    56,
+    56
+   ],
+   "point": false
+  },
+  {
+   "path": "Holz/scroll.png",
+   "border": [
+    24,
+    24,
+    24,
+    24
+   ],
+   "point": false
+  },
+  {
+   "path": "Holz/roller.png",
+   "border": [
+    0,
+    24,
+    0,
+    24
+   ],
+   "point": false
+  },
+  {
+   "path": "Holz/shield.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Holz/glow.png",
+   "border": [
+    60,
+    60,
+    60,
+    60
+   ],
+   "point": false
+  },
+  {
+   "path": "Holz/glow_circle.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Holz/banner.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Holz/rail.png",
+   "border": [
+    14,
+    0,
+    14,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Holz/gem.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Holz/turn.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Holz/up.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Holz/coin.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Holz/pouch.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Holz/seal.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Holz/rope.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  }
+ ]
+}

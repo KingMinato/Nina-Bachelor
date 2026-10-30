@@ -1,0 +1,1338 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5f55e2e5fe957942b5618478fc4b4da, type: 3}
+  m_Name: Pixel
+  m_EditorClassIdentifier: Game::UiStyle
+  displayName: Pixel
+  font: {fileID: 11400000, guid: 6cd4ed13de060ed46a476ee8395c7102, type: 2}
+  titleFont: {fileID: 11400000, guid: 6cd4ed13de060ed46a476ee8395c7102, type: 2}
+  charsPerSecond: 45
+  looks:
+  - key: Panel
+    sprites:
+    - {fileID: 21300000, guid: 40f9b51840735e04b853f79ee2c3b475, type: 3}
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 1
+    pixelsPerUnit: 0.33333334
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 0
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 3
+    exit: 4
+    swap: 5
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Prompt.Text
+    sprites: []
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 27
+    textColor: {r: 1, g: 1, b: 1, a: 1}
+    alignment: 257
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 45
+    rectMode: 2
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 1, y: 1}
+    offsetMin: {x: 54, y: 180}
+    offsetMax: {x: -54, y: -44}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Split.Text
+    sprites: []
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 27
+    textColor: {r: 1, g: 1, b: 1, a: 1}
+    alignment: 257
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 45
+    rectMode: 2
+    anchorMin: {x: 0, y: 1}
+    anchorMax: {x: 1, y: 1}
+    offsetMin: {x: 54, y: -200}
+    offsetMax: {x: -54, y: -40}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Split.Shares
+    sprites: []
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 30
+    textColor: {r: 1, g: 0.8235294, b: 0.24705882, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 0
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Button
+    sprites:
+    - {fileID: 21300000, guid: e36451f1c2a395541a7e901820d5466d, type: 3}
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 1
+    pixelsPerUnit: 0.33333334
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 1
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 340, y: 111}
+    rotation: 0
+    enter: 1
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 6
+    pulse: 0
+    idleDuration: 0
+  - key: Button.Text
+    sprites: []
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 24
+    textColor: {r: 0.101960786, g: 0.09411765, b: 0.2, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 2
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 1, y: 1}
+    offsetMin: {x: 0, y: 15}
+    offsetMax: {x: -0, y: -0}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Panel.Speaker
+    sprites:
+    - {fileID: 21300000, guid: b7d4561ee20e9184787b253a7ac6e656, type: 3}
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 1
+    pixelsPerUnit: 0.25
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 1
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 250, y: 64}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Panel.Speaker.Text
+    sprites: []
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 18
+    textColor: {r: 0.101960786, g: 0.09411765, b: 0.2, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 2
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 1, y: 1}
+    offsetMin: {x: 0, y: 12}
+    offsetMax: {x: -0, y: -0}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Loader.Dot
+    sprites:
+    - {fileID: 21300000, guid: 4c8af032be39be141a50127a0242980f, type: 3}
+    - {fileID: 21300000, guid: 2b939b90620a7c1429006b1a354905f0, type: 3}
+    - {fileID: 21300000, guid: 2b939b90620a7c1429006b1a354905f0, type: 3}
+    framesPerSecond: 3.33
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 0
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Talk
+    sprites:
+    - {fileID: 21300000, guid: 40f9b51840735e04b853f79ee2c3b475, type: 3}
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 1
+    pixelsPerUnit: 0.33333334
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 1
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 460, y: 115}
+    rotation: 0
+    enter: 1
+    exit: 2
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 6
+    pulse: 0
+    idleDuration: 0
+  - key: Talk.Text
+    sprites: []
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 28
+    textColor: {r: 1, g: 1, b: 1, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 2
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 1, y: 1}
+    offsetMin: {x: 100, y: 15}
+    offsetMax: {x: -24, y: -0}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Talk.Icon
+    sprites:
+    - {fileID: 21300000, guid: 41c5217bd6ec6e44d98f9f338961aedf, type: 3}
+    framesPerSecond: 8
+    color: {r: 1, g: 0.8235294, b: 0.24705882, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 1
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 2
+    anchorMin: {x: 0, y: 0.5}
+    anchorMax: {x: 0, y: 0.5}
+    offsetMin: {x: 34, y: -9.5}
+    offsetMax: {x: 90, y: 23.5}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 9
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0.6
+  - key: Instr
+    sprites:
+    - {fileID: 21300000, guid: 40f9b51840735e04b853f79ee2c3b475, type: 3}
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 1
+    pixelsPerUnit: 0.33333334
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 0
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 1
+    exit: 2
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 1
+    idleDuration: 0
+  - key: Instr.Text
+    sprites: []
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 30
+    textColor: {r: 1, g: 1, b: 1, a: 1}
+    alignment: 4097
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 30
+    rectMode: 0
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Instr.Count
+    sprites: []
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 30
+    textColor: {r: 1, g: 0.8235294, b: 0.24705882, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 0
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 7
+    idleDuration: 0
+  - key: Instr.Tri
+    sprites:
+    - {fileID: 21300000, guid: 663bc9756ed7ef64e9558890e2c1b0a8, type: 3}
+    framesPerSecond: 8
+    color: {r: 1, g: 0.8235294, b: 0.24705882, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 1
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 2
+    anchorMin: {x: 0, y: 0.5}
+    anchorMax: {x: 0, y: 0.5}
+    offsetMin: {x: 22, y: -7}
+    offsetMax: {x: 38, y: 21}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 10
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Arrow
+    sprites:
+    - {fileID: 21300000, guid: 40f9b51840735e04b853f79ee2c3b475, type: 3}
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 1
+    pixelsPerUnit: 0.33333334
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 1
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 140, y: 155}
+    rotation: 0
+    enter: 1
+    exit: 2
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 6
+    pulse: 0
+    idleDuration: 0
+  - key: Arrow.Icon
+    sprites:
+    - {fileID: 21300000, guid: e879d55b8ce7db946a28230fa6d7e2fc, type: 3}
+    framesPerSecond: 8
+    color: {r: 1, g: 0.8235294, b: 0.24705882, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 1
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 2
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 1, y: 1}
+    offsetMin: {x: 28, y: 43}
+    offsetMax: {x: -28, y: -28}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 9
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Arrow.Want
+    sprites:
+    - {fileID: 21300000, guid: b6c8b5d8c70f45e47838cb2da7c30cf7, type: 3}
+    - {fileID: 21300000, guid: cb7842561ab80bf4ca302a81a4c528a9, type: 3}
+    framesPerSecond: 4
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 1
+    pixelsPerUnit: 0.33333334
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 2
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 1, y: 1}
+    offsetMin: {x: -12, y: 3}
+    offsetMax: {x: 12, y: 12}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Jump
+    sprites:
+    - {fileID: 21300000, guid: 40f9b51840735e04b853f79ee2c3b475, type: 3}
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 1
+    pixelsPerUnit: 0.33333334
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 1
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 360, y: 115}
+    rotation: 0
+    enter: 1
+    exit: 2
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 6
+    pulse: 0
+    idleDuration: 0
+  - key: Jump.Text
+    sprites: []
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 26
+    textColor: {r: 1, g: 1, b: 1, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 2
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 1, y: 1}
+    offsetMin: {x: 90, y: 15}
+    offsetMax: {x: -24, y: -0}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Jump.Icon
+    sprites:
+    - {fileID: 21300000, guid: 7607735bac2dbca4e88184531b5fc6d5, type: 3}
+    framesPerSecond: 8
+    color: {r: 1, g: 0.8235294, b: 0.24705882, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 1
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 2
+    anchorMin: {x: 0, y: 0.5}
+    anchorMax: {x: 0, y: 0.5}
+    offsetMin: {x: 36, y: -13}
+    offsetMax: {x: 76, y: 27}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 9
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Jump.Want
+    sprites:
+    - {fileID: 21300000, guid: b6c8b5d8c70f45e47838cb2da7c30cf7, type: 3}
+    - {fileID: 21300000, guid: cb7842561ab80bf4ca302a81a4c528a9, type: 3}
+    framesPerSecond: 4
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 1
+    pixelsPerUnit: 0.33333334
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 2
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 1, y: 1}
+    offsetMin: {x: -12, y: 3}
+    offsetMax: {x: 12, y: 12}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Step
+    sprites:
+    - {fileID: 21300000, guid: 40f9b51840735e04b853f79ee2c3b475, type: 3}
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 1
+    pixelsPerUnit: 0.33333334
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 1
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 110, y: 125}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 6
+    pulse: 0
+    idleDuration: 0
+  - key: Step.Text
+    sprites: []
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 40
+    textColor: {r: 1, g: 0.8235294, b: 0.24705882, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 2
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 1, y: 1}
+    offsetMin: {x: 0, y: 15}
+    offsetMax: {x: -0, y: -0}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Track
+    sprites:
+    - {fileID: 21300000, guid: 16e9d83f13aae1745bb5399a67139a69, type: 3}
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 2
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 2
+    anchorMin: {x: 0, y: 0.25}
+    anchorMax: {x: 1, y: 0.75}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: FillArea
+    sprites: []
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 2
+    anchorMin: {x: 0, y: 0.25}
+    anchorMax: {x: 1, y: 0.75}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Fill
+    sprites:
+    - {fileID: 21300000, guid: 6ed122279bde60d4284ef39ad4f5b051, type: 3}
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 2
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 3
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Handle
+    sprites: []
+    framesPerSecond: 8
+    color: {r: 0, g: 0, b: 0, a: 0}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 0
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Balance
+    sprites:
+    - {fileID: 21300000, guid: 40f9b51840735e04b853f79ee2c3b475, type: 3}
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 1
+    pixelsPerUnit: 0.33333334
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 1
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 330, y: 118}
+    rotation: 0
+    enter: 1
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 5
+    idleDuration: 0
+  - key: Balance.Icon
+    sprites:
+    - {fileID: 21300000, guid: 94f4bf9848b13864bafdc44958e03d0e, type: 3}
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 1
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 2
+    anchorMin: {x: 0, y: 0.5}
+    anchorMax: {x: 0, y: 0.5}
+    offsetMin: {x: 22, y: -21}
+    offsetMax: {x: 78, y: 35}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 11
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Balance.Caption
+    sprites: []
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 16
+    textColor: {r: 0.5411765, g: 0.53333336, b: 0.72156864, a: 1}
+    alignment: 1025
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 2
+    anchorMin: {x: 0, y: 0.5}
+    anchorMax: {x: 1, y: 1}
+    offsetMin: {x: 96, y: 10}
+    offsetMax: {x: -16, y: -14}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Balance.Value
+    sprites: []
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 28
+    textColor: {r: 1, g: 0.8235294, b: 0.24705882, a: 1}
+    alignment: 257
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 2
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 1, y: 0.5}
+    offsetMin: {x: 96, y: 18}
+    offsetMax: {x: -16, y: -2}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Balance.Gain
+    sprites: []
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 2100000, guid: f354f58514be181468725df48dc5dda3, type: 2}
+    fontSize: 30
+    textColor: {r: 1, g: 0.8235294, b: 0.24705882, a: 1}
+    alignment: 516
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 0
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 8
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Round
+    sprites:
+    - {fileID: 21300000, guid: 40f9b51840735e04b853f79ee2c3b475, type: 3}
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 1
+    pixelsPerUnit: 0.33333334
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 1
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 330, y: 88}
+    rotation: 0
+    enter: 1
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 1
+    idleDuration: 0
+  - key: Round.Text
+    sprites: []
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 20
+    textColor: {r: 1, g: 0.8235294, b: 0.24705882, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 2
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 1, y: 1}
+    offsetMin: {x: 0, y: 15}
+    offsetMax: {x: -0, y: -0}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Done
+    sprites: []
+    framesPerSecond: 8
+    color: {r: 0, g: 0, b: 0, a: 0}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 0
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 2
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Done.Icon
+    sprites:
+    - {fileID: 21300000, guid: 41a4df98195627144b9202cbede247f3, type: 3}
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 1
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 0
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 1
+    exit: 0
+    swap: 0
+    idle: 12
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Done.Text
+    sprites: []
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 2100000, guid: f354f58514be181468725df48dc5dda3, type: 2}
+    fontSize: 64
+    textColor: {r: 1, g: 0.8235294, b: 0.24705882, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 0
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 1
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Door.Outline
+    sprites:
+    - {fileID: 21300000, guid: b6c8b5d8c70f45e47838cb2da7c30cf7, type: 3}
+    - {fileID: 21300000, guid: cb7842561ab80bf4ca302a81a4c528a9, type: 3}
+    framesPerSecond: 3.33
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 1
+    pixelsPerUnit: 0.05
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 2
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 1, y: 1}
+    offsetMin: {x: -80, y: -80}
+    offsetMax: {x: 80, y: 80}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 1
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Door.Tag
+    sprites:
+    - {fileID: 21300000, guid: b7d4561ee20e9184787b253a7ac6e656, type: 3}
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 1
+    pixelsPerUnit: 0.083333336
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 1
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 1000, y: 300}
+    rotation: 0
+    enter: 1
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Door.Text
+    sprites: []
+    framesPerSecond: 8
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 100
+    textColor: {r: 0.101960786, g: 0.09411765, b: 0.2, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 2
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 1, y: 1}
+    offsetMin: {x: 0, y: 56}
+    offsetMax: {x: -0, y: -0}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Door.Pointer
+    sprites:
+    - {fileID: 21300000, guid: bab6cbfebb6b6884f9f8bdb49e9eaafe, type: 3}
+    framesPerSecond: 8
+    color: {r: 1, g: 0.8235294, b: 0.24705882, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 1
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 2
+    anchorMin: {x: 0.5, y: 1}
+    anchorMax: {x: 0.5, y: 1}
+    offsetMin: {x: -80, y: 30}
+    offsetMax: {x: 80, y: 190}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 9
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0

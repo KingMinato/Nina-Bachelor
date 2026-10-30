@@ -312,6 +312,8 @@ function doPost(e) {
 
 Important: send the POST with `Content-Type: text/plain` (JSON in the body) to avoid a CORS preflight, which Apps Script does not answer. Use `UnityWebRequest` with an `UploadHandlerRaw` and set the header manually.
 
+Analysis: `Tools/sheet_analysis.gs` (second script file in the same Apps Script project, run `updateAnalysis` once, then menu "Mirror Game > Auswertung aktualisieren", also refreshes on open). It writes the sheets "Auswertung" (sample, descriptives per species / avatar gender / survey gender / device, ANOVA + Kruskal-Wallis, Welch t + Mann-Whitney, chi-square, paired t R1 vs R3, effect sizes, legend) and "Daten (bereinigt)" (one row per pid, readable columns, derived offers, for CSV export). Only test = 0, first run per pid. Values are computed in the script, not as sheet formulas (formulas written by Apps Script broke in the German-locale sheet). The statistics were checked against scipy. Keep `SPECIES` and the round parameters at the top in sync with config.json.
+
 Note: the university may have data storage rules. Keep the submitter behind an interface so the backend can be swapped later.
 
 ---

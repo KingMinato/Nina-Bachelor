@@ -20,6 +20,7 @@ public class KeyRoom : MonoBehaviour
     public async Awaitable Run(Texts texts)
     {
         nav.Enter();
+        nav.onWalk = ui.HideInstruction; // the locked hint belongs to the door spot
         actionButtons.Show(texts);
         inventory.gameObject.SetActive(true);
         bool hasKey = false, unlocked = false;

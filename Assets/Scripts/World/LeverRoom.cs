@@ -31,6 +31,7 @@ public class LeverRoom : MonoBehaviour
     public async Awaitable Run(Texts texts)
     {
         nav.Enter();
+        nav.onWalk = ui.HideInstruction; // the locked hint belongs to the door spot
         actionButtons.Show(texts);
         bool solved = false;
         while (true)

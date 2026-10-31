@@ -20,6 +20,8 @@ public class RoomNav : MonoBehaviour
     [Tooltip("An arrow lies at most this far behind its spot.")]
     [SerializeField] float arrowBeyond = 1f;
 
+    [System.NonSerialized] public System.Action onWalk;
+
     int at;
     Vector3[] points;
 
@@ -49,6 +51,7 @@ public class RoomNav : MonoBehaviour
             if (to < 0)
                 return clicked;
 
+            onWalk?.Invoke();
             actionButtons.Hide();
             await player.StandUp();
             await walker.WalkTo(player.transform, to != 0, spots[to]);

@@ -20,6 +20,7 @@ public class MirrorWorld : MonoBehaviour
     readonly List<(Transform source, Transform copy)> synced = new List<(Transform, Transform)>();
     GameObject avatarClone;
     GameObject roomCopy;
+    bool pendingCopy;
 
     void Start()
     {
@@ -30,13 +31,25 @@ public class MirrorWorld : MonoBehaviour
     }
 
     // Copies the room again, e.g. after switching the room variant. Before Start this does nothing,
-    // Start makes the first copy.
+    // Start makes the first copy. While hidden (room not shown, see GameFlow.ShowRooms) the copy waits for OnEnable,
+    // because a copy of a hidden room would come out empty.
     public void RebuildRoom()
     {
         if (roomCopy == null)
             return;
         Destroy(roomCopy);
-        CopyRoom();
+        roomCopy = null;
+        if (isActiveAndEnabled)
+            CopyRoom();
+        else
+            pendingCopy = true;
+    }
+
+    void OnEnable()
+    {
+        if (pendingCopy)
+            CopyRoom();
+        pendingCopy = false;
     }
 
     void CopyRoom()

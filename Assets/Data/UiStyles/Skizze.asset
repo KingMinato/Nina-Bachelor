@@ -1453,11 +1453,44 @@ MonoBehaviour:
     press: 0
     pulse: 0
     idleDuration: 0
-  - key: Floor.Arrow
+  - key: Nav
+    sprites:
+    - {fileID: 21300000, guid: 785e787ef029f724b81f5239997d560b, type: 3}
+    - {fileID: 21300000, guid: 24876873e928a9d4fb2605deb57ebff2, type: 3}
+    - {fileID: 21300000, guid: 8ecd9a28beb2e1845b6eb3300ae66d8f, type: 3}
+    framesPerSecond: 8.3
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 1
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 156, y: 156}
+    rotation: 0
+    enter: 13
+    exit: 14
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 20
+    pulse: 0
+    idleDuration: 0
+  - key: Nav.Icon
     sprites:
     - {fileID: 21300000, guid: 8367d0e0c37282e488ef104b2df1883d, type: 3}
     framesPerSecond: 8
-    color: {r: 0.8862745, g: 0.27450982, b: 0.23137255, a: 1}
+    color: {r: 0.14901961, g: 0.13333334, b: 0.11764706, a: 1}
     imageType: 0
     pixelsPerUnit: 1
     preserveAspect: 1
@@ -1469,17 +1502,81 @@ MonoBehaviour:
     fontStyle: 0
     characterSpacing: 0
     lineSpacing: 0
-    rectMode: 0
+    rectMode: 2
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 1, y: 1}
+    offsetMin: {x: 32, y: 32}
+    offsetMax: {x: -32, y: -32}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 0
+    exit: 0
+    swap: 0
+    idle: 23
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Inventory
+    sprites:
+    - {fileID: 21300000, guid: 785e787ef029f724b81f5239997d560b, type: 3}
+    - {fileID: 21300000, guid: 24876873e928a9d4fb2605deb57ebff2, type: 3}
+    - {fileID: 21300000, guid: 8ecd9a28beb2e1845b6eb3300ae66d8f, type: 3}
+    framesPerSecond: 8.3
+    color: {r: 1, g: 1, b: 1, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 0
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 1
     anchorMin: {x: 0, y: 0}
     anchorMax: {x: 0, y: 0}
     offsetMin: {x: 0, y: 0}
     offsetMax: {x: 0, y: 0}
+    size: {x: 156, y: 156}
+    rotation: 0
+    enter: 13
+    exit: 14
+    swap: 0
+    idle: 0
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
+  - key: Inventory.Key
+    sprites:
+    - {fileID: 21300000, guid: 063a15f8d897c31478af0cbcf5ddcf05, type: 3}
+    framesPerSecond: 8
+    color: {r: 0.14901961, g: 0.13333334, b: 0.11764706, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 1
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 2
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 1, y: 1}
+    offsetMin: {x: 26, y: 26}
+    offsetMax: {x: -26, y: -26}
     size: {x: 0, y: 0}
     rotation: 0
     enter: 13
     exit: 0
     swap: 0
-    idle: 23
+    idle: 0
     wantIdle: 0
     press: 0
     pulse: 0

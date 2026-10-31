@@ -108,10 +108,11 @@ public class Texts
     // Shown briefly after each completed tutorial step, empty = not shown.
     public string stepDone = "Geschafft!";
     public string goToDoor = "Zur Tür";
-    // Room 2: tag on the key, door locked without it, short note when taken.
+    // Room 2: tag on the key, door locked without it, short notes when taken and when the door is unlocked.
     public string key = "Schlüssel";
     public string lockedKey = "Hm, die Tür ist verschlossen. Ob es wohl irgendwo einen Schlüssel hat?";
     public string keyTaken = "Schlüssel gefunden!";
+    public string doorUnlocked = "Aufgeschlossen!";
     // Room 3: door locked until the levers are set like on the sign, short note when solved.
     public string lockedLevers = "Hm, wieder verschlossen. Vielleicht wenn ich die Hebel richtig betätige …?";
     public string leversSolved = "Klick!";

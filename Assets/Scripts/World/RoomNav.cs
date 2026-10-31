@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Walking inside a room: arrows on the floor lead from the first spot (home, where the player enters)
-// to every other spot (in front of a mirror, door, key, ...) and back. Objects can only be used from their spot.
+// Walking inside a room: arrows lead from the first spot (home, where the player enters) to every other spot
+// (in front of a mirror, door, key, ...) and back. Objects can only be used from their spot.
+// The arrows are screen UI buttons (styled like the other buttons, never hidden by furniture), kept over a point
+// on the floor along the way. They always point up: every spot lies straight ahead after a 90 degree turn.
 public class RoomNav : MonoBehaviour
 {
     [SerializeField] PlayerActions player;
@@ -13,12 +15,13 @@ public class RoomNav : MonoBehaviour
     [SerializeField] Transform[] spots;
     [Tooltip("arrows[i] leads to spots[i]; arrow 0 (home) is shown at every other spot.")]
     [SerializeField] WorldButton[] arrows;
-    [Tooltip("Distance of an arrow from the player, far enough to be in view on the floor.")]
+    [Tooltip("Distance of an arrow's floor point from the player, far enough to be in view.")]
     [SerializeField] float arrowReach = 2.4f;
     [Tooltip("An arrow lies at most this far behind its spot.")]
     [SerializeField] float arrowBeyond = 1f;
 
     int at;
+    Vector3[] points;
 
     // The player has just walked in and stands at home.
     public void Enter() => at = 0;
@@ -37,7 +40,7 @@ public class RoomNav : MonoBehaviour
             {
                 if (i == at || at != 0 && i != 0)
                     continue;
-                PlaceArrow(arrows[i], spots[at].position, spots[i].position);
+                PlaceArrow(i, spots[at].position, spots[i].position);
                 options.Add((arrows[i], ""));
             }
 
@@ -54,13 +57,32 @@ public class RoomNav : MonoBehaviour
         }
     }
 
-    // On the floor along the way, pointing along it.
-    void PlaceArrow(WorldButton arrow, Vector3 from, Vector3 to)
+    // Floor point along the way, followed on screen in LateUpdate.
+    void PlaceArrow(int i, Vector3 from, Vector3 to)
     {
+        points ??= new Vector3[arrows.Length];
         Vector3 way = to - from;
         way.y = 0f;
-        float distance = Mathf.Min(arrowReach, way.magnitude + arrowBeyond);
-        arrow.transform.SetPositionAndRotation(from + way.normalized * distance + Vector3.up * 0.01f,
-            Quaternion.LookRotation(Vector3.down, way));
+        points[i] = from + way.normalized * Mathf.Min(arrowReach, way.magnitude + arrowBeyond);
+        points[i].y = from.y;
+        Follow(i);
+    }
+
+    void LateUpdate()
+    {
+        if (points == null)
+            return;
+        for (int i = 0; i < arrows.Length; i++)
+            if (arrows[i].gameObject.activeSelf)
+                Follow(i);
+    }
+
+    void Follow(int i)
+    {
+        Vector3 screen = Camera.main.WorldToScreenPoint(points[i]);
+        var t = arrows[i].transform;
+        t.position = new Vector3(screen.x, screen.y, 0f);
+        // Behind the camera: hidden until the player turns towards it.
+        t.localScale = screen.z > 0f ? Vector3.one : Vector3.zero;
     }
 }

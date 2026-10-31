@@ -286,7 +286,10 @@ public static class UiStyleBuilder
             Img("Door.Tag", One(S, "btn_yel"), ppu: 1f / 12).Size(1000, 300).M(UiMotion.PixelPop),
             Txt("Door.Text", 100, ink).Inset(0, 56, 0, 0),
             Img("Door.Pointer", One(S, "down"), Image.Type.Simple).Tinted(yel).Aspect().AboveTop(160, 160, 30).M(idle: UiMotion.Bob),
-            Img("Floor.Arrow", One(S, "up"), Image.Type.Simple).Tinted(yel).Aspect().M(UiMotion.PixelPop, idle: UiMotion.Bob),
+            Img("Nav", box, ppu: Px3).Size(140, 155).M(UiMotion.PixelPop, UiMotion.PixelOut, press: UiMotion.PixelPress),
+            Img("Nav.Icon", One(S, "up"), Image.Type.Simple).Tinted(yel).Aspect().Inset(28, 43, 28, 28).M(idle: UiMotion.Bob),
+            Img("Inventory", box, ppu: Px3).Size(140, 155).M(UiMotion.PixelPop, UiMotion.PixelOut),
+            Img("Inventory.Key", One(S, "key"), Image.Type.Simple).Aspect().Inset(22, 43, 22, 28).M(UiMotion.PixelPop),
         };
         return SaveStyle(S, font, font, 45, looks);
     }
@@ -358,7 +361,10 @@ public static class UiStyleBuilder
             Img("Door.Tag", paper, ppu: 0.25f, fps: boil).Size(900, 330).M(UiMotion.PopIn),
             Txt("Door.Text", 200, ink).Inset(0, 30, 40, 0),
             Img("Door.Pointer", One(S, "down"), Image.Type.Simple).Tinted(red).Aspect().AboveTop(240, 240, 20).M(idle: UiMotion.Hop),
-            Img("Floor.Arrow", One(S, "up"), Image.Type.Simple).Tinted(red).Aspect().M(UiMotion.PopIn, idle: UiMotion.Hop),
+            Img("Nav", circle, Image.Type.Simple, fps: boil).Size(156, 156).M(UiMotion.PopIn, UiMotion.PopOut, press: UiMotion.Squish),
+            Img("Nav.Icon", One(S, "up"), Image.Type.Simple).Tinted(ink).Aspect().Inset(32, 32, 32, 32).M(idle: UiMotion.Hop),
+            Img("Inventory", circle, Image.Type.Simple, fps: boil).Size(156, 156).M(UiMotion.PopIn, UiMotion.PopOut),
+            Img("Inventory.Key", One(S, "key"), Image.Type.Simple).Tinted(ink).Aspect().Inset(26, 26, 26, 26).M(UiMotion.PopIn),
         };
         return SaveStyle(S, font, font, 42, looks);
     }
@@ -429,7 +435,10 @@ public static class UiStyleBuilder
             Img("Door.Tag", plank, ppu: 0.35f).Size(980, 310).M(UiMotion.Drop, idle: UiMotion.Swing),
             Txt("Door.Text", 130, cream, title: true, material: shadow).Inset(0, 36, 0, 0),
             Img("Door.Rope", One(S, "rope"), Image.Type.Simple).AboveTop(560, 240, -30),
-            Img("Floor.Arrow", One(S, "up"), Image.Type.Simple).Aspect().M(idle: UiMotion.Glow),
+            Img("Nav", shield, Image.Type.Simple).Size(176, 186).M(UiMotion.ShieldIn, UiMotion.ShieldOut, press: UiMotion.Press),
+            Img("Nav.Icon", One(S, "up"), Image.Type.Simple).Aspect().Inset(44, 54, 44, 34),
+            Img("Inventory", shield, Image.Type.Simple).Size(176, 186).M(UiMotion.ShieldIn, UiMotion.ShieldOut),
+            Img("Inventory.Key", One(S, "key"), Image.Type.Simple).Aspect().Inset(36, 46, 36, 30).M(UiMotion.PopIn),
         };
         return SaveStyle(S, body, title, 38, looks);
     }
@@ -606,6 +615,20 @@ public static class UiStyleBuilder
         Set(actionButtons, "turnRightWant", wants["TurnRight"]);
         Set(actionButtons, "jumpWant", wants["Jump"]);
 
+        // key slot top left (Room 2), the key icon shows while the player holds the key
+        var slot = Node(ui, "Inventory", new Vector2(0, 1), new Vector2(0, 1), new Vector2(0.5f, 0.5f), new Vector2(130, -130), new Vector2(176, 186));
+        AddImage(slot);
+        Skin(slot, "Inventory");
+        var slotKey = Node(slot, "Key", Vector2.zero, Vector2.one, new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+        AddImage(slotKey);
+        Skin(slotKey, "Inventory.Key");
+        slotKey.gameObject.SetActive(false);
+        var inventory = GetOrAdd<KeyInventory>(slot.gameObject);
+        Set(inventory, "cam", Camera.main);
+        Set(inventory, "icon", slotKey.gameObject);
+        slot.gameObject.SetActive(false);
+        Set(Object.FindFirstObjectByType<KeyRoom>(FindObjectsInactive.Include), "inventory", inventory);
+
         // talk button
         var talk = ui.Find("SoloButton");
         Skin(talk, "Talk");
@@ -671,7 +694,7 @@ public static class UiStyleBuilder
         AddImage(outline);
         Skin(outline, "Door.Outline", motionScale: 6);
         var tag = hit.Find("Tag");
-        ((RectTransform)tag).anchoredPosition = new Vector2(0, -520);
+        ((RectTransform)tag).anchoredPosition = new Vector2(0, -1100); // mid height, in view of small avatars too
         Skin(tag, "Door.Tag", motionScale: 6);
         Skin(tag.Find("Label"), "Door.Text");
         var rope = Node(tag, "Rope", Vector2.zero, Vector2.zero, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(400, 180));

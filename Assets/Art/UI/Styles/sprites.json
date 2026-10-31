@@ -141,6 +141,16 @@
    "point": true
   },
   {
+   "path": "Pixel/key.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": true
+  },
+  {
    "path": "Pixel/star.png",
    "border": [
     0,
@@ -431,6 +441,16 @@
    "point": false
   },
   {
+   "path": "Skizze/key.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
    "path": "Skizze/down.png",
    "border": [
     0,
@@ -572,6 +592,16 @@
   },
   {
    "path": "Holz/up.png",
+   "border": [
+    0,
+    0,
+    0,
+    0
+   ],
+   "point": false
+  },
+  {
+   "path": "Holz/key.png",
    "border": [
     0,
     0,

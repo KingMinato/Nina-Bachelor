@@ -28,6 +28,7 @@ public class AvatarSpawner : MonoBehaviour
 
         var body = Instantiate(database.Get(speciesId, gender), playerActions.transform, false);
         playerCamera.transform.localPosition = new Vector3(0f, body.EyeHeight, 0f);
+        playerCamera.GetComponent<CameraAim>().SetEyeHeight(body.EyeHeight);
 
         onActionStarted = action =>
         {

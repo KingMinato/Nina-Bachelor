@@ -47,6 +47,8 @@ public static class RoomBuilder
                      "WalkToDoor2", "WalkIntoRoom3", "WalkToLevers", "WalkToDoor3", "WalkIntoRoom4", "Door2Button", "Door3Button",
                      "KeyButton", "Lever1Button", "Lever2Button", "Lever3Button", "NpcButton", "Nav" })
             Remove(world, name);
+        var uiRoot = GameObject.Find("UI").transform;
+        Remove(uiRoot, "NavArrows");
 
         // Door 1 moves out of Room 1, so it is shared by the copies of Room 1 and Room 2.
         var doors = Child(world, "Doors");
@@ -136,8 +138,10 @@ public static class RoomBuilder
 
         // Tappable objects: copies of the styled door button of Room 1.
         var doorButton = world.Find("DoorButton");
-        var door2Button = WorldButtonAt(doorButton, "Door2Button", new Vector3(R2.x, 0f, -Half + 0.02f), 180f, 0.001f, new Vector2(1200, 2200), -520);
-        var door3Button = WorldButtonAt(doorButton, "Door3Button", new Vector3(Half + T + 0.12f, 0f, R3.z), 270f, 0.001f, new Vector2(1200, 2200), -520);
+        // Door tags at mid height (like Door 1, see UiStyleBuilder), so small avatars (eyes at 0.85 m) see them too.
+        const float DoorTagY = -1100;
+        var door2Button = WorldButtonAt(doorButton, "Door2Button", new Vector3(R2.x, 0f, -Half + 0.02f), 180f, 0.001f, new Vector2(1200, 2200), DoorTagY);
+        var door3Button = WorldButtonAt(doorButton, "Door3Button", new Vector3(Half + T + 0.12f, 0f, R3.z), 270f, 0.001f, new Vector2(1200, 2200), DoorTagY);
         var keyButton = WorldButtonAt(doorButton, "KeyButton", new Vector3(R2.x, keyY - 0.3f, wallZ - 0.08f), 0f, 0.0005f, new Vector2(1100, 1200), -1250);
         var leverButtons = new WorldButton[3];
         for (int i = 0; i < 3; i++)
@@ -149,7 +153,12 @@ public static class RoomBuilder
         // Walking spots per room, spot 0 = home. Door spots: where the walk through the door starts.
         var nav = Child(world, "Nav");
         var walker = nav.gameObject.AddComponent<WalkPath>();
-        var arrowTemplate = ArrowTemplate(doorButton);
+        var navUi = UiNode("NavArrows", uiRoot);
+        navUi.anchorMin = Vector2.zero;
+        navUi.anchorMax = Vector2.one;
+        navUi.sizeDelta = Vector2.zero;
+        navUi.SetSiblingIndex(0); // below panels and buttons
+        var arrowTemplate = ArrowTemplate(navUi);
         var spot = new System.Collections.Generic.Dictionary<string, Transform>();
         RoomNav Nav(string name, params (string id, Vector3 pos, float yaw)[] spots)
         {
@@ -163,8 +172,8 @@ public static class RoomBuilder
                 t.SetPositionAndRotation(spots[i].pos, Quaternion.Euler(0, spots[i].yaw, 0));
                 spot[name + "/" + spots[i].id] = t;
                 spotList[i] = t;
-                var arrow = Object.Instantiate(arrowTemplate, root);
-                arrow.name = "Arrow_" + spots[i].id;
+                var arrow = Object.Instantiate(arrowTemplate, navUi);
+                arrow.name = name + "_" + spots[i].id;
                 arrows[i] = arrow.GetComponent<WorldButton>();
             }
             Set(n, "spots", spotList);
@@ -323,30 +332,41 @@ public static class RoomBuilder
         return go.GetComponent<WorldButton>();
     }
 
-    // Copy of the door button for the floor: no outline, the style arrow instead, pivot in the middle.
-    // RoomNav lays it on the floor pointing along the way.
-    static GameObject ArrowTemplate(Transform doorButton)
+    // Screen button for walking, styled per UI style (skin keys Nav, Nav.Icon). RoomNav keeps it over a floor point.
+    static GameObject ArrowTemplate(Transform parent)
     {
-        var go = Object.Instantiate(doorButton.gameObject, doorButton.parent);
-        var rt = (RectTransform)go.transform;
-        rt.localScale = Vector3.one * 0.001f;
-        rt.sizeDelta = new Vector2(700, 700);
-        rt.pivot = new Vector2(0.5f, 0.5f);
-        var hit = rt.Find("Button");
-        Object.DestroyImmediate(hit.Find("Outline").gameObject);
-        var arrow = (RectTransform)new GameObject("Arrow", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image)).transform;
-        arrow.SetParent(hit, false);
-        arrow.SetSiblingIndex(0);
-        arrow.anchorMin = Vector2.zero;
-        arrow.anchorMax = Vector2.one;
-        arrow.offsetMin = arrow.offsetMax = Vector2.zero;
-        arrow.GetComponent<Image>().raycastTarget = false;
-        var skin = new SerializedObject(arrow.gameObject.AddComponent<UiSkin>());
-        skin.FindProperty("key").stringValue = "Floor.Arrow";
-        skin.FindProperty("motionScale").floatValue = 4f;
+        var root = UiNode("Arrow", parent);
+        root.sizeDelta = new Vector2(170, 170);
+        var hit = UiNode("Button", root);
+        hit.sizeDelta = new Vector2(170, 170);
+        var button = hit.gameObject.AddComponent<Button>();
+        button.targetGraphic = hit.gameObject.AddComponent<Image>();
+        button.transition = Selectable.Transition.None;
+        SkinKey(hit, "Nav");
+        var icon = UiNode("Icon", hit);
+        icon.anchorMin = Vector2.zero;
+        icon.anchorMax = Vector2.one;
+        icon.sizeDelta = Vector2.zero;
+        icon.gameObject.AddComponent<Image>().raycastTarget = false;
+        SkinKey(icon, "Nav.Icon");
+        Set(root.gameObject.AddComponent<WorldButton>(), ("button", button));
+        root.gameObject.SetActive(false);
+        return root.gameObject;
+    }
+
+    static RectTransform UiNode(string name, Transform parent)
+    {
+        var rt = (RectTransform)new GameObject(name, typeof(RectTransform)).transform;
+        rt.gameObject.layer = parent.gameObject.layer;
+        rt.SetParent(parent, false);
+        return rt;
+    }
+
+    static void SkinKey(Transform node, string key)
+    {
+        var skin = new SerializedObject(node.gameObject.AddComponent<UiSkin>());
+        skin.FindProperty("key").stringValue = key;
         skin.ApplyModifiedPropertiesWithoutUndo();
-        go.SetActive(false);
-        return go;
     }
 
     static WalkPath Path(Transform parent, string name, params (Vector3 pos, float yaw)[] points)

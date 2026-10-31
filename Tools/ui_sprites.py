@@ -147,6 +147,17 @@ def up_arrow(c, size, width, xy=None):
     return min_d(sd_polyline(x, y, shaft), sd_polyline(x, y, head)) - width / 2
 
 
+def key_shape(c, size, width, xy=None):
+    """Key lying horizontally: ring bow on the left, shaft to the right, two teeth down."""
+    x, y = xy if xy else (c.x, c.y)
+    s = size
+    bow = np.abs(sd_circle(x, y, 0.27 * s, 0.45 * s, 0.14 * s))
+    shaft = sd_polyline(x, y, [(0.41 * s, 0.45 * s), (0.88 * s, 0.45 * s)])
+    teeth = min_d(sd_polyline(x, y, [(0.72 * s, 0.45 * s), (0.72 * s, 0.62 * s)]),
+                  sd_polyline(x, y, [(0.85 * s, 0.45 * s), (0.85 * s, 0.6 * s)]))
+    return min_d(bow, shaft, teeth) - width / 2
+
+
 def min_d(*ds):
     out = ds[0]
     for d in ds[1:]:
@@ -260,6 +271,8 @@ def pixel():
     coin = px_art(["..####..", ".#oooo#.", "#oo##oo#", "#o#oo#o#", "#o#oo#o#", "#oo##oo#", ".#oooo#.", "..####.."],
                   {"#": rgba("#b07d10"), "o": yel})
     save(S, "coin", px_img(px_scale(px_outline(coin, ink), 4)), point=True)
+    key = px_art([".###........", "#...#.......", "#...########", "#...#....#.#", ".###.....#.#"], {"#": yel})
+    save(S, "key", px_img(px_scale(px_outline(key, ink), 4)), point=True)
     star = px_art(["....#....", "....#....", "...###...", "#########", ".#######.", "..#####..", "..##.##..", ".##...##.", ".#.....#."], {"#": yel})
     save(S, "star", px_img(px_scale(px_outline(star, ink), 6)), point=True)
 
@@ -360,6 +373,7 @@ def skizze():
 
     icon("turn", turn_arrow)
     icon("up", up_arrow)
+    icon("key", key_shape)
     icon("down", lambda c, s, w, xy: up_arrow(c, s, w, (xy[0], s - xy[1])), color=red)
 
     def check(c, s, w, xy):
@@ -519,6 +533,7 @@ def holz():
 
     icon("turn", turn_arrow)
     icon("up", up_arrow)
+    icon("key", key_shape)
 
     def coin(c, s, cx, cy, r):
         rr = np.hypot(c.x - cx + r * 0.2, c.y - cy + r * 0.3) / r

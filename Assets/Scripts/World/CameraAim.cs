@@ -8,10 +8,18 @@ public class CameraAim : MonoBehaviour
     [SerializeField] float sharpness = 4f;
     [Tooltip("Degrees the camera looks below the face, so the face sits in the upper part of the screen above the dialog panel.")]
     [SerializeField] float pitchDown = 14f;
-    [Tooltip("Degrees the camera looks down without a target.")]
+    [Tooltip("Degrees the camera looks down without a target, at full eye height.")]
     [SerializeField] float restPitch = 12f;
+    [Tooltip("From this eye height on the camera looks down by restPitch, smaller avatars proportionally less.")]
+    [SerializeField] float fullPitchEyeHeight = 1.6f;
 
     Transform target;
+    float rest;
+
+    void Awake() => rest = restPitch;
+
+    // Called by the avatar spawner with the avatar's standing eye height.
+    public void SetEyeHeight(float eyes) => rest = restPitch * Mathf.Clamp01(eyes / fullPitchEyeHeight);
 
     public void Aim(Transform target)
     {
@@ -20,12 +28,12 @@ public class CameraAim : MonoBehaviour
 
     void Start()
     {
-        transform.localRotation = Quaternion.Euler(restPitch, 0, 0);
+        transform.localRotation = Quaternion.Euler(rest, 0, 0);
     }
 
     void LateUpdate()
     {
-        Quaternion local = Quaternion.Euler(restPitch, 0, 0);
+        Quaternion local = Quaternion.Euler(rest, 0, 0);
         if (target != null)
         {
             Quaternion look = Quaternion.LookRotation(target.position - transform.position) * Quaternion.Euler(pitchDown, 0, 0);

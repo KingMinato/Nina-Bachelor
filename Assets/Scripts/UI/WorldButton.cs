@@ -18,8 +18,11 @@ public class WorldButton : MonoBehaviour
     {
         foreach (var (b, caption) in options)
         {
-            b.label.text = caption;
-            b.label.transform.parent.gameObject.SetActive(!string.IsNullOrEmpty(caption));
+            if (b.label != null)
+            {
+                b.label.text = caption;
+                b.label.transform.parent.gameObject.SetActive(!string.IsNullOrEmpty(caption));
+            }
             b.button.interactable = false;
             b.gameObject.SetActive(true);
         }

@@ -152,6 +152,7 @@ public class GameFlow : MonoBehaviour
     async Awaitable GoThrough(WalkPath toDoor, Door through, WalkPath into, int fromRoom)
     {
         Transform rig = playerActions.transform;
+        cameraAim.Look(null);
         await toDoor.Walk(rig);
         ShowRooms(fromRoom, fromRoom + 1);
         await through.Open();

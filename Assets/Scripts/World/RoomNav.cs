@@ -35,9 +35,20 @@ public class RoomNav : MonoBehaviour
         while (true)
         {
             var options = new List<(WorldButton, string)>();
+            Vector3 middle = Vector3.zero;
+            int here = 0;
             foreach (var (button, caption, spot) in targets)
                 if (spot == null || spot == spots[at])
+                {
                     options.Add((button, caption));
+                    if (spot != null)
+                    {
+                        middle += button.Center;
+                        here++;
+                    }
+                }
+            // Standing in front of a door, key, levers or the NPC: look at it.
+            Aim(here > 0 ? middle / here : null);
             for (int i = 0; i < spots.Length; i++)
             {
                 if (i == at || at != 0 && i != 0)
@@ -52,6 +63,7 @@ public class RoomNav : MonoBehaviour
                 return clicked;
 
             onWalk?.Invoke();
+            Aim(null);
             actionButtons.Hide();
             await player.StandUp();
             await walker.WalkTo(player.transform, to != 0, spots[to]);
@@ -59,6 +71,8 @@ public class RoomNav : MonoBehaviour
             actionButtons.Show(texts);
         }
     }
+
+    static void Aim(Vector3? at) => Camera.main.GetComponent<CameraAim>().Look(at);
 
     // Floor point along the way, followed on screen in LateUpdate.
     void PlaceArrow(int i, Vector3 from, Vector3 to)

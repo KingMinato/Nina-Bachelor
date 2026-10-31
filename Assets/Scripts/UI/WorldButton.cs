@@ -13,6 +13,9 @@ public class WorldButton : MonoBehaviour
     [Tooltip("Button stays disabled this long after it appears, so a double tap cannot trigger it by accident.")]
     [SerializeField] float inputDelaySeconds = 0.4f;
 
+    // Middle of the tappable area, i.e. of the object it covers.
+    public Vector3 Center => button.transform.position;
+
     // Shows all buttons (empty caption = no tag) and returns the one tapped first; all are hidden again.
     public static async Awaitable<WorldButton> FirstClick(params (WorldButton button, string caption)[] options)
     {

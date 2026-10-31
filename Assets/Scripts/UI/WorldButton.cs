@@ -13,12 +13,6 @@ public class WorldButton : MonoBehaviour
     [Tooltip("Button stays disabled this long after it appears, so a double tap cannot trigger it by accident.")]
     [SerializeField] float inputDelaySeconds = 0.4f;
 
-    // Shows the button and completes when it is tapped.
-    public async Awaitable WaitForClick(string caption)
-    {
-        await FirstClick((this, caption));
-    }
-
     // Shows all buttons (empty caption = no tag) and returns the one tapped first; all are hidden again.
     public static async Awaitable<WorldButton> FirstClick(params (WorldButton button, string caption)[] options)
     {

@@ -167,13 +167,11 @@ public static class RoomVariantBuilder
         Put(v.room2, P(Office, "SM_Prop_Shelf_05"), In(1, Side, 0f, 2.2f), -90f, wall: Wall.PlusX);
         Put(v.room2, P(Office, "SM_Prop_Plant_04"), In(1, -2.5f, 0f, -2.5f), 40f);
 
-        Put(v.room3, P(Office, "SM_Prop_Table_03"), In(2, -1.9f, 0f, Side - 0.05f), 0f, wall: Wall.PlusZ);
-        Put(v.room3, P(Western, "SM_Prop_Chair_01"), In(2, -2.3f, 0f, 1.9f), 160f);
+        ChairAt(v.room3, P(Western, "SM_Prop_Chair_01"), Put(v.room3, P(Office, "SM_Prop_Table_03"), In(2, -1.9f, 0f, Side - 0.05f), 0f, wall: Wall.PlusZ));
         Put(v.room3, P(Office, "SM_Prop_Plant_04"), In(2, 2.5f, 0f, -2.5f), 10f);
 
         Put(v.room4, P(Office, "SM_Prop_Shelf_05"), In(3, -Side, 0f, -1.9f), 90f, wall: Wall.MinusX);
-        Put(v.room4, P(Office, "SM_Prop_Table_03"), In(3, -1.4f, 0f, Side - 0.05f), 0f, wall: Wall.PlusZ);
-        Put(v.room4, P(Western, "SM_Prop_Chair_01"), In(3, -1f, 0f, 2.1f), -160f);
+        ChairAt(v.room4, P(Western, "SM_Prop_Chair_01"), Put(v.room4, P(Office, "SM_Prop_Table_03"), In(3, -1.4f, 0f, Side - 0.05f), 0f, wall: Wall.PlusZ));
         Put(v.room4, P(Office, "SM_Prop_Plant_04"), In(3, -2.5f, 0f, 1.6f), -40f);
     }
 
@@ -223,7 +221,7 @@ public static class RoomVariantBuilder
         Put(v.room3, P(Western, "SM_Prop_Lantern_01"), In(2, 2.6f, 0f, -2.6f));
 
         var table = Put(v.room4, P(Western, "SM_Prop_Table_01"), In(3, -1.2f, 0f, Side - 0.1f), -90f, wall: Wall.PlusZ);
-        Put(v.room4, P(Western, "SM_Prop_Chair_01"), In(3, -1.2f, 0f, 1.8f), -170f);
+        ChairAt(v.room4, P(Western, "SM_Prop_Chair_01"), table);
         Put(v.room4, P(Western, "SM_Prop_Lantern_01"), In(3, -1.5f, Bounds(table).max.y, 2.6f));
         Put(v.room4, P(Office, "SM_Prop_Shelf_06"), In(3, -Side, 0f, -1.9f), 90f, wall: Wall.MinusX);
         Put(v.room4, P(Western, "SM_Prop_PlantPot_02"), In(3, -2.5f, 0f, 2.5f));
@@ -304,6 +302,16 @@ public static class RoomVariantBuilder
         }
         go.transform.position += offset;
         return go;
+    }
+
+    // Chair in front of a table that stands against the +z wall, facing it, the seat a little under the table top.
+    // The Western chair model faces +z (backrest at -z).
+    static void ChairAt(Transform parent, GameObject chair, GameObject table)
+    {
+        if (table == null)
+            return;
+        var t = Bounds(table);
+        Put(parent, chair, new Vector3(t.center.x, 0f, t.min.z + 0.12f), 0f, wall: Wall.PlusZ);
     }
 
     // Colliders are not needed, lights and particles would break the symmetric mirror lighting.

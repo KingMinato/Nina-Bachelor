@@ -30,21 +30,14 @@ public class ActionButtonsUI : MonoBehaviour
         crouchButton.onClick.AddListener(playerActions.Crouch);
     }
 
-    public void Show(Texts texts, bool withJump)
+    public void Show(Texts texts)
     {
         this.texts = texts;
         jumpLabel.text = texts.jump;
         SetWanted("");
         gameObject.SetActive(true);
-        UiSkin.Show(turnLeftButton.gameObject);
-        UiSkin.Show(turnRightButton.gameObject);
-        foreach (var button in new[] { jumpButton, crouchButton })
-        {
-            if (withJump)
-                UiSkin.Show(button.gameObject);
-            else
-                UiSkin.Hide(button.gameObject);
-        }
+        foreach (var button in new[] { turnLeftButton, turnRightButton, jumpButton, crouchButton })
+            UiSkin.Show(button.gameObject);
     }
 
     public void Hide()

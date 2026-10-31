@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // Room 3: the door to the NPC is locked until the levers are set like on the sign above them.
+// Door and levers can only be used from the spot in front of them (RoomNav).
 public class LeverRoom : MonoBehaviour
 {
     [SerializeField] UIManager ui;
     [SerializeField] ActionButtonsUI actionButtons;
     [SerializeField] PlayerActions player;
     [SerializeField] StepDoneUI stepDone;
+    [SerializeField] RoomNav nav;
     [SerializeField] WorldButton doorButton;
+    [SerializeField] Transform doorSpot;
     [SerializeField] Lever[] levers;
     [SerializeField] WorldButton[] leverButtons;
+    [SerializeField] Transform leverSpot;
     [Tooltip("Lever positions that open the door, true = up. Must match the sign.")]
     [SerializeField] bool[] solution;
-    [SerializeField] WalkPath walkToLevers;
 
     public static bool Matches(bool[] positions, bool[] solution)
     {
@@ -27,30 +30,22 @@ public class LeverRoom : MonoBehaviour
     // Completes when the player taps the unlocked door.
     public async Awaitable Run(Texts texts)
     {
-        actionButtons.Show(texts, withJump: true);
-        bool solved = false, atLevers = false;
+        nav.Enter();
+        actionButtons.Show(texts);
+        bool solved = false;
         while (true)
         {
-            var options = new List<(WorldButton, string)> { (doorButton, texts.goToDoor) };
+            var targets = new List<(WorldButton, string, Transform)> { (doorButton, texts.goToDoor, doorSpot) };
             if (!solved)
                 foreach (var b in leverButtons)
-                    options.Add((b, ""));
-            var clicked = await WorldButton.FirstClick(options.ToArray());
+                    targets.Add((b, "", leverSpot));
+            var clicked = await nav.Next(texts, targets.ToArray());
             if (clicked == doorButton)
             {
                 if (solved)
                     break;
                 ui.ShowInstruction(texts.lockedLevers);
                 continue;
-            }
-            // The first lever tap walks the player up to the levers.
-            if (!atLevers)
-            {
-                actionButtons.Hide();
-                await player.StandUp();
-                await walkToLevers.Walk(player.transform);
-                actionButtons.Show(texts, withJump: true);
-                atLevers = true;
             }
             await levers[Array.IndexOf(leverButtons, clicked)].Toggle();
             solved = Matches(Array.ConvertAll(levers, l => l.Up), solution);

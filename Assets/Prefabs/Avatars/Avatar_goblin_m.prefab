@@ -31,7 +31,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8434084522745401495}
-  - {fileID: 5572533296617090828}
+  - {fileID: 6122087953569362965}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1194770747260449104
@@ -47,9 +47,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game::AvatarBody
   animator: {fileID: 8379337489132805381}
-  eyes: {fileID: 5572533296617090828}
+  eyes: {fileID: 6122087953569362965}
   jumpClipSeconds: 0.95
---- !u!1 &1660103305551395476
+--- !u!1 &8184254643977768678
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -57,7 +57,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5572533296617090828}
+  - component: {fileID: 6122087953569362965}
   m_Layer: 0
   m_Name: Eyes
   m_TagString: Untagged
@@ -65,13 +65,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5572533296617090828
+--- !u!4 &6122087953569362965
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1660103305551395476}
+  m_GameObject: {fileID: 8184254643977768678}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1.6691123, z: 0}

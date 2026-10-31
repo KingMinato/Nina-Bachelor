@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &4876557474790211906
+--- !u!1 &6934691304654765391
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,7 +8,7 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 6087667975760478916}
+  - component: {fileID: 2795265921909030542}
   m_Layer: 0
   m_Name: Eyes
   m_TagString: Untagged
@@ -16,13 +16,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &6087667975760478916
+--- !u!4 &2795265921909030542
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4876557474790211906}
+  m_GameObject: {fileID: 6934691304654765391}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1.6691123, z: 0}
@@ -62,7 +62,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5278647506215906220}
-  - {fileID: 6087667975760478916}
+  - {fileID: 2795265921909030542}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &9065006868087415737
@@ -78,7 +78,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Game::AvatarBody
   animator: {fileID: 5188917528506756812}
-  eyes: {fileID: 6087667975760478916}
+  eyes: {fileID: 2795265921909030542}
   jumpClipSeconds: 0.95
 --- !u!1001 &5283053969276422530
 PrefabInstance:

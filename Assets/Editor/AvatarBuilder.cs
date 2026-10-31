@@ -81,9 +81,11 @@ public static class AvatarBuilder
         var controller = BuildController();
         var overrides = new Dictionary<string, AnimatorOverrideController>
         {
-            ["Slime"] = Override(controller, "Slime", Clip(Slime + "AnimationClips/idle.anim"), Clip(Slime + "AnimationClips/jump.anim")),
-            ["Mushroom"] = Override(controller, "Mushroom", Clip(Mushroom + "Animations/Anim_Mushroom_Idle.fbx"), MushroomJump()),
-            ["Cow"] = Override(controller, "Cow", Clip(Cow + "Cow.fbx", "Idle"), Clip(Cow + "Cow.fbx", "Run")),
+            ["Slime"] = Override(controller, "Slime", Clip(Slime + "AnimationClips/idle.anim"), Clip(Slime + "AnimationClips/jump.anim"),
+                Clip(Slime + "AnimationClips/move.anim")),
+            ["Mushroom"] = Override(controller, "Mushroom", Clip(Mushroom + "Animations/Anim_Mushroom_Idle.fbx"), MushroomJump(),
+                Clip(Mushroom + "Animations/Anim_Mushroom_Walk.fbx")),
+            ["Cow"] = Override(controller, "Cow", Clip(Cow + "Cow.fbx", "Idle"), Clip(Cow + "Cow.fbx", "Run"), Clip(Cow + "Cow.fbx", "Walk")),
         };
 
         var entries = new List<AvatarDatabase.Species>();
@@ -118,7 +120,7 @@ public static class AvatarBuilder
         Debug.Log("Avatars built: " + string.Join(", ", entries.Select(e => e.id)));
     }
 
-    // Idle -> Jump (trigger, speed from JumpSpeed) -> Idle, Idle <-> Crouch (bool), Crouch -> Jump.
+    // Idle -> Jump (trigger, speed from JumpSpeed) -> Idle, Idle <-> Crouch (bool), Crouch -> Jump, Idle <-> Walk (bool).
     // Shared by all avatars and the NPC.
     static AnimatorController BuildController()
     {
@@ -133,6 +135,7 @@ public static class AvatarBuilder
         controller.AddParameter("Jump", AnimatorControllerParameterType.Trigger);
         controller.AddParameter("JumpSpeed", AnimatorControllerParameterType.Float);
         controller.AddParameter("Crouch", AnimatorControllerParameterType.Bool);
+        controller.AddParameter("Walk", AnimatorControllerParameterType.Bool);
         controller.parameters = controller.parameters.Select(p =>
         {
             if (p.name == "JumpSpeed") p.defaultFloat = 1f;
@@ -176,10 +179,27 @@ public static class AvatarBuilder
         up.AddCondition(AnimatorConditionMode.IfNot, 0, "Crouch");
         up.hasExitTime = false;
         up.duration = 0.3f;
+
+        var walk = sm.AddState("Walk");
+        walk.motion = Clip(Anim + "Humanoid_Walk.anim");
+        Between(idle, walk, (AnimatorConditionMode.If, 0, "Walk"), (AnimatorConditionMode.IfNot, 0, "Walk"), 0.2f);
         return controller;
     }
 
-    static AnimatorOverrideController Override(AnimatorController controller, string name, AnimationClip idle, AnimationClip jump)
+    static void Between(AnimatorState from, AnimatorState to, (AnimatorConditionMode, float, string) there,
+        (AnimatorConditionMode, float, string) back, float seconds)
+    {
+        foreach (var (a, b, c) in new[] { (from, to, there), (to, from, back) })
+        {
+            var t = a.AddTransition(b);
+            t.AddCondition(c.Item1, c.Item2, c.Item3);
+            t.hasExitTime = false;
+            t.duration = seconds;
+        }
+    }
+
+    static AnimatorOverrideController Override(AnimatorController controller, string name, AnimationClip idle, AnimationClip jump,
+        AnimationClip walk)
     {
         string path = Anim + name + ".overrideController";
         var o = AssetDatabase.LoadAssetAtPath<AnimatorOverrideController>(path);
@@ -192,6 +212,7 @@ public static class AvatarBuilder
         o["Humanoid_Idle"] = idle;
         o["Humanoid_Jump"] = jump;
         o["Humanoid_Crouch"] = idle;
+        o["Humanoid_Walk"] = walk;
         EditorUtility.SetDirty(o);
         return o;
     }

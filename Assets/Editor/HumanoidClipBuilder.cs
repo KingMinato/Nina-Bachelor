@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 
-// Builds the humanoid idle, jump and crouch clips shared by all humanoid avatars and the NPC.
+// Builds the humanoid idle, jump, crouch and walk clips shared by all humanoid avatars and the NPC.
 // Poses are written as muscle values on top of a relaxed standing pose. Keys marked as grounded
 // are corrected so the feet stand on the floor; then the body height is baked per frame so heel and toe
 // never go below the floor, taking the rig's jump height into account. Measured on a reference model.
@@ -21,7 +21,8 @@ public static class HumanoidClipBuilder
         public Dictionary<string, float> muscles;
     }
 
-    // Arms hanging relaxed, legs straight, fingers slightly curled. Both sides get the same values.
+    // Arms hanging relaxed, legs straight, fingers slightly curled. Both sides get the same values,
+    // unless a key names one side ("Left Arm Down-Up").
     static readonly Dictionary<string, float> Stand = new Dictionary<string, float>
     {
         ["Upper Leg Front-Back"] = 0.6f, ["Upper Leg Twist In-Out"] = -0.06f, ["Lower Leg Stretch"] = 1f,
@@ -65,6 +66,13 @@ public static class HumanoidClipBuilder
         };
         var crouch = new List<Key> { K(0f, true, squat), K(2f, true, squat) };
 
+        // One stride per second (two steps of 0.65 m at the 1.3 m/s of WalkPath): contact, passing, contact, passing.
+        var walk = new List<Key>
+        {
+            Contact(0f, "Left", "Right"), Passing(0.25f, "Right"), Contact(0.5f, "Right", "Left"), Passing(0.75f, "Left"),
+            Contact(1f, "Left", "Right"),
+        };
+
         var reference = (GameObject)Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(ReferenceModel));
         try
         {
@@ -72,6 +80,7 @@ public static class HumanoidClipBuilder
             Save(BuildClip(idle, animator, loop: true, t => 0f), "Humanoid_Idle");
             Save(BuildClip(jump, animator, loop: false, JumpLift), "Humanoid_Jump");
             Save(BuildClip(crouch, animator, loop: true, t => 0f), "Humanoid_Crouch");
+            Save(BuildClip(walk, animator, loop: true, t => 0f), "Humanoid_Walk");
         }
         finally
         {
@@ -88,6 +97,17 @@ public static class HumanoidClipBuilder
             muscles[muscle] = value;
         return new Key { time = time, grounded = grounded, muscles = muscles };
     }
+
+    // Front foot touches down, back foot pushes off; the arms swing against the legs.
+    static Key Contact(float time, string front, string back) => K(time, true,
+        (front + " Upper Leg Front-Back", 0.3f), (front + " Lower Leg Stretch", 0.95f), (front + " Foot Up-Down", -0.2f),
+        (back + " Upper Leg Front-Back", 0.85f), (back + " Lower Leg Stretch", 0.75f), (back + " Foot Up-Down", 0.35f),
+        (front + " Arm Front-Back", 0.55f), (back + " Arm Front-Back", 0.05f), ("Forearm Stretch", 0.7f));
+
+    // The swinging leg passes the standing one with a bent knee.
+    static Key Passing(float time, string swing) => K(time, true,
+        (swing + " Upper Leg Front-Back", 0.45f), (swing + " Lower Leg Stretch", 0.25f), (swing + " Foot Up-Down", 0.1f),
+        ("Forearm Stretch", 0.7f));
 
     // Height of the player rig above the floor at time t of the jump clip, as moved by PlayerActions
     // (0.15 s windup, 0.6 s in the air with 0.5 m peak, then landing).
@@ -183,9 +203,11 @@ public static class HumanoidClipBuilder
         return clip;
     }
 
-    // "Left Arm Down-Up" -> "Arm Down-Up"; fingers share "Fingers Stretched" / "Thumb Stretched".
+    // "Left Arm Down-Up" exactly, else "Arm Down-Up"; fingers share "Fingers Stretched" / "Thumb Stretched".
     static float MuscleValue(Dictionary<string, float> muscles, string name)
     {
+        if (muscles.TryGetValue(name, out float oneSide))
+            return oneSide;
         string side = Regex.Replace(name, "^(Left|Right) ", "");
         if (muscles.TryGetValue(side, out float value))
             return value;

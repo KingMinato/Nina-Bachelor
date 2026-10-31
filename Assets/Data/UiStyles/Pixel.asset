@@ -1336,6 +1336,37 @@ MonoBehaviour:
     press: 0
     pulse: 0
     idleDuration: 0
+  - key: Floor.Arrow
+    sprites:
+    - {fileID: 21300000, guid: 7607735bac2dbca4e88184531b5fc6d5, type: 3}
+    framesPerSecond: 8
+    color: {r: 1, g: 0.8235294, b: 0.24705882, a: 1}
+    imageType: 0
+    pixelsPerUnit: 1
+    preserveAspect: 1
+    titleFont: 0
+    fontMaterial: {fileID: 0}
+    fontSize: 0
+    textColor: {r: 0, g: 0, b: 0, a: 1}
+    alignment: 514
+    fontStyle: 0
+    characterSpacing: 0
+    lineSpacing: 0
+    rectMode: 0
+    anchorMin: {x: 0, y: 0}
+    anchorMax: {x: 0, y: 0}
+    offsetMin: {x: 0, y: 0}
+    offsetMax: {x: 0, y: 0}
+    size: {x: 0, y: 0}
+    rotation: 0
+    enter: 1
+    exit: 0
+    swap: 0
+    idle: 9
+    wantIdle: 0
+    press: 0
+    pulse: 0
+    idleDuration: 0
   sounds:
   - name: click
     clip: {fileID: 8300000, guid: 0a5cc006d267a9947b789ba774d3bb22, type: 3}

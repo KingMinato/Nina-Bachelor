@@ -50,6 +50,18 @@ public static class UltimatumRules
             : new RoundResult(false, 0, 0, 0);
     }
 
+    // How hard the NPC thinks about a split, 0 (easy) to 1 (hard), from the amount the proposer keeps
+    // (the player in rounds 1 and 3, the NPC itself in rounds 2 and 4). Hardest right at the acceptance limit
+    // and one step above it, easy for fair splits and for splits far above the limit.
+    public static float ThinkEffort(int proposerKeeps, Config c)
+    {
+        int limit = c.npcAcceptMaxPlayerKeeps, half = c.moneyPerRound / 2;
+        float effort = proposerKeeps <= limit
+            ? (proposerKeeps - half) / (float)(limit - half)
+            : (c.moneyPerRound - proposerKeeps) / (float)(c.moneyPerRound - limit - c.splitStep);
+        return Math.Clamp(effort, 0f, 1f);
+    }
+
     // Rounds to the nearest multiple of splitStep and clamps to 0..moneyPerRound.
     public static int SnapToStep(int value, Config c)
     {

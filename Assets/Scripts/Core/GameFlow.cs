@@ -19,8 +19,10 @@ public class GameFlow : MonoBehaviour
              " Room 4 overlaps the mirror world behind Room 1's bottom mirror.")]
     [SerializeField] GameObject[] roomGroups;
     [SerializeField] GameObject[] roomMirrors;
+    [SerializeField] RoomNav nav1;
     [SerializeField] Door door;
     [SerializeField] WorldButton doorButton;
+    [SerializeField] Transform doorSpot;
     [SerializeField] WalkPath walkToDoor;
     [SerializeField] WalkPath walkIntoRoom2;
     [SerializeField] KeyRoom keyRoom;
@@ -30,7 +32,10 @@ public class GameFlow : MonoBehaviour
     [SerializeField] LeverRoom leverRoom;
     [SerializeField] Door door3;
     [SerializeField] WalkPath walkToDoor3;
-    [SerializeField] WalkPath walkToNpc;
+    [SerializeField] WalkPath walkIntoRoom4;
+    [SerializeField] RoomNav nav4;
+    [SerializeField] WorldButton npcButton;
+    [SerializeField] Transform npcSpot;
     [SerializeField] AvatarSpawner avatarSpawner;
     [SerializeField] NpcLookAt npc;
     [SerializeField] CameraAim cameraAim;
@@ -92,11 +97,12 @@ public class GameFlow : MonoBehaviour
             await tutorial.Run(config);
         }
 
-        // The player may still be facing a mirror, so the arrows stay available to turn towards the closed door.
+        // The player walks around (arrows on the floor) and opens the door from the spot in front of it.
         SetState(GameState.GoToDoor);
-        actionButtons.Show(config.texts, withJump: false);
+        nav1.Enter();
+        actionButtons.Show(config.texts);
         ui.ShowInstruction(config.texts.goToDoorHint);
-        await doorButton.WaitForClick(config.texts.goToDoor);
+        await nav1.Next(config.texts, (doorButton, config.texts.goToDoor, doorSpot));
         actionButtons.Hide();
         ui.HideInstruction();
         await playerActions.StandUp();
@@ -109,10 +115,15 @@ public class GameFlow : MonoBehaviour
         SetState(GameState.LeverRoom);
         await leverRoom.Run(config.texts);
         SetState(GameState.WalkToNPC);
-        await GoThrough(walkToDoor3, door3, walkToNpc, 2);
+        await GoThrough(walkToDoor3, door3, walkIntoRoom4, 2);
+        // The NPC stands at the back wall: walk up to it, then talk.
+        nav4.Enter();
+        actionButtons.Show(config.texts);
+        await nav4.Next(config.texts, (npcButton, config.texts.talk, npcSpot));
+        actionButtons.Hide();
+        await playerActions.StandUp();
         npc.LookAt(cameraAim.transform);
         cameraAim.Aim(npc.Face);
-        await ui.ShowButton(config.texts.talk);
 
         SetState(GameState.Dialog);
         await ultimatum.Run(config, session);

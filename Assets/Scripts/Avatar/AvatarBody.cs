@@ -7,6 +7,7 @@ public class AvatarBody : MonoBehaviour
     static readonly int JumpTrigger = Animator.StringToHash("Jump");
     static readonly int JumpSpeed = Animator.StringToHash("JumpSpeed");
     static readonly int CrouchParam = Animator.StringToHash("Crouch");
+    static readonly int WalkParam = Animator.StringToHash("Walk");
 
     [SerializeField] Animator animator;
     [SerializeField] Transform eyes;
@@ -17,6 +18,7 @@ public class AvatarBody : MonoBehaviour
 
     bool crouched;
     float squash = 1f;
+    Vector3 lastPosition;
 
     public void PlayJump(float seconds)
     {
@@ -30,9 +32,15 @@ public class AvatarBody : MonoBehaviour
         animator.SetBool(CrouchParam, value);
     }
 
-    // Creatures have no crouch clip, they squash instead (the mirror clones copy the root scale).
     void Update()
     {
+        // Walks are scripted moves of the rig: walk while it moves sideways (jumps only move it up).
+        Vector3 moved = transform.position - lastPosition;
+        lastPosition = transform.position;
+        float speed = Time.deltaTime > 0f ? new Vector2(moved.x, moved.z).magnitude / Time.deltaTime : 0f;
+        animator.SetBool(WalkParam, speed > 0.3f);
+
+        // Creatures have no crouch clip, they squash instead (the mirror clones copy the root scale).
         if (animator.isHuman)
             return;
         squash = Mathf.MoveTowards(squash, crouched ? 0.7f : 1f, Time.deltaTime / 0.3f);

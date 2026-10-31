@@ -105,6 +105,19 @@ public class UltimatumRulesTests
         Assert.AreEqual(r4Accept ? "1" : "0", f["r4"]);
     }
 
+    // Default limit 85, steps of 5: hardest at 85 and 90, easy at 50:50 and at 100.
+    [TestCase(50, 0f)]
+    [TestCase(30, 0f)]
+    [TestCase(75, 25f / 35f)]
+    [TestCase(85, 1f)]
+    [TestCase(90, 1f)]
+    [TestCase(95, 0.5f)]
+    [TestCase(100, 0f)]
+    public void ThinkEffort_IsHighestNearTheLimit(int proposerKeeps, float expected)
+    {
+        Assert.AreEqual(expected, UltimatumRules.ThinkEffort(proposerKeeps, C), 0.0001f);
+    }
+
     [Test]
     public void Fill_ReplacesAmounts()
     {

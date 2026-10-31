@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// Scripted walk from Room 1 through the door to the NPC. The rig turns towards each waypoint,
+// Scripted walk, e.g. through a door into the next room. The rig turns towards each waypoint,
 // walks there at constant speed and finally turns to the last waypoint's facing.
 public class WalkPath : MonoBehaviour
 {
@@ -12,9 +12,12 @@ public class WalkPath : MonoBehaviour
 
     float sinceStep;
 
-    public async Awaitable Walk(Transform rig)
+    public Awaitable Walk(Transform rig) => WalkTo(rig, true, waypoints);
+
+    // Walks along points; turnAtEnd false keeps facing the way the rig walked.
+    public async Awaitable WalkTo(Transform rig, bool turnAtEnd, params Transform[] points)
     {
-        foreach (var point in waypoints)
+        foreach (var point in points)
         {
             Vector3 target = new Vector3(point.position.x, rig.position.y, point.position.z);
             Vector3 dir = target - rig.position;
@@ -33,7 +36,8 @@ public class WalkPath : MonoBehaviour
                 await Awaitable.NextFrameAsync();
             }
         }
-        await TurnTo(rig, Quaternion.Euler(0f, waypoints[waypoints.Length - 1].eulerAngles.y, 0f));
+        if (turnAtEnd)
+            await TurnTo(rig, Quaternion.Euler(0f, points[points.Length - 1].eulerAngles.y, 0f));
     }
 
     async Awaitable TurnTo(Transform rig, Quaternion target)

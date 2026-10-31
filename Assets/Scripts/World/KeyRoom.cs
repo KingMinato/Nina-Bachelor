@@ -1,27 +1,31 @@
 using UnityEngine;
 
 // Room 2: the door to Room 3 is locked until the player has taken the key from the wall.
+// Door and key can only be used from the spot in front of them (RoomNav).
 public class KeyRoom : MonoBehaviour
 {
     [SerializeField] UIManager ui;
     [SerializeField] ActionButtonsUI actionButtons;
     [SerializeField] PlayerActions player;
     [SerializeField] StepDoneUI stepDone;
+    [SerializeField] RoomNav nav;
     [SerializeField] WorldButton doorButton;
+    [SerializeField] Transform doorSpot;
     [SerializeField] WorldButton keyButton;
+    [SerializeField] Transform keySpot;
     [SerializeField] GameObject key;
-    [SerializeField] WalkPath walkToKey;
 
     // Completes when the player taps the door with the key.
     public async Awaitable Run(Texts texts)
     {
-        actionButtons.Show(texts, withJump: true);
+        nav.Enter();
+        actionButtons.Show(texts);
         bool hasKey = false;
         while (true)
         {
             var clicked = hasKey
-                ? await WorldButton.FirstClick((doorButton, texts.goToDoor))
-                : await WorldButton.FirstClick((doorButton, texts.goToDoor), (keyButton, texts.key));
+                ? await nav.Next(texts, (doorButton, texts.goToDoor, doorSpot))
+                : await nav.Next(texts, (doorButton, texts.goToDoor, doorSpot), (keyButton, texts.key, keySpot));
             if (clicked == doorButton)
             {
                 if (hasKey)
@@ -29,15 +33,11 @@ public class KeyRoom : MonoBehaviour
                 ui.ShowInstruction(texts.lockedKey);
                 continue;
             }
-            actionButtons.Hide();
-            await player.StandUp();
-            await walkToKey.Walk(player.transform);
             key.SetActive(false);
             hasKey = true;
             ui.HideInstruction();
             UiSfx.Play(UiSfx.Coin);
             stepDone.Show(texts.keyTaken);
-            actionButtons.Show(texts, withJump: true);
         }
         ui.HideInstruction();
         actionButtons.Hide();

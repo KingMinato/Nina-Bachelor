@@ -286,6 +286,7 @@ public static class UiStyleBuilder
             Img("Door.Tag", One(S, "btn_yel"), ppu: 1f / 12).Size(1000, 300).M(UiMotion.PixelPop),
             Txt("Door.Text", 100, ink).Inset(0, 56, 0, 0),
             Img("Door.Pointer", One(S, "down"), Image.Type.Simple).Tinted(yel).Aspect().AboveTop(160, 160, 30).M(idle: UiMotion.Bob),
+            Img("Floor.Arrow", One(S, "up"), Image.Type.Simple).Tinted(yel).Aspect().M(UiMotion.PixelPop, idle: UiMotion.Bob),
         };
         return SaveStyle(S, font, font, 45, looks);
     }
@@ -357,6 +358,7 @@ public static class UiStyleBuilder
             Img("Door.Tag", paper, ppu: 0.25f, fps: boil).Size(900, 330).M(UiMotion.PopIn),
             Txt("Door.Text", 200, ink).Inset(0, 30, 40, 0),
             Img("Door.Pointer", One(S, "down"), Image.Type.Simple).Tinted(red).Aspect().AboveTop(240, 240, 20).M(idle: UiMotion.Hop),
+            Img("Floor.Arrow", One(S, "up"), Image.Type.Simple).Tinted(red).Aspect().M(UiMotion.PopIn, idle: UiMotion.Hop),
         };
         return SaveStyle(S, font, font, 42, looks);
     }
@@ -427,6 +429,7 @@ public static class UiStyleBuilder
             Img("Door.Tag", plank, ppu: 0.35f).Size(980, 310).M(UiMotion.Drop, idle: UiMotion.Swing),
             Txt("Door.Text", 130, cream, title: true, material: shadow).Inset(0, 36, 0, 0),
             Img("Door.Rope", One(S, "rope"), Image.Type.Simple).AboveTop(560, 240, -30),
+            Img("Floor.Arrow", One(S, "up"), Image.Type.Simple).Aspect().M(idle: UiMotion.Glow),
         };
         return SaveStyle(S, body, title, 38, looks);
     }
@@ -583,7 +586,8 @@ public static class UiStyleBuilder
         AddImage(jumpIcon);
         Skin(jumpIcon, "Jump.Icon");
         wants["Jump"] = Want(jump, "Jump.Want");
-        // crouch: a copy of the jump button with the icon pointing down, both side by side
+        // crouch: a copy of the jump button with the icon pointing down; crouch bottom left, jump bottom right,
+        // so the bottom centre stays free for the arrows on the floor
         var crouch = actions.Find("Crouch");
         if (crouch == null)
         {
@@ -592,8 +596,8 @@ public static class UiStyleBuilder
         }
         crouch.Find("Icon").localScale = new Vector3(1, -1, 1);
         var jumpRect = (RectTransform)jump;
-        jumpRect.anchoredPosition = new Vector2(220, jumpRect.anchoredPosition.y);
-        ((RectTransform)crouch).anchoredPosition = new Vector2(-220, jumpRect.anchoredPosition.y);
+        jumpRect.anchoredPosition = new Vector2(620, jumpRect.anchoredPosition.y);
+        ((RectTransform)crouch).anchoredPosition = new Vector2(-620, jumpRect.anchoredPosition.y);
         var actionButtons = actions.GetComponent<ActionButtonsUI>();
         Set(actionButtons, "crouchButton", crouch.GetComponent<Button>());
         Set(actionButtons, "crouchLabel", crouch.Find("Label").GetComponent<TMP_Text>());

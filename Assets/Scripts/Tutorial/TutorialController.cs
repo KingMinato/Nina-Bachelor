@@ -24,7 +24,7 @@ public class TutorialController : MonoBehaviour
 
         finished = new AwaitableCompletionSource();
         playerActions.Performed += OnPerformed;
-        actionButtons.Show(config.texts, withJump: true);
+        actionButtons.Show(config.texts);
         UpdateInstruction();
 
         await finished.Awaitable;

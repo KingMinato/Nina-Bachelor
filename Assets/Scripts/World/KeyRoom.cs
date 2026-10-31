@@ -16,20 +16,22 @@ public class KeyRoom : MonoBehaviour
     [SerializeField] GameObject key;
     [SerializeField] KeyInventory inventory;
 
-    // Completes when the player taps the unlocked door.
-    public async Awaitable Run(Texts texts)
+    bool hasKey, unlocked;
+
+    // Returns true when the player taps the unlocked door, false for the door back to Room 1.
+    public async Awaitable<bool> Run(Texts texts)
     {
-        nav.Enter();
         nav.onWalk = ui.HideInstruction; // the locked hint belongs to the door spot
         actionButtons.Show(texts);
         inventory.gameObject.SetActive(true);
-        bool hasKey = false, unlocked = false;
+        bool forward;
         while (true)
         {
             var clicked = hasKey
                 ? await nav.Next(texts, (doorButton, texts.goToDoor, doorSpot))
                 : await nav.Next(texts, (doorButton, texts.goToDoor, doorSpot), (keyButton, texts.key, keySpot));
-            if (clicked == doorButton && unlocked)
+            forward = clicked == doorButton;
+            if (clicked == nav.BackDoor || forward && unlocked)
                 break;
             if (clicked == doorButton && !hasKey)
             {
@@ -56,5 +58,6 @@ public class KeyRoom : MonoBehaviour
         ui.HideInstruction();
         actionButtons.Hide();
         await player.StandUp();
+        return forward;
     }
 }

@@ -1,6 +1,7 @@
 using UnityEngine;
 
 // Runs the whole sequence: Init -> Tutorial -> GoToDoor -> KeyRoom -> LeverRoom -> WalkToNPC -> Dialog -> Submit -> Redirect.
+// Until the dialog the player can go back through every door.
 public class GameFlow : MonoBehaviour
 {
     [SerializeField] UIManager ui;
@@ -19,21 +20,17 @@ public class GameFlow : MonoBehaviour
              " Room 4 overlaps the mirror world behind Room 1's bottom mirror.")]
     [SerializeField] GameObject[] roomGroups;
     [SerializeField] GameObject[] roomMirrors;
-    [SerializeField] RoomNav nav1;
-    [SerializeField] Door door;
+    [Tooltip("Room1..Room4.")]
+    [SerializeField] RoomNav[] navs;
+    [Tooltip("doors[i] leads from room i+1 to room i+2; walksToDoor[i] walks up to it, walksInto[i] into the next room" +
+             " (its first point is the doorway).")]
+    [SerializeField] Door[] doors;
+    [SerializeField] WalkPath[] walksToDoor;
+    [SerializeField] WalkPath[] walksInto;
     [SerializeField] WorldButton doorButton;
     [SerializeField] Transform doorSpot;
-    [SerializeField] WalkPath walkToDoor;
-    [SerializeField] WalkPath walkIntoRoom2;
     [SerializeField] KeyRoom keyRoom;
-    [SerializeField] Door door2;
-    [SerializeField] WalkPath walkToDoor2;
-    [SerializeField] WalkPath walkIntoRoom3;
     [SerializeField] LeverRoom leverRoom;
-    [SerializeField] Door door3;
-    [SerializeField] WalkPath walkToDoor3;
-    [SerializeField] WalkPath walkIntoRoom4;
-    [SerializeField] RoomNav nav4;
     [SerializeField] WorldButton npcButton;
     [SerializeField] Transform npcSpot;
     [SerializeField] AvatarSpawner avatarSpawner;
@@ -97,31 +94,24 @@ public class GameFlow : MonoBehaviour
             await tutorial.Run(config);
         }
 
-        // The player walks around (arrows on the floor) and opens the door from the spot in front of it.
-        SetState(GameState.GoToDoor);
-        nav1.Enter();
-        actionButtons.Show(config.texts);
+        // The player walks around (arrows on the floor) and uses doors, key, levers from the spots in front of them,
+        // back and forth through the doors, until talking to the NPC in Room 4.
+        var states = new[] { GameState.GoToDoor, GameState.KeyRoom, GameState.LeverRoom, GameState.WalkToNPC };
+        int room = 0;
+        navs[0].Enter();
         ui.ShowInstruction(config.texts.goToDoorHint);
-        await nav1.Next(config.texts, (doorButton, config.texts.goToDoor, doorSpot));
-        actionButtons.Hide();
-        ui.HideInstruction();
-        await playerActions.StandUp();
-        await GoThrough(walkToDoor, door, walkIntoRoom2, 0);
-
-        SetState(GameState.KeyRoom);
-        await keyRoom.Run(config.texts);
-        await GoThrough(walkToDoor2, door2, walkIntoRoom3, 1);
-
-        SetState(GameState.LeverRoom);
-        await leverRoom.Run(config.texts);
-        SetState(GameState.WalkToNPC);
-        await GoThrough(walkToDoor3, door3, walkIntoRoom4, 2);
-        // The NPC stands at the back wall: walk up to it, then talk.
-        nav4.Enter();
-        actionButtons.Show(config.texts);
-        await nav4.Next(config.texts, (npcButton, config.texts.talk, npcSpot));
-        actionButtons.Hide();
-        await playerActions.StandUp();
+        while (true)
+        {
+            SetState(states[room]);
+            bool forward = await RunRoom(room);
+            if (forward && room == 3)
+                break;
+            if (forward)
+                await GoThrough(room++);
+            else
+                await GoBack(room--);
+            navs[room].Enter(back: !forward);
+        }
         npc.LookAt(cameraAim.transform);
         cameraAim.Aim(npc.Face);
 
@@ -148,17 +138,59 @@ public class GameFlow : MonoBehaviour
         Redirector.Go(Redirector.BuildUrl(config.returnUrlTemplate, fields));
     }
 
+    // True: on through the room's door (Room 4: talk to the NPC); false: back through the door it was entered by.
+    Awaitable<bool> RunRoom(int room) => room switch
+    {
+        0 => Room1(),
+        1 => keyRoom.Run(config.texts),
+        2 => leverRoom.Run(config.texts),
+        _ => Room4(),
+    };
+
+    async Awaitable<bool> Room1()
+    {
+        actionButtons.Show(config.texts);
+        await navs[0].Next(config.texts, (doorButton, config.texts.goToDoor, doorSpot));
+        actionButtons.Hide();
+        ui.HideInstruction();
+        await playerActions.StandUp();
+        return true;
+    }
+
+    // The NPC stands at the back wall: walk up to it, then talk.
+    async Awaitable<bool> Room4()
+    {
+        actionButtons.Show(config.texts);
+        var clicked = await navs[3].Next(config.texts, (npcButton, config.texts.talk, npcSpot));
+        actionButtons.Hide();
+        await playerActions.StandUp();
+        return clicked == npcButton;
+    }
+
     // Walks up to the door, through it into the next room and closes it behind the player.
-    async Awaitable GoThrough(WalkPath toDoor, Door through, WalkPath into, int fromRoom)
+    async Awaitable GoThrough(int from)
     {
         Transform rig = playerActions.transform;
         cameraAim.Look(null);
-        await toDoor.Walk(rig);
-        ShowRooms(fromRoom, fromRoom + 1);
-        await through.Open();
-        await into.Walk(rig);
-        await through.Close();
-        ShowRooms(fromRoom + 1, fromRoom + 1);
+        await walksToDoor[from].Walk(rig);
+        ShowRooms(from, from + 1);
+        await doors[from].Open();
+        await walksInto[from].Walk(rig);
+        await doors[from].Close();
+        ShowRooms(from + 1, from + 1);
+    }
+
+    // Back through the door the room was entered by, to the spot in front of it in the previous room, facing into that room.
+    async Awaitable GoBack(int from)
+    {
+        Transform rig = playerActions.transform;
+        cameraAim.Look(null);
+        ShowRooms(from - 1, from);
+        await doors[from - 1].Open();
+        var into = walksInto[from - 1];
+        await into.WalkTo(rig, false, into.First, navs[from - 1].ExitSpot);
+        await doors[from - 1].Close();
+        ShowRooms(from - 1, from - 1);
     }
 
     void ShowRooms(int first, int last)

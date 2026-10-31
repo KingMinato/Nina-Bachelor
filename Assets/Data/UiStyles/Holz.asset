@@ -538,7 +538,7 @@ MonoBehaviour:
     idleDuration: 0
   - key: Arrow.Icon
     sprites:
-    - {fileID: 21300000, guid: 3b5d82a2e94904943883ba127558b2b5, type: 3}
+    - {fileID: 21300000, guid: 452c19bdb237c0544b2ed505508f314a, type: 3}
     framesPerSecond: 8
     color: {r: 1, g: 1, b: 1, a: 1}
     imageType: 0

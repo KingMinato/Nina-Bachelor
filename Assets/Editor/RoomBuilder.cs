@@ -45,7 +45,8 @@ public static class RoomBuilder
         npc.SetParent(null, true);
         foreach (var name in new[] { "Room2", "Room3", "Room4", "Interactive", "WalkToNpc", "WalkIntoRoom2", "WalkToKey",
                      "WalkToDoor2", "WalkIntoRoom3", "WalkToLevers", "WalkToDoor3", "WalkIntoRoom4", "Door2Button", "Door3Button",
-                     "KeyButton", "Lever1Button", "Lever2Button", "Lever3Button", "NpcButton", "Nav" })
+                     "KeyButton", "Lever1Button", "Lever2Button", "Lever3Button", "NpcButton", "Nav", "Door1BackButton", "Door2BackButton",
+                     "Door3BackButton" })
             Remove(world, name);
         var uiRoot = GameObject.Find("UI").transform;
         Remove(uiRoot, "NavArrows");
@@ -148,6 +149,11 @@ public static class RoomBuilder
             leverButtons[i] = WorldButtonAt(doorButton, "Lever" + (i + 1) + "Button", new Vector3(plateX - 0.15f, pivotY - 0.33f, R3.z + LeverZ[i]),
                 90f, 0.0005f, new Vector2(720, 1320), -520);
 
+        // The same doors from the other side, to go back.
+        var door1Back = WorldButtonAt(doorButton, "Door1BackButton", new Vector3(Half + T + 0.12f, 0f, 0f), 270f, 0.001f, new Vector2(1200, 2200), DoorTagY);
+        var door2Back = WorldButtonAt(doorButton, "Door2BackButton", new Vector3(R2.x, 0f, -Half - T - 0.12f), 0f, 0.001f, new Vector2(1200, 2200), DoorTagY);
+        var door3Back = WorldButtonAt(doorButton, "Door3BackButton", new Vector3(Half - 0.02f, 0f, R4.z), 90f, 0.001f, new Vector2(1200, 2200), DoorTagY);
+
         var npcButton = WorldButtonAt(doorButton, "NpcButton", new Vector3(R4.x - 2.1f, 0f, R4.z), 270f, 0.001f, new Vector2(900, 2000), -1150);
 
         // Walking spots per room, spot 0 = home. Door spots: where the walk through the door starts.
@@ -184,9 +190,9 @@ public static class RoomBuilder
             ("MirrorTop", new Vector3(0, 0, 1.8f), 0f), ("MirrorBottom", new Vector3(0, 0, -1.8f), 180f),
             ("Door", new Vector3(1.5f, 0, 0), 90f));
         var nav2 = Nav("Room2", ("Home", R2, 90f), ("Mirror", R2 + new Vector3(1.8f, 0, 0), 90f),
-            ("Key", R2 + new Vector3(0, 0, 1.6f), 0f), ("Door", R2 + new Vector3(0, 0, -1.5f), 180f));
+            ("Key", R2 + new Vector3(0, 0, 1.6f), 0f), ("Back", R2 + new Vector3(-1.5f, 0, 0), 270f), ("Door", R2 + new Vector3(0, 0, -1.5f), 180f));
         var nav3 = Nav("Room3", ("Home", R3, 180f), ("Mirror", R3 + new Vector3(0, 0, -1.8f), 180f),
-            ("Levers", R3 + new Vector3(1.2f, 0, 0), 90f), ("Door", R3 + new Vector3(-1.5f, 0, 0), 270f));
+            ("Levers", R3 + new Vector3(1.2f, 0, 0), 90f), ("Back", R3 + new Vector3(0, 0, 1.5f), 0f), ("Door", R3 + new Vector3(-1.5f, 0, 0), 270f));
         var nav4 = Nav("Room4", ("Home", R4 + new Vector3(1.8f, 0, 0), 270f), ("Npc", R4 + new Vector3(-1f, 0, 0), 270f));
         Object.DestroyImmediate(arrowTemplate);
 
@@ -200,6 +206,11 @@ public static class RoomBuilder
 
         foreach (var n in new[] { nav1, nav2, nav3, nav4 })
             Set(n, ("player", player), ("actionButtons", actions), ("walker", walker));
+        Set(nav1, ("exitSpot", spot["Room1/Door"]));
+        Set(nav2, ("backDoor", door1Back), ("backSpot", spot["Room2/Back"]), ("exitSpot", spot["Room2/Door"]));
+        Set(nav3, ("backDoor", door2Back), ("backSpot", spot["Room3/Back"]), ("exitSpot", spot["Room3/Door"]));
+        // Room 4 is entered right next to the door: it is tappable from home.
+        Set(nav4, ("backDoor", door3Back), ("backSpot", spot["Room4/Home"]));
         var keyRoom = GetOrAdd<KeyRoom>(game);
         Set(keyRoom, ("ui", ui), ("actionButtons", actions), ("player", player), ("stepDone", stepDone), ("nav", nav2),
             ("doorButton", door2Button), ("doorSpot", spot["Room2/Door"]), ("keyButton", keyButton), ("keySpot", spot["Room2/Key"]),
@@ -216,10 +227,12 @@ public static class RoomBuilder
             sol.GetArrayElementAtIndex(i).boolValue = Solution[i];
         so.ApplyModifiedPropertiesWithoutUndo();
 
-        Set(flow, ("nav1", nav1), ("door", door1), ("doorSpot", spot["Room1/Door"]), ("door2", door2), ("door3", door3),
-            ("walkToDoor", walkToDoor), ("walkIntoRoom2", intoRoom2), ("keyRoom", keyRoom), ("walkToDoor2", toDoor2),
-            ("walkIntoRoom3", intoRoom3), ("leverRoom", leverRoom), ("walkToDoor3", toDoor3), ("walkIntoRoom4", intoRoom4),
-            ("nav4", nav4), ("npcButton", npcButton), ("npcSpot", spot["Room4/Npc"]));
+        Set(flow, ("doorSpot", spot["Room1/Door"]), ("keyRoom", keyRoom), ("leverRoom", leverRoom),
+            ("npcButton", npcButton), ("npcSpot", spot["Room4/Npc"]));
+        Set(flow, "navs", new Object[] { nav1, nav2, nav3, nav4 });
+        Set(flow, "doors", new Object[] { door1, door2, door3 });
+        Set(flow, "walksToDoor", new Object[] { walkToDoor, toDoor2, toDoor3 });
+        Set(flow, "walksInto", new Object[] { intoRoom2, intoRoom3, intoRoom4 });
         Set(Object.FindFirstObjectByType<UltimatumController>(FindObjectsInactive.Include), ("npc", npc.GetComponentInChildren<NpcLookAt>()));
         Set(flow, "roomGroups", new Object[] { room1.gameObject, room2.gameObject, room3.gameObject, room4.gameObject });
         Set(flow, "roomMirrors", new Object[] { mw1.gameObject, mw2.gameObject, mw3.gameObject, null });

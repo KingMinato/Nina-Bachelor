@@ -19,25 +19,36 @@ public class RoomNav : MonoBehaviour
     [SerializeField] float arrowReach = 2.4f;
     [Tooltip("An arrow lies at most this far behind its spot.")]
     [SerializeField] float arrowBeyond = 1f;
+    [Tooltip("Door back to the previous room (none in Room 1), tappable from backSpot.")]
+    [SerializeField] WorldButton backDoor;
+    [SerializeField] Transform backSpot;
+    [Tooltip("Spot in front of the door to the next room: where the player stands after coming back through it.")]
+    [SerializeField] Transform exitSpot;
 
     [System.NonSerialized] public System.Action onWalk;
 
     int at;
     Vector3[] points;
 
-    // The player has just walked in and stands at home.
-    public void Enter() => at = 0;
+    public WorldButton BackDoor => backDoor;
+    public Transform ExitSpot => exitSpot;
 
-    // Shows the arrows and the targets that can be used from the current spot (spot null = from anywhere).
-    // Tapped arrows walk the player; returns the first tapped target.
+    // The player has just walked in: at home, or (back) at the exit spot after coming back from the next room.
+    public void Enter(bool back = false) => at = back ? System.Array.IndexOf(spots, exitSpot) : 0;
+
+    // Shows the arrows and the targets that can be used from the current spot (spot null = from anywhere),
+    // plus the back door. Tapped arrows walk the player; returns the first tapped target.
     public async Awaitable<WorldButton> Next(Texts texts, params (WorldButton button, string caption, Transform spot)[] targets)
     {
+        var all = new List<(WorldButton button, string caption, Transform spot)>(targets);
+        if (backDoor != null)
+            all.Add((backDoor, texts.goToDoor, backSpot));
         while (true)
         {
             var options = new List<(WorldButton, string)>();
             Vector3 middle = Vector3.zero;
             int here = 0;
-            foreach (var (button, caption, spot) in targets)
+            foreach (var (button, caption, spot) in all)
                 if (spot == null || spot == spots[at])
                 {
                     options.Add((button, caption));

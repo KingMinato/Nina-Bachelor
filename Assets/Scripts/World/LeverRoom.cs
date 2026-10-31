@@ -27,13 +27,13 @@ public class LeverRoom : MonoBehaviour
         return true;
     }
 
-    // Completes when the player taps the unlocked door.
-    public async Awaitable Run(Texts texts)
+    // Returns true when the player taps the unlocked door, false for the door back to Room 2.
+    public async Awaitable<bool> Run(Texts texts)
     {
-        nav.Enter();
         nav.onWalk = ui.HideInstruction; // the locked hint belongs to the door spot
         actionButtons.Show(texts);
-        bool solved = false;
+        bool solved = Matches(Array.ConvertAll(levers, l => l.Up), solution);
+        bool forward = false;
         while (true)
         {
             var targets = new List<(WorldButton, string, Transform)> { (doorButton, texts.goToDoor, doorSpot) };
@@ -41,8 +41,11 @@ public class LeverRoom : MonoBehaviour
                 foreach (var b in leverButtons)
                     targets.Add((b, "", leverSpot));
             var clicked = await nav.Next(texts, targets.ToArray());
+            if (clicked == nav.BackDoor)
+                break;
             if (clicked == doorButton)
             {
+                forward = solved;
                 if (solved)
                     break;
                 ui.ShowInstruction(texts.lockedLevers);
@@ -60,5 +63,6 @@ public class LeverRoom : MonoBehaviour
         ui.HideInstruction();
         actionButtons.Hide();
         await player.StandUp();
+        return forward;
     }
 }

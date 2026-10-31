@@ -14,6 +14,8 @@ public class WalkPath : MonoBehaviour
 
     public Awaitable Walk(Transform rig) => WalkTo(rig, true, waypoints);
 
+    public Transform First => waypoints[0];
+
     // Walks along points; turnAtEnd false keeps facing the way the rig walked.
     public async Awaitable WalkTo(Transform rig, bool turnAtEnd, params Transform[] points)
     {

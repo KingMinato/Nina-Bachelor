@@ -128,23 +128,18 @@ def arc_points(cx, cy, r, a0, a1, n=48):
             for i in range(n + 1)]
 
 
-def turn_arrow(c, size, width, xy=None):
-    """Curved arrow turning left (counter-clockwise): arc over the top, head on the left pointing down."""
-    x, y = xy if xy else (c.x, c.y)
-    s = size
-    cx, cy, r = 0.5 * s, 0.58 * s, 0.27 * s
-    pts = arc_points(cx, cy, r, -40, 180)
-    end = pts[-1]
-    head = [(end[0] - 0.15 * s, end[1] - 0.06 * s), end, (end[0] + 0.12 * s, end[1] - 0.1 * s)]
-    return min_d(sd_polyline(x, y, pts), sd_polyline(x, y, head)) - width / 2
-
-
 def up_arrow(c, size, width, xy=None):
     x, y = xy if xy else (c.x, c.y)
     s = size
     shaft = [(0.5 * s, 0.85 * s), (0.5 * s, 0.18 * s)]
     head = [(0.22 * s, 0.45 * s), (0.5 * s, 0.16 * s), (0.78 * s, 0.45 * s)]
     return min_d(sd_polyline(x, y, shaft), sd_polyline(x, y, head)) - width / 2
+
+
+def left_arrow(c, size, width, xy=None):
+    """The up arrow mirrored at the diagonal: points left."""
+    x, y = xy if xy else (c.x, c.y)
+    return up_arrow(c, size, width, (y, x))
 
 
 def key_shape(c, size, width, xy=None):
@@ -371,7 +366,7 @@ def skizze():
         c.paint(fill(fn(c, size, width, (x, y))), color)
         save(S, name, c.image())
 
-    icon("turn", turn_arrow)
+    icon("arrow", left_arrow)
     icon("up", up_arrow)
     icon("key", key_shape)
     icon("down", lambda c, s, w, xy: up_arrow(c, s, w, (xy[0], s - xy[1])), color=red)
@@ -531,7 +526,7 @@ def holz():
         c.paint(fill(fn(c, size, width, (c.x, c.y))), cream)
         save(S, name, c.image())
 
-    icon("turn", turn_arrow)
+    icon("arrow", left_arrow)
     icon("up", up_arrow)
     icon("key", key_shape)
 

@@ -18,7 +18,6 @@ public class CameraAim : MonoBehaviour
 
     Transform target;
     Vector3? point;
-    float below;
     float rest;
 
     void Awake() => rest = restPitch;
@@ -30,15 +29,13 @@ public class CameraAim : MonoBehaviour
     {
         target = face;
         point = null;
-        below = pitchDown;
     }
 
-    // Looks straight at a point (null = rest).
+    // Looks at a point, but never further down than at rest (null = rest).
     public void Look(Vector3? at)
     {
         target = null;
         point = at;
-        below = 0f;
     }
 
     void Start()
@@ -55,7 +52,11 @@ public class CameraAim : MonoBehaviour
             Vector3 to = at.Value - transform.position;
             // Turning away from it looks at the floor arrows again.
             if (Vector3.Angle(Vector3.ProjectOnPlane(to, Vector3.up), transform.parent.forward) < frontAngle)
-                local = Quaternion.Inverse(transform.parent.rotation) * Quaternion.LookRotation(to) * Quaternion.Euler(below, 0, 0);
+            {
+                Quaternion look = Quaternion.LookRotation(to);
+                float pitch = target != null ? look.eulerAngles.x + pitchDown : Mathf.Min(Mathf.DeltaAngle(0f, look.eulerAngles.x), rest);
+                local = Quaternion.Inverse(transform.parent.rotation) * Quaternion.Euler(pitch, look.eulerAngles.y, 0f);
+            }
         }
         transform.localRotation = Quaternion.Slerp(transform.localRotation, local, 1f - Mathf.Exp(-sharpness * Time.deltaTime));
     }

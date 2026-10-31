@@ -332,7 +332,7 @@ public static class UiStyleBuilder
             Img("Instr.Tape", One(S, "tape"), Image.Type.Simple).AboveTop(170, 42, -22).Rot(3),
 
             Img("Arrow", circle, Image.Type.Simple, fps: boil).Size(156, 156).M(UiMotion.PopIn, UiMotion.PopOut, press: UiMotion.Squish),
-            Img("Arrow.Icon", One(S, "turn"), Image.Type.Simple).Tinted(ink).Aspect().Inset(28, 32, 32, 28).M(want: UiMotion.Wiggle),
+            Img("Arrow.Icon", One(S, "arrow"), Image.Type.Simple).Tinted(ink).Aspect().Inset(28, 32, 32, 28).M(want: UiMotion.Wiggle),
             Img("Arrow.Want", Frames(S, "ring"), Image.Type.Simple, fps: boil).Inset(-26, -26, -26, -26),
             Img("Jump", paper, fps: boil).Size(340, 110).M(UiMotion.PopIn, UiMotion.PopOut, press: UiMotion.Squish),
             Txt("Jump.Text", 54, ink).Inset(84, 8, 24, 0),
@@ -405,7 +405,7 @@ public static class UiStyleBuilder
             Img("Instr.RollerR", One(S, "roller")).Rect(new Vector2(1, 0), Vector2.one, new Vector2(-20, -16), new Vector2(20, 16)),
 
             Img("Arrow", shield, Image.Type.Simple).Size(176, 186).M(UiMotion.ShieldIn, UiMotion.ShieldOut, press: UiMotion.Press),
-            Img("Arrow.Icon", One(S, "turn"), Image.Type.Simple).Aspect().Inset(44, 54, 44, 34),
+            Img("Arrow.Icon", One(S, "arrow"), Image.Type.Simple).Aspect().Inset(44, 54, 44, 34),
             Img("Arrow.Want", One(S, "glow_circle"), Image.Type.Simple).Inset(-21, -11, -21, -21).M(idle: UiMotion.Glow),
             Img("Jump", plank).Size(380, 118).M(UiMotion.PlankUp, UiMotion.PlankDown, press: UiMotion.Press),
             Txt("Jump.Text", 36, cream, title: true, material: shadow).Inset(84, 14, 30, 0),

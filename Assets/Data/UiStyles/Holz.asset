@@ -1545,5 +1545,11 @@ MonoBehaviour:
     clip: {fileID: 8300000, guid: ff8b127ce589d574da291a971fbf876e, type: 3}
   - name: step_4
     clip: {fileID: 8300000, guid: 0cfa1feb0354e6e4fb7b92e02671c18a, type: 3}
+  - name: step_5
+    clip: {fileID: 8300000, guid: 33ae735d54a4df147a012d1ef64eee0a, type: 3}
+  - name: step_6
+    clip: {fileID: 8300000, guid: cd6562622b6b44b43b2ce640ea6122f9, type: 3}
+  - name: step_7
+    clip: {fileID: 8300000, guid: 755e912d09bee094798001290e6c5370, type: 3}
   - name: unlock
     clip: {fileID: 8300000, guid: e3eab1a53ee3d3d4e95141a286bac808, type: 3}

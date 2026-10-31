@@ -423,7 +423,7 @@ Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> S
 - Room variants: Holz is the start; Büro, Stein, Hütte kept for comparison. After the final choice remove the others (and unused packs) from the builder.
 - UI style Holz chosen. Remove Pixel and Skizze from the builder once confirmed (fonts, sprites, looks).
 - Balance display may be counterproductive (thesis author discusses with the lecturer): `showBalance` in config.json.
-- After the 2026-10-31 changes: redeploy the Apps Script with `lang` in `cols`, add `lang` to Survey B's embedded data, pass `&lang=${e://Field/Q_Language}` from Survey A, translate Survey A and B to English.
+- After the 2026-10-31 changes: redeploy the Apps Script with `lang` in `cols`, add `lang` to Survey B's embedded data, pass `&lang=${e://Field/Q_Language}` from Survey A, translate Survey A and B to English. The free Qualtrics account cannot add languages, so the translation is done after the move to the thesis author's account (if the university licence has no translations either: English copies of both surveys plus a second return URL in config.json).
 - Texts written by Claude, not by the thesis author: `goToDoorHint`, `keyTaken`, `leversSolved` (DE/EN). The English lever hint says "set the levers the right way" instead of "in the right order" (the levers have no order).
 - Build size 2026-10-30: 38.4 MB (37.2 MB without room variants), over the 30 MB target. Main causes are avatar textures at 4096: mushroom (`T_Mushroom_*`, ~64 MB uncompressed), `Generic_Normals_01`, `Generic_01_A`, `Generic_Emissive_01_A`.
 - Data storage rules of the university unknown. Google Sheet is the working assumption.

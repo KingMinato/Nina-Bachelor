@@ -16,8 +16,8 @@ public class KeyInventory : MonoBehaviour
         Vector3 from = key.position, front = Front();
         Quaternion rotation = key.rotation;
         Vector3 size = key.localScale;
+        UiSfx.Play(UiSfx.KeyPick);
         await Tween(0.6f, t => key.position = Vector3.Lerp(from, front, t));
-        UiSfx.Play(UiSfx.Coin);
         await Tween(0.8f, t => key.rotation = Quaternion.AngleAxis(360f * t, cam.transform.up) * rotation);
         Vector3 slot = SlotPoint();
         await Tween(0.4f, t =>
@@ -43,8 +43,8 @@ public class KeyInventory : MonoBehaviour
             key.localScale = size * (0.2f + 0.8f * t);
         });
         // A quarter turn as in a lock, then it shrinks away.
+        UiSfx.Play(UiSfx.Unlock);
         await Tween(0.5f, t => key.rotation = Quaternion.AngleAxis(90f * t, cam.transform.forward) * rotation);
-        UiSfx.Play(UiSfx.Door);
         await Tween(0.3f, t => key.localScale = size * (1f - t));
         key.gameObject.SetActive(false);
         key.localScale = size;

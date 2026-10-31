@@ -27,7 +27,7 @@ public class Lever : MonoBehaviour
     public async Awaitable Toggle()
     {
         Up = !Up;
-        UiSfx.Play(UiSfx.Click);
+        UiSfx.Play(UiSfx.Lever);
         Quaternion from = transform.localRotation, to = Pose(Up);
         for (float t = 0f; t < seconds; t += Time.deltaTime)
         {

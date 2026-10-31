@@ -93,7 +93,6 @@ PIXEL = {
     "click": [tone(f=660, dur=.06, vol=.07)],
     "turn": [tone(f=220, f2=330, dur=.14, vol=.05)],
     "jump": [tone(f=260, f2=820, dur=.2, vol=.07)],
-    "land": [tone(f=150, f2=80, dur=.08, vol=.06)],
     "count": [tone(f=880, dur=.06, vol=.07), tone(f=1320, dur=.09, vol=.07, at=.07)],
     "done": [tone(f=f, dur=.1, vol=.07, at=i * .08) for i, f in enumerate([523, 659, 784, 1046])],
     "instr": [tone(f=990, dur=.05, vol=.05), tone(f=1480, dur=.06, vol=.05, at=.05)],
@@ -101,8 +100,6 @@ PIXEL = {
     "type": [tone(f=1200, dur=.018, vol=.025)],
     "tick": [tone(f=1500, dur=.025, vol=.04)],
     "coin": [tone(f=988, dur=.07, vol=.07), tone(f=1319, dur=.3, vol=.07, at=.07)],
-    "door": [noise(dur=.5, f=400, f2=150, type="lowpass", vol=.12)],
-    "step": [tone(f=110, dur=.04, vol=.04)],
     "end": [tone(f=f, dur=.12, vol=.06, at=i * .1) for i, f in enumerate([1046, 784, 659, 523])],
 }
 
@@ -110,7 +107,6 @@ SKIZZE = {
     "click": [tone(type="sine", f=540, f2=260, dur=.08, vol=.12)],
     "turn": [noise(dur=.28, f=2600, f2=1200, q=2, vol=.05)],
     "jump": [tone(type="triangle", f=280, f2=720, dur=.2, vol=.1)],
-    "land": [noise(dur=.08, f=300, type="lowpass", vol=.12)],
     "count": [noise(dur=.05, f=3200, q=3, vol=.06), tone(type="sine", f=880, dur=.14, vol=.06, at=.03)],
     "done": [noise(dur=.06, f=3000, q=2, vol=.07, at=a) for a in (0, .07, .14)]
             + [tone(type="sine", f=660, dur=.3, vol=.07, at=.25), tone(type="sine", f=990, dur=.4, vol=.06, at=.37)],
@@ -119,8 +115,6 @@ SKIZZE = {
     "type": [noise(dur=.016, f=4200, q=4, vol=.035)],
     "tick": [noise(dur=.02, f=3000, q=4, vol=.05)],
     "coin": [tone(type="sine", f=1480, dur=.18, vol=.06), tone(type="sine", f=1980, dur=.25, vol=.05, at=.06)],
-    "door": [noise(dur=.5, f=500, f2=150, type="lowpass", vol=.12)],
-    "step": [noise(dur=.05, f=220, type="lowpass", vol=.06)],
     "end": [tone(type="sine", f=f, dur=.3, vol=.05, at=i * .12) for i, f in enumerate([784, 659, 523])],
 }
 
@@ -128,7 +122,6 @@ HOLZ = {
     "click": [tone(type="triangle", f=200, f2=120, dur=.1, vol=.22), noise(dur=.02, f=1800, q=2, vol=.06)],
     "turn": [noise(dur=.32, f=650, f2=250, type="lowpass", vol=.07)],
     "jump": [tone(type="triangle", f=200, f2=430, dur=.16, vol=.1)],
-    "land": [tone(type="sine", f=95, f2=50, dur=.16, vol=.28)],
     "count": [tone(type="sine", f=2600, dur=.14, vol=.05), tone(type="sine", f=3400, dur=.1, vol=.04, at=.01)],
     "done": [tone(type="sine", f=130, f2=40, dur=.28, vol=.4), noise(dur=.12, f=450, type="lowpass", vol=.25),
              tone(type="sine", f=1568, dur=.4, vol=.05, at=.25), tone(type="sine", f=2093, dur=.5, vol=.045, at=.36)],
@@ -140,9 +133,6 @@ HOLZ = {
     "coin": [p for i, a in enumerate((0, .08, .17))
              for p in (tone(type="sine", f=2500 + i * 300, dur=.14, vol=.05, at=a),
                        tone(type="sine", f=3500 + i * 200, dur=.09, vol=.035, at=a + .005))],
-    "door": [tone(type="sawtooth", f=110, f2=170, dur=.7, vol=.025),
-             noise(dur=.5, f=400, f2=150, type="lowpass", vol=.1)],
-    "step": [tone(type="sine", f=75, dur=.09, vol=.14)],
     "end": [tone(type="sine", f=f, dur=.5, vol=.045, at=i * .15) for i, f in enumerate([1568, 1319, 1047, 784])],
 }
 

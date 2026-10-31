@@ -411,7 +411,7 @@ public static class RoomVariantBuilder
         {
             string n = filter.name;
             RoomSurface.Kind kind;
-            if (n == "Floor") kind = RoomSurface.Kind.Floor;
+            if (n.StartsWith("Floor")) kind = RoomSurface.Kind.Floor; // floor and door sills
             else if (n == "Ceiling") kind = RoomSurface.Kind.Ceiling;
             else if (n == "DoorLeaf") kind = RoomSurface.Kind.Door;
             else if (n.StartsWith("Wall")) kind = RoomSurface.Kind.Wall;

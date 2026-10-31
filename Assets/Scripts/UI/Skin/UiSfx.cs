@@ -10,7 +10,13 @@ public class UiSfx : MonoBehaviour
     public const string Jump = "jump";
     public const string Land = "land";
     public const string Step = "step";
-    public const string Door = "door";
+    // World sounds (Tools/world_sounds.py), the same in every style.
+    public const string DoorOpen = "doorOpen";
+    public const string DoorClose = "doorClose";
+    public const string Unlock = "unlock";
+    public const string KeyPick = "keyPick";
+    public const string Lever = "lever";
+    public const string Mechanism = "mechanism";
     public const string Instruction = "instr";
     public const string Count = "count";
     public const string Done = "done";

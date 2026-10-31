@@ -202,7 +202,8 @@ Three styles from the prototype round (Mockup Viewer, rated "Gut"), switchable a
 - `UiMotions`: the CSS keyframes of the prototypes as code (offsets in canvas px, `UiSkin.motionScale` for the world-space door canvas).
 - Everything is built by `Editor/UiStyleBuilder.cs` (menu **Mirror Game/Build UI Styles**, safe to rerun): sprite import settings, TMP font assets (`Art/UI/Fonts`, dynamic, glyphs cleared on build and generated from the TTF at runtime), font materials (outline/shadow), the three style assets, and the skin keys, decorations and new elements in `Main.unity`. Change looks in the builder, not in the assets.
 - Sprites are drawn from code by `Tools/ui_sprites.py` (Python, numpy + Pillow) into `Art/UI/Styles/<Style>/`, with `sprites.json` (9-slice borders, point filter). Rerun the script, then the builder.
-- Sounds (`UiSfx.Play(name)`, `UiStyle.sounds`): the WebAudio recipes of the prototypes rendered offline by `Tools/ui_sounds.py` (numpy) into `Art/UI/Sounds/<Style>/<name>.wav`: click (skinned buttons), turn, jump, land, step (walk), door, instr (new instruction, "Ansprechen"), count, done, panel, type (every second typed letter), tick (split slider), coin, end. Rerun the script, then the builder.
+- Sounds (`UiSfx.Play(name)`, `UiStyle.sounds`): the WebAudio recipes of the prototypes rendered offline by `Tools/ui_sounds.py` (numpy) into `Art/UI/Sounds/<Style>/<name>.wav`: click (skinned buttons), turn, jump, instr (new instruction, "Ansprechen"), count, done, panel, type (every second typed letter), tick (split slider), coin, end. Rerun the script, then the builder.
+- World sounds, the same in every style: `Tools/world_sounds.py` (modal synthesis, filtered noise, short synthetic room reverb) writes `Art/UI/Sounds/World/<name>.wav`, which the builder adds to every style: step_1-4 (walk, `UiStyle.Sound` picks `name_N` variants at random), land, doorOpen (start of the swing), doorClose (when the door hits the frame; closing speeds up towards it), keyPick (key taken), unlock (key turns), lever, mechanism (levers solved). Rerun the script, then the builder.
 - Fonts are Google Fonts under the SIL Open Font License (licence texts next to the TTFs), allowed to ship in the build and the public repo.
 - `CameraAim.pitchDown` (14 deg) keeps the NPC's face in the upper part of the screen, above the dialog panel.
 
@@ -295,7 +296,7 @@ One scene. Rooms 1-4, mirror worlds and NPC all live in `Main.unity`.
 
 **Scene layout** (greybox, milestone 2): both rooms 6 x 6 m interior, 3 m high, walls 0.2 m. Room 1 centred at the origin, mirrors on -x (left), +z (top), -z (bottom), door (1.2 x 2.2 m) in the +x wall. Room 2 directly behind it, centre x = 6.2. Player rig (`PlayerRig`, with `PlayerActions`, camera at 1.6 m and the avatar as children) starts at the origin facing the door (+x). `WalkToDoor` stops at (2.2, 0, 0) facing the door, then the door opens; `WalkToNpc`: doorway (3.1, 0, 0), then (6.0, 0, 0) facing +x; NPC at (7.4, 0, 0) facing -x. Mirrors are body-sized (1.5 x 2.4 m, bottom edge 0.15 m above the floor) centred on each mirror wall (`World/Room1/MirrorWall*`), with a dark frame and a subtle glass tint. The avatar is spawned into `PlayerRig` at startup (`Game/AvatarSpawner`), which also moves the camera to the avatar's eye height. The NPC prefab sits under `NPC`. Jump: 0.15 s windup, 0.6 s in the air, 0.2 s landing (`PlayerActions`); the avatar's jump clip is stretched to that duration.
 
-**Rooms 2-4** (`Editor/RoomBuilder.cs`, menu **Mirror Game/Build Rooms**, then rerun Build Room Variants; safe to rerun): Room 2 at (6.2, 0, 0) (mirror +x, door to Room 3 in -z), Room 3 at (6.2, 0, -6.2) (mirror -z, levers on +x, door to Room 4 in -x), Room 4 at (0, 0, -6.2) (NPC at the back wall (-2.4, 0, -6.2) facing +x, player enters to (1.8, 0, -6.2), NPC spot (-1, 0, -6.2)). Walking spots and arrows: `World/Nav/Room1-4` (`RoomNav`, `Spot_<id>`, `Arrow_<id>`), door spots 1.5 m from the centre towards the door, `Back` spots the same towards the entrance door (back door buttons `Door<N>BackButton`). `GameFlow` loops over the rooms (`navs`, `doors`, `walksToDoor`, `walksInto`). Chairs in the variants are placed by `RoomVariantBuilder.ChairAt` in front of their table. The greybox values above for Room 2 and the NPC are outdated. Every room has its own walls (0.1 m each side of a shared wall), so each mirror copy is complete. Doors are under `World/Doors` (Door1-3), key and levers under `World/Interactive`; neither is part of a room copy, the mirror worlds copy them as `sharedParts` and sync them every `LateUpdate`. Mirror worlds are grouped per room (`World/MirrorWorlds/Room1-3`). Room 4 overlaps the mirror world behind Room 1's bottom mirror, so `GameFlow` shows only the current room(s) and their mirror worlds (`roomGroups`, `roomMirrors`).
+**Rooms 2-4** (`Editor/RoomBuilder.cs`, menu **Mirror Game/Build Rooms**, then rerun Build Room Variants; safe to rerun): Room 2 at (6.2, 0, 0) (mirror +x, door to Room 3 in -z), Room 3 at (6.2, 0, -6.2) (mirror -z, levers on +x, door to Room 4 in -x), Room 4 at (0, 0, -6.2) (NPC at the back wall (-2.4, 0, -6.2) facing +x, player enters to (1.8, 0, -6.2), NPC spot (-1, 0, -6.2)). Walking spots and arrows: `World/Nav/Room1-4` (`RoomNav`, `Spot_<id>`, `Arrow_<id>`), door spots 1.5 m from the centre towards the door, `Back` spots the same towards the entrance door (back door buttons `Door<N>BackButton`). `GameFlow` loops over the rooms (`navs`, `doors`, `walksToDoor`, `walksInto`). Chairs in the variants are placed by `RoomVariantBuilder.ChairAt` in front of their table. The greybox values above for Room 2 and the NPC are outdated. Every room has its own walls (0.1 m each side of a shared wall), so each mirror copy is complete. Each doorway has a `FloorSill` per room (floor material, as deep as the room's wall), otherwise the floor would have a gap under the door. Doors are under `World/Doors` (Door1-3), key and levers under `World/Interactive`; neither is part of a room copy, the mirror worlds copy them as `sharedParts` and sync them every `LateUpdate`. Mirror worlds are grouped per room (`World/MirrorWorlds/Room1-3`). Room 4 overlaps the mirror world behind Room 1's bottom mirror, so `GameFlow` shows only the current room(s) and their mirror worlds (`roomGroups`, `roomMirrors`).
 
 **GameFlow states:** `Init -> Tutorial -> GoToDoor -> KeyRoom -> LeverRoom -> WalkToNPC -> Dialog -> Submit -> Redirect`
 
@@ -400,24 +401,26 @@ Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> S
 
 ## 14. Test Checklist
 
-- [ ] Game starts without params (test mode, random avatar)
-- [ ] `g=m`, `g=w`, `g=x`, `g` missing all handled correctly, `ag` logged
-- [ ] `s=1`-`4` and invalid `s` handled
-- [ ] `debug=1` skips tutorial, no Sheet POST
-- [ ] `lang=en` shows English texts, `lang` arrives in Sheet and Survey B (Survey B in English)
-- [ ] Key and lever puzzles cannot be skipped, locked doors show their hint
-- [ ] Round 1/3: keeps 85 -> accepted, keeps 90 -> rejected, keeps 100 -> rejected
-- [ ] Round 2/4 accept and reject both recorded correctly
-- [ ] Balance correct in all combinations
-- [ ] Dialog cannot be left
-- [ ] Decision times plausible
-- [ ] Sheet row arrives, correct columns
-- [ ] Redirect works when Sheet is unreachable (timeout path)
-- [ ] All values arrive in Qualtrics Survey B
-- [ ] No double submission when buttons are tapped repeatedly
-- [ ] Chrome, Firefox, Safari desktop
-- [ ] Safari iOS, Chrome Android, landscape and portrait overlay
-- [ ] Total duration about 5 minutes
+All checked by the developer (2026-10-31, repeatedly), including data in Sheet and Qualtrics and performance on mobile.
+
+- [x] Game starts without params (test mode, random avatar)
+- [x] `g=m`, `g=w`, `g=x`, `g` missing all handled correctly, `ag` logged
+- [x] `s=1`-`4` and invalid `s` handled
+- [x] `debug=1` skips tutorial, no Sheet POST
+- [x] `lang=en` shows English texts, `lang` arrives in Sheet and Survey B (Survey B in English)
+- [x] Key and lever puzzles cannot be skipped, locked doors show their hint
+- [x] Round 1/3: keeps 85 -> accepted, keeps 90 -> rejected, keeps 100 -> rejected
+- [x] Round 2/4 accept and reject both recorded correctly
+- [x] Balance correct in all combinations
+- [x] Dialog cannot be left
+- [x] Decision times plausible
+- [x] Sheet row arrives, correct columns
+- [x] Redirect works when Sheet is unreachable (timeout path)
+- [x] All values arrive in Qualtrics Survey B
+- [x] No double submission when buttons are tapped repeatedly
+- [x] Chrome, Firefox, Safari desktop
+- [x] Safari iOS, Chrome Android, landscape and portrait overlay
+- [x] Total duration about 5 minutes
 
 ---
 
@@ -428,12 +431,12 @@ Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> S
 - UI style Holz chosen. Remove Pixel and Skizze from the builder once confirmed (fonts, sprites, looks).
 - Balance display may be counterproductive (thesis author discusses with the lecturer): `showBalance` in config.json.
 - After the 2026-10-31 changes: redeploy the Apps Script with `lang` in `cols`, add `lang` to Survey B's embedded data, pass `&lang=${e://Field/Q_Language}` from Survey A, translate Survey A and B to English. The free Qualtrics account cannot add languages, so the translation is done after the move to the thesis author's account (if the university licence has no translations either: English copies of both surveys plus a second return URL in config.json).
+- Room 3: the lever solution moves from the sign onto three walls (number + up/down, painted, same in every room variant) with numbers 1-3 above the levers. Drawings by `Tools/wall_hints.py` (5 styles), mockup `_Mockups/Hebel_Hinweise` waiting for the developer's choice; then build it into `RoomBuilder` and remove the sign.
 - Texts written by Claude, not by the thesis author: `goToDoorHint`, `keyTaken`, `doorUnlocked`, `leversSolved` (DE/EN). The English lever hint says "set the levers the right way" instead of "in the right order" (the levers have no order).
-- Build size 2026-10-30: 38.4 MB (37.2 MB without room variants), over the 30 MB target. Main causes are avatar textures at 4096: mushroom (`T_Mushroom_*`, ~64 MB uncompressed), `Generic_Normals_01`, `Generic_01_A`, `Generic_Emissive_01_A`.
+- Build size 2026-10-30: 38.4 MB, over the 30 MB target only because all UI styles, room variants and avatar candidates are still in; it drops below 30 MB once the unused ones are removed (developer, 2026-10-31).
 - Data storage rules of the university unknown. Google Sheet is the working assumption.
-- Texture sizes of the character packs not yet limited to 1024 (performance pass, milestone 5).
 - Test setup runs on the developer's Google account (Sheet + Apps Script) and free Qualtrics account (Survey A "Mirror Game – Teil A": https://qualtricsxmbxwbdbh7v.qualtrics.com/jfe/form/SV_5iPvenZKKZp0isC, Survey B "Mirror Game – Teil B"). Before the pilot, move everything (Sheet, Apps Script, Qualtrics surveys, e.g. via .qsf export/import) to the thesis author's account and update `appsScriptUrl` and `returnUrlTemplate` in config.json.
 - Thesis author should check whether the university has a Qualtrics license with URL redirect (otherwise keep the link workaround from section 11).
 - Before the pilot, set `debugTools` to `false` in config.json (debug switchers are shown to runs with a pid while it is on).
 - Before the pilot, delete all test rows/responses in the Sheet, Survey A and Survey B.
-- Decisions to confirm with the thesis author: decision time starts when the buttons appear after the typed-out text (so it no longer includes most of the reading time), still including the 0.4 s input lock; split slider starts at 50:50 (possible anchoring); Tutorial: actions other than the requested one are performed but not counted; the NPC greeting is shown as the first dialog line after "Ansprechen"; the NPC's thinking gestures and longer thinking near 85:15 (requested by the developer) contradict "no emotional reactions" and may signal the acceptance limit before round 3; door tags "Öffnen" / "Verschlossen" / "Aufschließen" (developer's wording, English "Open" / "Locked" / "Unlock" by Claude).
+- Decisions to confirm with the thesis author: decision time starts when the buttons appear after the typed-out text (so it no longer includes most of the reading time), still including the 0.4 s input lock; split slider starts at 50:50 (possible anchoring); Tutorial: actions other than the requested one are performed but not counted; the NPC greeting is shown as the first dialog line after "Ansprechen"; the NPC's thinking gestures and longer thinking near 85:15 (requested by the developer) contradict "no emotional reactions" and may signal the acceptance limit before round 3.

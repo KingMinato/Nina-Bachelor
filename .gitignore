@@ -126,3 +126,6 @@ InitTestScene*.unity*
 # Feedback of the thesis author (private)
 /Assets/Feedback/
 /Assets/Feedback.meta
+
+# Python
+__pycache__/

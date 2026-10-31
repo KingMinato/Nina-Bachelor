@@ -143,14 +143,13 @@ public static class UiStyleBuilder
         return style;
     }
 
-    // All WAVs in Art/UI/Sounds/<Style> (Tools/ui_sounds.py), named after the file. Short clips: decompressed on load.
+    // All WAVs in Art/UI/Sounds/<Style> (Tools/ui_sounds.py) and Art/UI/Sounds/World (Tools/world_sounds.py, the same
+    // for every style), named after the file. Short clips: decompressed on load.
     static UiSound[] LoadSounds(string style)
     {
         var sounds = new List<UiSound>();
-        string dir = $"{SoundDir}/{style}";
-        if (!Directory.Exists(dir))
-            return sounds.ToArray();
-        foreach (var file in Directory.GetFiles(dir, "*.wav"))
+        foreach (string dir in new[] { $"{SoundDir}/{style}", $"{SoundDir}/World" })
+        foreach (var file in Directory.Exists(dir) ? Directory.GetFiles(dir, "*.wav") : new string[0])
         {
             string path = file.Replace("\\", "/");
             var importer = (AudioImporter)AssetImporter.GetAtPath(path);

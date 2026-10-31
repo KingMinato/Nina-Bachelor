@@ -10,17 +10,26 @@ public class Door : MonoBehaviour
 
     void Awake() => closed = transform.localRotation;
 
-    public Awaitable Open() => Swing(closed * Quaternion.Euler(0f, openAngle, 0f));
-
-    public Awaitable Close() => Swing(closed);
-
-    async Awaitable Swing(Quaternion to)
+    public Awaitable Open()
     {
-        UiSfx.Play(UiSfx.Door);
+        UiSfx.Play(UiSfx.DoorOpen);
+        return Swing(closed * Quaternion.Euler(0f, openAngle, 0f), false);
+    }
+
+    // Speeds up towards the frame and closes with a thud.
+    public async Awaitable Close()
+    {
+        await Swing(closed, true);
+        UiSfx.Play(UiSfx.DoorClose);
+    }
+
+    async Awaitable Swing(Quaternion to, bool easeIn)
+    {
         Quaternion from = transform.localRotation;
         for (float t = 0f; t < openSeconds; t += Time.deltaTime)
         {
-            transform.localRotation = Quaternion.Slerp(from, to, Mathf.SmoothStep(0f, 1f, t / openSeconds));
+            float k = t / openSeconds;
+            transform.localRotation = Quaternion.Slerp(from, to, easeIn ? k * k : Mathf.SmoothStep(0f, 1f, k));
             await Awaitable.NextFrameAsync();
         }
         transform.localRotation = to;

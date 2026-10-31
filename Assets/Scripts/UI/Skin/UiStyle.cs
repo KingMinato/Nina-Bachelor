@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,12 +26,14 @@ public class UiStyle : ScriptableObject
         return null;
     }
 
+    // Variants named name_1, name_2, ... (e.g. footsteps) are picked at random.
     public AudioClip Sound(string name)
     {
+        var matches = new List<AudioClip>();
         foreach (var sound in sounds)
-            if (sound.name == name)
-                return sound.clip;
-        return null;
+            if (sound.name == name || sound.name.StartsWith(name + "_"))
+                matches.Add(sound.clip);
+        return matches.Count > 0 ? matches[UnityEngine.Random.Range(0, matches.Count)] : null;
     }
 }
 

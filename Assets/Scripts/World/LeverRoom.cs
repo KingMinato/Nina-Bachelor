@@ -56,7 +56,7 @@ public class LeverRoom : MonoBehaviour
             if (solved)
             {
                 ui.HideInstruction();
-                UiSfx.Play(UiSfx.Door);
+                UiSfx.Play(UiSfx.Mechanism);
                 stepDone.Show(texts.leversSolved);
             }
         }

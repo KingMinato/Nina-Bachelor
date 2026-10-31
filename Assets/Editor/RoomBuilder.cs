@@ -72,6 +72,8 @@ public static class RoomBuilder
             w.localPosition = new Vector3(Half + T / 2f, w.localPosition.y, w.localPosition.z);
             w.localScale = new Vector3(T, w.localScale.y, w.localScale.z);
         }
+        Remove(room1, "FloorSill");
+        Sill(room1, new Vector3(Half + T / 2f, 0f, 0f), 90f);
 
         var room2 = Room(world, "Room2", R2, plusX: Wall.Mirror, minusX: Wall.Door, plusZ: Wall.Solid, minusZ: Wall.Door);
         var room3 = Room(world, "Room3", R3, plusX: Wall.Solid, minusX: Wall.Door, plusZ: Wall.Door, minusZ: Wall.Mirror);
@@ -278,6 +280,7 @@ public static class RoomBuilder
             Box("Wall" + side + "A", g, new Vector3(-(DoorHalfW + w / 2), H / 2, z), new Vector3(w, H, T), wallMat, local: true);
             Box("Wall" + side + "B", g, new Vector3(DoorHalfW + w / 2, H / 2, z), new Vector3(w, H, T), wallMat, local: true);
             Box("Wall" + side + "Lintel", g, new Vector3(0, (H + DoorH) / 2, z), new Vector3(2 * DoorHalfW, H - DoorH, T), wallMat, local: true);
+            Sill(g, new Vector3(0, 0, z), 0f);
             return;
         }
         // Body-sized mirror opening with frame and glass, thin walls around it (like Room 1).
@@ -295,6 +298,13 @@ public static class RoomBuilder
         var mirror = g.gameObject.AddComponent<MirrorWall>();
         Set(mirror, ("glass", glass.GetComponent<MeshRenderer>()), ("darkMaterial", darkMat));
         g.name = "MirrorWall" + side;
+    }
+
+    // Floor under the doorway, as deep as the room's own wall: the floors of both rooms end at their walls.
+    static void Sill(Transform parent, Vector3 localPos, float yaw)
+    {
+        var t = Box("FloorSill", parent, localPos + new Vector3(0, -0.05f, 0), new Vector3(2 * DoorHalfW, 0.1f, T), floorMat, local: true);
+        t.localRotation = Quaternion.Euler(0, yaw, 0);
     }
 
     static Door DoorAt(Transform doors, string name, Vector3 pos, float yaw)

@@ -34411,7 +34411,7 @@ MonoBehaviour:
   jumpWindupSeconds: 0.15
   jumpSeconds: 0.6
   jumpLandSeconds: 0.2
-  landSoundLead: 0.5
+  landSoundLead: 0.28
   jumpHeight: 0.5
   eyes: {fileID: 330585546}
   crouchSeconds: 0.3

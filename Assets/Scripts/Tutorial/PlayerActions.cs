@@ -12,7 +12,7 @@ public class PlayerActions : MonoBehaviour
     [Tooltip("Landing, the rig stays on the ground while the avatar absorbs the impact.")]
     [SerializeField] float jumpLandSeconds = 0.2f;
     [Tooltip("The landing sound starts this early, so it is heard at touchdown despite audio latency.")]
-    [SerializeField] float landSoundLead = 0.5f;
+    [SerializeField] float landSoundLead = 0.28f;
     [SerializeField] float jumpHeight = 0.5f;
     [Tooltip("First-person camera, lowered while crouching.")]
     [SerializeField] Transform eyes;

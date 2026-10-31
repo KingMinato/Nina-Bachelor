@@ -186,6 +186,7 @@ public static class UiStyleBuilder
 
     static UiLook Tinted(this UiLook l, Color c) { l.color = c; return l; }
     static UiLook Aspect(this UiLook l) { l.preserveAspect = true; return l; }
+    static UiLook Shrink(this UiLook l) { l.shrinkToFit = true; return l; }
     static UiLook Rot(this UiLook l, float deg) { l.rotation = deg; return l; }
     static UiLook Size(this UiLook l, float w, float h) { l.rectMode = UiRectMode.Size; l.size = new Vector2(w, h); return l; }
 
@@ -284,7 +285,7 @@ public static class UiStyleBuilder
 
             Img("Door.Outline", ring, ppu: 1f / 20, fps: 3.33f).Inset(-80, -80, -80, -80).M(UiMotion.PixelPop),
             Img("Door.Tag", One(S, "btn_yel"), ppu: 1f / 12).Size(1000, 300).M(UiMotion.PixelPop),
-            Txt("Door.Text", 100, ink).Inset(0, 56, 0, 0),
+            Txt("Door.Text", 100, ink).Inset(50, 56, 50, 0).Shrink(),
             Img("Door.Pointer", One(S, "down"), Image.Type.Simple).Tinted(yel).Aspect().AboveTop(160, 160, 30).M(idle: UiMotion.Bob),
             Img("Nav", box, ppu: Px3).Size(140, 155).M(UiMotion.PixelPop, UiMotion.PixelOut, press: UiMotion.PixelPress),
             Img("Nav.Icon", One(S, "up"), Image.Type.Simple).Tinted(yel).Aspect().Inset(28, 43, 28, 28).M(idle: UiMotion.Bob),
@@ -359,7 +360,7 @@ public static class UiStyleBuilder
 
             Img("Door.Outline", Frames(S, "ringrect"), ppu: 0.2f, fps: boil).Inset(-70, -70, -70, -70).M(UiMotion.PopIn),
             Img("Door.Tag", paper, ppu: 0.25f, fps: boil).Size(900, 330).M(UiMotion.PopIn),
-            Txt("Door.Text", 200, ink).Inset(0, 30, 40, 0),
+            Txt("Door.Text", 200, ink).Inset(50, 30, 90, 0).Shrink(),
             Img("Door.Pointer", One(S, "down"), Image.Type.Simple).Tinted(red).Aspect().AboveTop(240, 240, 20).M(idle: UiMotion.Hop),
             Img("Nav", circle, Image.Type.Simple, fps: boil).Size(156, 156).M(UiMotion.PopIn, UiMotion.PopOut, press: UiMotion.Squish),
             Img("Nav.Icon", One(S, "up"), Image.Type.Simple).Tinted(ink).Aspect().Inset(32, 32, 32, 32).M(idle: UiMotion.Hop),
@@ -433,7 +434,7 @@ public static class UiStyleBuilder
 
             Img("Door.Outline", One(S, "glow"), ppu: 0.25f).Inset(-136, -136, -136, -136).M(idle: UiMotion.Glow),
             Img("Door.Tag", plank, ppu: 0.35f).Size(980, 310).M(UiMotion.Drop, idle: UiMotion.Swing),
-            Txt("Door.Text", 130, cream, title: true, material: shadow).Inset(0, 36, 0, 0),
+            Txt("Door.Text", 130, cream, title: true, material: shadow).Inset(80, 36, 80, 0).Shrink(),
             Img("Door.Rope", One(S, "rope"), Image.Type.Simple).AboveTop(560, 240, -30),
             Img("Nav", shield, Image.Type.Simple).Size(176, 186).M(UiMotion.ShieldIn, UiMotion.ShieldOut, press: UiMotion.Press),
             Img("Nav.Icon", One(S, "up"), Image.Type.Simple).Aspect().Inset(44, 54, 44, 34),

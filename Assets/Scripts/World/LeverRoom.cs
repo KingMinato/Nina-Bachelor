@@ -36,7 +36,7 @@ public class LeverRoom : MonoBehaviour
         bool forward = false;
         while (true)
         {
-            var targets = new List<(WorldButton, string, Transform)> { (doorButton, texts.goToDoor, doorSpot) };
+            var targets = new List<(WorldButton, string, Transform)> { (doorButton, solved ? texts.openDoor : texts.doorLocked, doorSpot) };
             if (!solved)
                 foreach (var b in leverButtons)
                     targets.Add((b, "", leverSpot));

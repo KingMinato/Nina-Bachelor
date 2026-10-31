@@ -28,6 +28,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -58,6 +59,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 27
+    shrinkToFit: 0
     textColor: {r: 1, g: 1, b: 1, a: 1}
     alignment: 257
     fontStyle: 0
@@ -88,6 +90,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 27
+    shrinkToFit: 0
     textColor: {r: 1, g: 1, b: 1, a: 1}
     alignment: 257
     fontStyle: 0
@@ -118,6 +121,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 30
+    shrinkToFit: 0
     textColor: {r: 1, g: 0.8235294, b: 0.24705882, a: 1}
     alignment: 514
     fontStyle: 0
@@ -149,6 +153,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -179,6 +184,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 24
+    shrinkToFit: 0
     textColor: {r: 0.101960786, g: 0.09411765, b: 0.2, a: 1}
     alignment: 514
     fontStyle: 0
@@ -210,6 +216,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -240,6 +247,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 18
+    shrinkToFit: 0
     textColor: {r: 0.101960786, g: 0.09411765, b: 0.2, a: 1}
     alignment: 514
     fontStyle: 0
@@ -273,6 +281,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -304,6 +313,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -334,6 +344,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 28
+    shrinkToFit: 0
     textColor: {r: 1, g: 1, b: 1, a: 1}
     alignment: 514
     fontStyle: 0
@@ -365,6 +376,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -396,6 +408,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -426,6 +439,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 30
+    shrinkToFit: 0
     textColor: {r: 1, g: 1, b: 1, a: 1}
     alignment: 4097
     fontStyle: 0
@@ -456,6 +470,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 30
+    shrinkToFit: 0
     textColor: {r: 1, g: 0.8235294, b: 0.24705882, a: 1}
     alignment: 514
     fontStyle: 0
@@ -487,6 +502,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -518,6 +534,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -549,6 +566,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -581,6 +599,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -612,6 +631,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -642,6 +662,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 26
+    shrinkToFit: 0
     textColor: {r: 1, g: 1, b: 1, a: 1}
     alignment: 514
     fontStyle: 0
@@ -673,6 +694,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -705,6 +727,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -736,6 +759,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -766,6 +790,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 40
+    shrinkToFit: 0
     textColor: {r: 1, g: 0.8235294, b: 0.24705882, a: 1}
     alignment: 514
     fontStyle: 0
@@ -797,6 +822,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -827,6 +853,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -858,6 +885,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -888,6 +916,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -919,6 +948,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -950,6 +980,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -980,6 +1011,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 16
+    shrinkToFit: 0
     textColor: {r: 0.5411765, g: 0.53333336, b: 0.72156864, a: 1}
     alignment: 1025
     fontStyle: 0
@@ -1010,6 +1042,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 28
+    shrinkToFit: 0
     textColor: {r: 1, g: 0.8235294, b: 0.24705882, a: 1}
     alignment: 257
     fontStyle: 0
@@ -1040,6 +1073,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 2100000, guid: f354f58514be181468725df48dc5dda3, type: 2}
     fontSize: 30
+    shrinkToFit: 0
     textColor: {r: 1, g: 0.8235294, b: 0.24705882, a: 1}
     alignment: 516
     fontStyle: 0
@@ -1071,6 +1105,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -1101,6 +1136,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 20
+    shrinkToFit: 0
     textColor: {r: 1, g: 0.8235294, b: 0.24705882, a: 1}
     alignment: 514
     fontStyle: 0
@@ -1131,6 +1167,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -1162,6 +1199,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -1192,6 +1230,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 2100000, guid: f354f58514be181468725df48dc5dda3, type: 2}
     fontSize: 64
+    shrinkToFit: 0
     textColor: {r: 1, g: 0.8235294, b: 0.24705882, a: 1}
     alignment: 514
     fontStyle: 0
@@ -1224,6 +1263,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -1255,6 +1295,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -1285,6 +1326,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 100
+    shrinkToFit: 1
     textColor: {r: 0.101960786, g: 0.09411765, b: 0.2, a: 1}
     alignment: 514
     fontStyle: 0
@@ -1293,8 +1335,8 @@ MonoBehaviour:
     rectMode: 2
     anchorMin: {x: 0, y: 0}
     anchorMax: {x: 1, y: 1}
-    offsetMin: {x: 0, y: 56}
-    offsetMax: {x: -0, y: -0}
+    offsetMin: {x: 50, y: 56}
+    offsetMax: {x: -50, y: -0}
     size: {x: 0, y: 0}
     rotation: 0
     enter: 0
@@ -1316,6 +1358,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -1347,6 +1390,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -1378,6 +1422,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -1409,6 +1454,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0
@@ -1440,6 +1486,7 @@ MonoBehaviour:
     titleFont: 0
     fontMaterial: {fileID: 0}
     fontSize: 0
+    shrinkToFit: 0
     textColor: {r: 0, g: 0, b: 0, a: 1}
     alignment: 514
     fontStyle: 0

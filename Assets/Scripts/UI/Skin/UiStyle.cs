@@ -62,6 +62,8 @@ public class UiLook
     public bool titleFont;
     public Material fontMaterial;
     public float fontSize;
+    [Tooltip("One line, shrunk down to half of fontSize when it does not fit (tags with long words).")]
+    public bool shrinkToFit;
     public Color textColor = Color.black;
     public TextAlignmentOptions alignment = TextAlignmentOptions.Center;
     public FontStyles fontStyle;

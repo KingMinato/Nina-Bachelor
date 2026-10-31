@@ -27,9 +27,10 @@ public class KeyRoom : MonoBehaviour
         bool forward;
         while (true)
         {
+            string doorTag = unlocked ? texts.openDoor : hasKey ? texts.unlock : texts.doorLocked;
             var clicked = hasKey
-                ? await nav.Next(texts, (doorButton, texts.goToDoor, doorSpot))
-                : await nav.Next(texts, (doorButton, texts.goToDoor, doorSpot), (keyButton, texts.key, keySpot));
+                ? await nav.Next(texts, (doorButton, doorTag, doorSpot))
+                : await nav.Next(texts, (doorButton, doorTag, doorSpot), (keyButton, texts.key, keySpot));
             forward = clicked == doorButton;
             if (clicked == nav.BackDoor || forward && unlocked)
                 break;

@@ -11,7 +11,7 @@ public class ConfigTests
         var c = Config.FromJson("");
         Assert.AreEqual(100, c.moneyPerRound);
         Assert.AreEqual(6, c.tutorialSteps.Length);
-        Assert.AreEqual("Zur Tür", c.texts.goToDoor);
+        Assert.AreEqual("Öffnen", c.texts.openDoor);
         // a missing or broken config must never show debug tools to participants
         Assert.IsFalse(c.debugTools);
     }

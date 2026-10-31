@@ -127,9 +127,12 @@ public class UiSkin : MonoBehaviour, IPointerDownHandler
         }
         if (look.fontSize > 0)
         {
-            text.enableAutoSizing = false;
-            text.fontSize = look.fontSize;
+            text.enableAutoSizing = look.shrinkToFit;
+            text.fontSize = text.fontSizeMax = look.fontSize;
+            text.fontSizeMin = look.fontSize / 2;
         }
+        if (look.shrinkToFit)
+            text.textWrappingMode = TextWrappingModes.NoWrap;
         text.color = look.textColor;
         text.alignment = look.alignment;
         text.fontStyle = look.fontStyle;

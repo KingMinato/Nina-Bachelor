@@ -107,7 +107,10 @@ public class Texts
     public string standUp = "Aufstehen";
     // Shown briefly after each completed tutorial step, empty = not shown.
     public string stepDone = "Geschafft!";
-    public string goToDoor = "Zur Tür";
+    // Door tags: open, locked (key or levers missing), unlock (player holds the key).
+    public string openDoor = "Öffnen";
+    public string doorLocked = "Verschlossen";
+    public string unlock = "Aufschließen";
     // Room 2: tag on the key, door locked without it, short notes when taken and when the door is unlocked.
     public string key = "Schlüssel";
     public string lockedKey = "Hm, die Tür ist verschlossen. Ob es wohl irgendwo einen Schlüssel hat?";

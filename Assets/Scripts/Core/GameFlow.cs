@@ -150,7 +150,7 @@ public class GameFlow : MonoBehaviour
     async Awaitable<bool> Room1()
     {
         actionButtons.Show(config.texts);
-        await navs[0].Next(config.texts, (doorButton, config.texts.goToDoor, doorSpot));
+        await navs[0].Next(config.texts, (doorButton, config.texts.openDoor, doorSpot));
         actionButtons.Hide();
         ui.HideInstruction();
         await playerActions.StandUp();

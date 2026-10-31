@@ -42,7 +42,7 @@ public class RoomNav : MonoBehaviour
     {
         var all = new List<(WorldButton button, string caption, Transform spot)>(targets);
         if (backDoor != null)
-            all.Add((backDoor, texts.goToDoor, backSpot));
+            all.Add((backDoor, texts.openDoor, backSpot));
         while (true)
         {
             var options = new List<(WorldButton, string)>();

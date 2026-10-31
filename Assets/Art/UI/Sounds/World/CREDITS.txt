@@ -2,7 +2,8 @@ World sounds (same in every UI style). All CC0 (public domain), from OpenGameArt
 Converted to mono WAV, leading silence trimmed, peak-normalised.
 
 step_1-7, land        Kenney, "50 RPG sound effects"        https://opengameart.org/content/50-rpg-sound-effects  (footstep00-03, 06-08; land = footstep08 + footstep01)
-doorOpen, doorClose   qubodup, "Door Open, Door Close Set"  https://opengameart.org/content/door-open-door-close-set  (DoorOpen01, DoorClose01)
+doorOpen              qubodup, "Door Open, Door Close Set"  https://opengameart.org/content/door-open-door-close-set  (DoorOpen01)
+doorClose             Kenney, "50 RPG sound effects"        https://opengameart.org/content/50-rpg-sound-effects  (doorClose_1)
 unlock                cough-e, "Door Lock Sounds"           https://opengameart.org/content/door-lock-sounds  (UnlockDoor)
 keyPick               rubberduck, "100 CC0 metal and wood SFX" https://opengameart.org/content/100-cc0-metal-and-wood-sfx  (keys_01)
-lever, mechanism      bmaczero, "Mechanical sounds"         https://opengameart.org/content/mechanical-sounds  (clank1, mechanical1)
+lever, mechanism      bmaczero, "Mechanical sounds"         https://opengameart.org/content/mechanical-sounds  (clank1, mechanical2)

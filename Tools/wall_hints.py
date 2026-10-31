@@ -1,10 +1,9 @@
-"""Draws the lever hints for Room 3 (number 1-3 + up/down arrow, scribbled with charcoal on the wall)
-and the lever numbers. Every look is drawn from code, so the textures can be committed (no third-party art).
+"""Draws the lever hints for Room 3: number 1-3 in a loose circle + up/down arrow, scribbled with charcoal on the wall.
+Drawn from code, so the textures can be committed (no third-party art). Each drawing has its own random seed.
 
     python Tools/wall_hints.py [out_folder]
 
-Writes <style>/hint_<n>_<up|down>.png (512 x 256) and <style>/label_<n>.png (128 x 128) per style.
-Each texture has its own random seed, so no two drawings look alike.
+Writes hint_<n>_<up|down>.png (512 x 256) for the solution below, then run Mirror Game/Build Rooms.
 """
 import math
 import sys
@@ -23,14 +22,11 @@ DIGITS = {
     3: [[(0.14, 0.16), (0.42, 0.04), (0.78, 0.12), (0.76, 0.38), (0.46, 0.48), (0.84, 0.6), (0.82, 0.86), (0.48, 0.97), (0.12, 0.86)]],
 }
 
-# Charcoal looks: line width (of the box height), passes per stroke, sideways wobble, shape jitter,
-# overshoot at the ends, smudge, extras.
-STYLES = {
-    "Hastig": dict(width=0.07, passes=2, wobble=0.035, jitter=0.07, overshoot=0.12, smudge=0.12, lazy_arrow=True),
-    "Kraeftig": dict(width=0.13, passes=3, wobble=0.02, jitter=0.05, overshoot=0.05, smudge=0.3),
-    "Nachgezogen": dict(width=0.065, passes=4, wobble=0.03, jitter=0.04, overshoot=0.1, smudge=0.1, offset=0.025, underline=True),
-    "Eingekreist": dict(width=0.085, passes=2, wobble=0.03, jitter=0.06, overshoot=0.08, smudge=0.18, circle=True),
-}
+# Lever positions that open the door (true = up), must match RoomBuilder.Solution.
+SOLUTION = [False, True, True]
+
+# Charcoal look: line width (of the box height), passes per stroke, sideways wobble, shape jitter, overshoot, smudge.
+ST = dict(width=0.085, passes=2, wobble=0.03, jitter=0.06, overshoot=0.08, smudge=0.18)
 
 
 def smooth(points, n=28):
@@ -55,8 +51,8 @@ def dense(points, step=0.01):
     return np.array(out)
 
 
-def arrow(up, r, lazy):
-    """Shaft and head in a unit box, a little crooked. lazy: drawn in one go, tail -> tip -> one side, then the other side."""
+def arrow(up, r):
+    """Shaft and head in a unit box, a little crooked."""
     bend = r.uniform(-0.12, 0.12)
     tip, tail = (0.5 + r.uniform(-0.05, 0.05), 0.04), (0.5 + r.uniform(-0.08, 0.08), 0.96)
     if not up:
@@ -66,8 +62,6 @@ def arrow(up, r, lazy):
     left = (0.5 - r.uniform(0.26, 0.4), hy + r.uniform(-0.06, 0.06))
     right = (0.5 + r.uniform(0.26, 0.4), hy + r.uniform(-0.06, 0.06))
     mid = ((tip[0] + tail[0]) / 2 + bend, 0.5)
-    if lazy:
-        return [[tail, mid, tip, left], [tip, right]]
     return [[tail, mid, tip], [left, tip, right]]
 
 
@@ -113,7 +107,7 @@ def scribble(w, h, strokes, box, st, r):
             drift = np.cumsum(r.normal(0, 1, (n, 2)), axis=0)
             drift -= np.linspace(drift[0], drift[-1], n)
             drift *= st["wobble"] * box / max(1.0, np.abs(drift).max())
-            pts = pts + drift + r.normal(0, st.get("offset", 0.012) * box, 2)
+            pts = pts + drift + r.normal(0, 0.012 * box, 2)
             pressure = 0.6 + 0.4 * np.interp(np.arange(n), np.linspace(0, n, 6), r.random(6))
             taper = np.minimum(1, np.minimum(np.arange(n), n - 1 - np.arange(n)) / 6 + 0.35)
             for (x, y), pr, tp in zip(pts, pressure, taper):
@@ -135,38 +129,20 @@ def charcoal(mask, st, r):
 
 
 def hint(n, up, st, r, W=512, H=256):
-    box = H * r.uniform(0.66, 0.8)
-    if st.get("circle"):
-        box *= 0.8  # room for the loop
+    box = H * r.uniform(0.66, 0.8) * 0.8  # room for the loop
     top = (H - box) / 2 + r.uniform(-0.06, 0.06) * H
     nx = W * r.uniform(0.1, 0.18)
     ax = W * r.uniform(0.54, 0.64)
     strokes = place(DIGITS[n], nx, top, box * r.uniform(0.55, 0.68), box)
     arrow_h = box * r.uniform(0.8, 1.0)
-    strokes += place(arrow(up, r, st.get("lazy_arrow", False)), ax, top + (box - arrow_h) / 2, box * r.uniform(0.5, 0.65), arrow_h)
-    if st.get("circle"):
-        strokes += circle(r, nx + box * 0.31, top + box * 0.5, box * 0.5, box * 0.56)
-    if st.get("underline"):
-        y = top + box * 1.04
-        strokes += [[(nx - box * 0.05, y), (nx + box * 0.35, y + r.uniform(-4, 4)), (nx + box * 0.75, y + r.uniform(-6, 6))]]
+    strokes += place(arrow(up, r), ax, top + (box - arrow_h) / 2, box * r.uniform(0.5, 0.65), arrow_h)
+    strokes += circle(r, nx + box * 0.31, top + box * 0.5, box * 0.5, box * 0.56)
     return charcoal(scribble(W, H, strokes, box, st, r), st, r)
 
 
-def label(n, st, r, S=128):
-    box = S * 0.7
-    x, y = S / 2 - box * 0.32 + r.uniform(-4, 4), (S - box) / 2 + r.uniform(-4, 4)
-    strokes = place(DIGITS[n], x, y, box * 0.64, box)
-    if st.get("circle"):
-        strokes = place(DIGITS[n], S * 0.36, S * 0.27, S * 0.3, S * 0.46) + circle(r, S / 2, S / 2, S * 0.38, S * 0.4)
-    return charcoal(scribble(S, S, strokes, box, st, r), st, r)
-
-
 if __name__ == "__main__":
-    for si, (name, st) in enumerate(STYLES.items()):
-        folder = OUT / name
-        folder.mkdir(parents=True, exist_ok=True)
-        for n, up in ((1, False), (2, True), (3, True), (1, True), (2, False), (3, False)):
-            hint(n, up, st, np.random.default_rng(si * 100 + n * 10 + up)).save(folder / f"hint_{n}_{'up' if up else 'down'}.png")
-        for n in (1, 2, 3):
-            label(n, st, np.random.default_rng(si * 100 + 50 + n)).save(folder / f"label_{n}.png")
-        print(name)
+    OUT.mkdir(parents=True, exist_ok=True)
+    for n, up in enumerate(SOLUTION, 1):
+        # seed 300 + ... is the drawing the developer approved (mockup 2026-10-31)
+        hint(n, up, ST, np.random.default_rng(300 + n * 10 + up)).save(OUT / f"hint_{n}_{'up' if up else 'down'}.png")
+    print("hints written to", OUT)

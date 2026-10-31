@@ -34,7 +34,7 @@ public static class RoomBuilder
         var iron = Mat("LeverIron", new Color(0.12f, 0.12f, 0.13f), 0.3f, 0.5f);
         var red = Mat("LeverRed", new Color(0.55f, 0.04f, 0.09f), 0.3f);
         var knob = Mat("LeverKnob", new Color(0.72f, 0.48f, 0.34f), 0.2f);
-        var board = Mat("Sign", new Color(1f, 0.65f, 0.38f), 0.1f);
+        var board = Mat("Sign", new Color(1f, 0.65f, 0.38f), 0.1f); // key board in Room 2
 
         var world = GameObject.Find("World").transform;
         var room1 = world.Find("Room1");
@@ -91,22 +91,20 @@ public static class RoomBuilder
         Box("Bit1", key, new Vector3(0.035f, -0.14f, 0f), new Vector3(0.05f, 0.025f, 0.02f), gold, local: true);
         Box("Bit2", key, new Vector3(0.03f, -0.095f, 0f), new Vector3(0.04f, 0.025f, 0.02f), gold, local: true);
 
-        // Room 3: lever plate on the +x wall, sign with the solution above it.
+        // Room 3: lever plate on the +x wall, levers numbered left to right only by their order.
         float plateX = R3.x + Half, pivotY = 0.95f;
         Box("LeverPlate", room3, new Vector3(plateX - 0.02f, pivotY, R3.z), new Vector3(0.04f, 0.55f, 1.3f), iron);
-        Box("Sign", room3, new Vector3(plateX - 0.015f, 1.47f, R3.z), new Vector3(0.03f, 0.32f, 1.3f), board);
-        // Door symbol on the left of the sign stands for "Türöffnung".
-        Box("SignDoor", room3, new Vector3(plateX - 0.035f, 1.47f, R3.z + 0.5f), new Vector3(0.01f, 0.22f, 0.13f), knob);
         var levers = new Lever[3];
-        var mini = new Vector3[3];
         for (int i = 0; i < 3; i++)
         {
             Box("Slot" + (i + 1), room3, new Vector3(plateX - 0.045f, pivotY, R3.z + LeverZ[i]), new Vector3(0.02f, 0.42f, 0.07f), iron);
             levers[i] = LeverAt(interactive, "Lever" + (i + 1), new Vector3(plateX - 0.06f, pivotY, R3.z + LeverZ[i]), 0.26f, red, knob, false);
-            mini[i] = new Vector3(plateX - 0.035f, 1.47f, R3.z + 0.18f - i * 0.22f);
-            var sign = LeverAt(room3, "SignLever" + (i + 1), mini[i], 0.1f, red, knob, Solution[i]);
-            Object.DestroyImmediate(sign); // static picture, no Lever component needed
         }
+        // The solution is scribbled on the other walls (Tools/wall_hints.py), scattered and crooked: one high next to
+        // the exit door, one low next to the entrance, one next to the mirror. Clear of the furniture of every variant.
+        Hint(room3, 1, R3 + new Vector3(-Half + 0.004f, 1.95f, 1.6f), 90f, 0.95f, -7f);
+        Hint(room3, 2, R3 + new Vector3(1.4f, 0.42f, Half - 0.004f), 180f, 0.85f, 11f);
+        Hint(room3, 3, R3 + new Vector3(2.0f, 1.35f, -Half + 0.004f), 0f, 1.0f, -9f);
 
         // NPC at the back wall of Room 4, facing the door to Room 3. Hidden with the room (it is inside the bottom mirror copy of Room 1).
         npc.SetParent(room4, true);
@@ -325,6 +323,38 @@ public static class RoomBuilder
         var mw = t.gameObject.AddComponent<MirrorWorld>();
         Set(mw, ("room", room), ("ownMirror", room.GetComponentInChildren<MirrorWall>()));
         Set(mw, "sharedParts", shared);
+    }
+
+    // Charcoal drawing on a wall: quad 2:1, front towards the room (yaw: direction the wall faces + 180), roll = tilt.
+    static void Hint(Transform room, int lever, Vector3 pos, float yaw, float width, float roll)
+    {
+        string name = $"hint_{lever}_{(Solution[lever - 1] ? "up" : "down")}";
+        string texPath = $"Assets/Art/Environment/Hints/{name}.png";
+        var importer = (TextureImporter)AssetImporter.GetAtPath(texPath);
+        importer.alphaIsTransparency = true;
+        importer.wrapMode = TextureWrapMode.Clamp;
+        importer.maxTextureSize = 512;
+        importer.SaveAndReimport();
+        string matPath = $"Assets/Materials/Hint{lever}.mat";
+        var mat = AssetDatabase.LoadAssetAtPath<Material>(matPath);
+        if (mat == null)
+        {
+            mat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            AssetDatabase.CreateAsset(mat, matPath);
+        }
+        mat.SetTexture("_BaseMap", AssetDatabase.LoadAssetAtPath<Texture2D>(texPath));
+        mat.SetColor("_BaseColor", Color.white);
+        mat.SetFloat("_Smoothness", 0.1f);
+        mat.SetFloat("_Surface", 1f); // transparent
+        mat.SetOverrideTag("RenderType", "Transparent");
+        mat.SetFloat("_SrcBlend", (float)BlendMode.SrcAlpha);
+        mat.SetFloat("_DstBlend", (float)BlendMode.OneMinusSrcAlpha);
+        mat.SetFloat("_ZWrite", 0f);
+        mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+        mat.renderQueue = (int)RenderQueue.Transparent;
+        EditorUtility.SetDirty(mat);
+        var t = Prim(PrimitiveType.Quad, "Hint" + lever, room, Vector3.zero, new Vector3(width, width / 2f, 1f), mat);
+        t.SetPositionAndRotation(pos, Quaternion.Euler(0f, yaw + 180f, roll));
     }
 
     // Pivot with local x along the wall and z out of it (wall at +x, facing -x), handle along local +y.

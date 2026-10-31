@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-// Room 3: the door to the NPC is locked until the levers are set like on the sign above them.
+// Room 3: the door to the NPC is locked until the levers are set like the hints scribbled on the walls say.
 // Door and levers can only be used from the spot in front of them (RoomNav).
 public class LeverRoom : MonoBehaviour
 {
@@ -16,7 +16,7 @@ public class LeverRoom : MonoBehaviour
     [SerializeField] Lever[] levers;
     [SerializeField] WorldButton[] leverButtons;
     [SerializeField] Transform leverSpot;
-    [Tooltip("Lever positions that open the door, true = up. Must match the sign.")]
+    [Tooltip("Lever positions that open the door, true = up. Must match the wall hints (Tools/wall_hints.py).")]
     [SerializeField] bool[] solution;
 
     public static bool Matches(bool[] positions, bool[] solution)

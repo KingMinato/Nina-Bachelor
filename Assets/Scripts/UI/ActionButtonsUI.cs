@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-// Arrow buttons at the left and right screen edge for turning, jump button at the bottom.
+// Arrow buttons at the left and right screen edge for turning, jump and crouch buttons at the bottom.
 // Buttons are disabled while an action runs, so the player sees when the next input is accepted.
 // The button the current tutorial step asks for is highlighted. Starts inactive in the scene.
 public class ActionButtonsUI : MonoBehaviour
@@ -12,29 +12,39 @@ public class ActionButtonsUI : MonoBehaviour
     [SerializeField] Button turnRightButton;
     [SerializeField] Button jumpButton;
     [SerializeField] TMP_Text jumpLabel;
-    [Tooltip("Highlight rings, children of the three buttons.")]
+    [SerializeField] Button crouchButton;
+    [SerializeField] TMP_Text crouchLabel;
+    [Tooltip("Highlight rings, children of the buttons.")]
     [SerializeField] GameObject turnLeftWant;
     [SerializeField] GameObject turnRightWant;
     [SerializeField] GameObject jumpWant;
+    [SerializeField] GameObject crouchWant;
+
+    Texts texts;
 
     void Awake()
     {
         turnLeftButton.onClick.AddListener(playerActions.TurnLeft);
         turnRightButton.onClick.AddListener(playerActions.TurnRight);
         jumpButton.onClick.AddListener(playerActions.Jump);
+        crouchButton.onClick.AddListener(playerActions.Crouch);
     }
 
     public void Show(Texts texts, bool withJump)
     {
+        this.texts = texts;
         jumpLabel.text = texts.jump;
         SetWanted("");
         gameObject.SetActive(true);
         UiSkin.Show(turnLeftButton.gameObject);
         UiSkin.Show(turnRightButton.gameObject);
-        if (withJump)
-            UiSkin.Show(jumpButton.gameObject);
-        else
-            UiSkin.Hide(jumpButton.gameObject);
+        foreach (var button in new[] { jumpButton, crouchButton })
+        {
+            if (withJump)
+                UiSkin.Show(button.gameObject);
+            else
+                UiSkin.Hide(button.gameObject);
+        }
     }
 
     public void Hide()
@@ -43,6 +53,7 @@ public class ActionButtonsUI : MonoBehaviour
         UiSkin.Hide(turnLeftButton.gameObject);
         UiSkin.Hide(turnRightButton.gameObject);
         UiSkin.Hide(jumpButton.gameObject);
+        UiSkin.Hide(crouchButton.gameObject);
     }
 
     // Highlights the button(s) for a tutorial action (TutorialStep.TurnLeft etc.), "" for none.
@@ -52,7 +63,10 @@ public class ActionButtonsUI : MonoBehaviour
         bool right = action == TutorialStep.TurnRight || action == TutorialStep.TurnAround;
         SetWanted(turnLeftButton, turnLeftWant, left);
         SetWanted(turnRightButton, turnRightWant, right);
-        SetWanted(jumpButton, jumpWant, action == TutorialStep.Jump);
+        // crouchJump: first crouch, then jump.
+        bool crouched = playerActions.IsCrouched;
+        SetWanted(jumpButton, jumpWant, action == TutorialStep.Jump || action == TutorialStep.CrouchJump && crouched);
+        SetWanted(crouchButton, crouchWant, action == TutorialStep.Crouch || action == TutorialStep.CrouchJump && !crouched);
     }
 
     static void SetWanted(Button button, GameObject ring, bool wanted)
@@ -68,5 +82,8 @@ public class ActionButtonsUI : MonoBehaviour
         turnLeftButton.interactable = ready;
         turnRightButton.interactable = ready;
         jumpButton.interactable = ready;
+        crouchButton.interactable = ready;
+        if (texts != null)
+            crouchLabel.text = playerActions.IsCrouched ? texts.standUp : texts.crouch;
     }
 }

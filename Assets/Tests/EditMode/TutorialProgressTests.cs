@@ -87,6 +87,26 @@ public class TutorialProgressTests
     }
 
     [Test]
+    public void Crouch_CountsWhenStandingUp_CrouchJumpCountsItself()
+    {
+        var p = new TutorialProgress(90f, new[] { Step(TutorialStep.Crouch, 1), Step(TutorialStep.CrouchJump, 1) });
+        Assert.IsFalse(p.Register(TutorialStep.Crouch));
+        Assert.IsTrue(p.Register(TutorialStep.StandUp));
+        Assert.IsFalse(p.Register(TutorialStep.Jump));
+        Assert.IsTrue(p.Register(TutorialStep.CrouchJump));
+        Assert.IsTrue(p.IsFinished);
+    }
+
+    [Test]
+    public void LeverSolution_MustMatchEveryLever()
+    {
+        var solution = new[] { false, true, true };
+        Assert.IsTrue(LeverRoom.Matches(new[] { false, true, true }, solution));
+        Assert.IsFalse(LeverRoom.Matches(new[] { false, false, true }, solution));
+        Assert.IsFalse(LeverRoom.Matches(new[] { true, true, true }, solution));
+    }
+
+    [Test]
     public void EmptyOrMissingStepsAreFinished()
     {
         Assert.IsTrue(new TutorialProgress(90f, new TutorialStep[0]).IsFinished);

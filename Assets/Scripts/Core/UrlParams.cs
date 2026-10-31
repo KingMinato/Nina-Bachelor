@@ -11,6 +11,7 @@ public class UrlParams
     public string AvatarGender;  // "m" or "w"
     public int Species;          // 1..SpeciesCount
     public bool Debug;
+    public string Language;      // "EN" for lang=en (also Qualtrics codes like EN-GB), otherwise "DE"
     public bool IsTest;          // no pid provided or debug mode
     public string AvatarOverride; // avatar species id from "a", test runs only, "" otherwise
     public string RoomOverride;   // room variant name from "room", test runs only, "" otherwise
@@ -26,6 +27,7 @@ public class UrlParams
         query.TryGetValue("a", out string avatar);
         query.TryGetValue("room", out string room);
         query.TryGetValue("ui", out string ui);
+        query.TryGetValue("lang", out string lang);
 
         var p = new UrlParams
         {
@@ -33,6 +35,7 @@ public class UrlParams
             AvatarGender = ResolveGender(g, rng),
             Species = ResolveSpecies(s, rng),
             Debug = debug == "1",
+            Language = lang != null && lang.Trim().StartsWith("en", StringComparison.OrdinalIgnoreCase) ? "EN" : "DE",
         };
 
         bool hasPid = !string.IsNullOrWhiteSpace(pid);

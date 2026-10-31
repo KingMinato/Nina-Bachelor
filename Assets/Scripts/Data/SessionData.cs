@@ -28,6 +28,7 @@ public class SessionData
     public readonly string Device;
     public readonly bool IsTest;
     public readonly string Version;
+    public readonly string Language;
     readonly double startTime;
 
     // Rounds 1/3: amount the player keeps. Rounds 2/4: 1 = accepted, 0 = rejected.
@@ -45,6 +46,7 @@ public class SessionData
         IsTest = urlParams.IsTest;
         Device = isMobile ? "mobile" : "pc";
         Version = version;
+        Language = urlParams.Language;
         this.startTime = startTime;
     }
 
@@ -80,6 +82,7 @@ public class SessionData
         fields.Add(Number("dur", DurationSeconds));
         fields.Add(Number("test", IsTest ? 1 : 0));
         fields.Add(Text("ver", Version));
+        fields.Add(Text("lang", Language));
         return fields;
     }
 

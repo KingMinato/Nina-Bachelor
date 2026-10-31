@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 
-// Builds the humanoid idle and jump clips shared by all humanoid avatars and the NPC.
+// Builds the humanoid idle, jump and crouch clips shared by all humanoid avatars and the NPC.
 // Poses are written as muscle values on top of a relaxed standing pose. Keys marked as grounded
 // are corrected so the feet stand on the floor; then the body height is baked per frame so heel and toe
 // never go below the floor, taking the rig's jump height into account. Measured on a reference model.
@@ -56,12 +56,22 @@ public static class HumanoidClipBuilder
             K(0.95f, true),
         };
 
+        // Deep squat, back bent, arms forward for balance, head up to keep looking ahead.
+        var squat = new (string, float)[]
+        {
+            ("Upper Leg Front-Back", -0.75f), ("Lower Leg Stretch", -0.85f), ("Foot Up-Down", -0.4f),
+            ("Spine Front-Back", 0.4f), ("Chest Front-Back", 0.2f), ("Head Nod Down-Up", -0.35f), ("Neck Nod Down-Up", -0.2f),
+            ("Arm Front-Back", -0.1f), ("Arm Down-Up", -0.45f), ("Forearm Stretch", 0.6f),
+        };
+        var crouch = new List<Key> { K(0f, true, squat), K(2f, true, squat) };
+
         var reference = (GameObject)Object.Instantiate(AssetDatabase.LoadAssetAtPath<GameObject>(ReferenceModel));
         try
         {
             var animator = reference.GetComponent<Animator>();
             Save(BuildClip(idle, animator, loop: true, t => 0f), "Humanoid_Idle");
             Save(BuildClip(jump, animator, loop: false, JumpLift), "Humanoid_Jump");
+            Save(BuildClip(crouch, animator, loop: true, t => 0f), "Humanoid_Crouch");
         }
         finally
         {

@@ -122,3 +122,7 @@ InitTestScene*.unity*
 # Local mockups for the Mockup Viewer (Mirror Game/Mockup Viewer), never committed
 /[Aa]ssets/_Mockups/
 /[Aa]ssets/_Mockups.meta
+
+# Feedback of the thesis author (private)
+/Assets/Feedback/
+/Assets/Feedback.meta

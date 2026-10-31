@@ -13,7 +13,7 @@ public class SessionDataTests
     [Test]
     public void Fields_AreInSheetColumnOrder()
     {
-        string[] expected = { "pid", "g", "ag", "s", "r1", "r2", "r3", "r4", "t1", "t2", "t3", "t4", "bal", "dev", "dur", "test", "ver" };
+        string[] expected = { "pid", "g", "ag", "s", "r1", "r2", "r3", "r4", "t1", "t2", "t3", "t4", "bal", "dev", "dur", "test", "ver", "lang" };
         CollectionAssert.AreEqual(expected, Create().ToFields().Select(f => f.Key).ToArray());
     }
 

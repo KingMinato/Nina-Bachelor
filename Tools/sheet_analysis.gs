@@ -16,11 +16,11 @@
  */
 
 // Game parameters, keep in sync with config.json.
-const SPECIES = ["humanC", "goblin", "robot", "cow"]; // "species": s = 1-4
+const SPECIES = ["humanC", "goblin", "slime", "cow"]; // "species": s = 1-4
 const SPECIES_NAMES = { humanC: "Mensch (C)", humanI: "Mensch (I)", goblin: "Goblin", robot: "Roboter", skeleton: "Skelett",
   slime: "Schleim", mushroom: "Pilz", cow: "Kuh" };
 const MONEY = 100;          // moneyPerRound
-const NPC_ACCEPT_MAX = 90;  // npcAcceptMaxPlayerKeeps: the NPC accepts if the player keeps at most this
+const NPC_ACCEPT_MAX = 85;  // npcAcceptMaxPlayerKeeps: the NPC accepts if the player keeps at most this
 const R2_OFFER = 50;        // MONEY - round2NpcKeeps
 const R4_OFFER = 25;        // MONEY - round4NpcKeeps
 
@@ -104,7 +104,7 @@ function readRuns(sheet) {
       npc1: keep1 <= NPC_ACCEPT_MAX ? 1 : 0, npc3: keep3 <= NPC_ACCEPT_MAX ? 1 : 0,
       offerMean: MONEY - (keep1 + keep3) / 2,
       times: ["t1", "t2", "t3", "t4"].map(k => num(get(k)) / 1000),
-      bal: num(get("bal")), dur: num(get("dur")) / 60, ver: String(get("ver")),
+      bal: num(get("bal")), dur: num(get("dur")) / 60, ver: String(get("ver")), lang: String(get("lang")),
     });
   }
   return { runs, tests, duplicates, invalid };
@@ -116,9 +116,9 @@ function writeClean(sh, runs) {
   const header = ["Teilnehmer-ID (pid)", "Datum", "Geschlecht Umfrage (g)", "Avatar-Geschlecht (ag)", "Spezies-Nr (s)", "Spezies",
     "Gerät", "R1 behalten", "R1 Angebot", "R1 vom Gegenüber angenommen", "R2 angenommen (Angebot 50)",
     "R3 behalten", "R3 Angebot", "R3 vom Gegenüber angenommen", "R4 angenommen (Angebot 25)", "Ø Angebot R1+R3",
-    "R1 Zeit (s)", "R2 Zeit (s)", "R3 Zeit (s)", "R4 Zeit (s)", "Endkontostand (CHF)", "Spieldauer (min)", "Version"];
+    "R1 Zeit (s)", "R2 Zeit (s)", "R3 Zeit (s)", "R4 Zeit (s)", "Endkontostand (Münzen)", "Spieldauer (min)", "Version", "Sprache"];
   const rows = runs.map(r => [r.pid, r.time, r.g, r.ag, r.s, r.species, r.dev, r.keep1, r.offer1, r.npc1, r.acc2,
-    r.keep3, r.offer3, r.npc3, r.acc4, r.offerMean, ...r.times, r.bal, r.dur, r.ver]);
+    r.keep3, r.offer3, r.npc3, r.acc4, r.offerMean, ...r.times, r.bal, r.dur, r.ver, r.lang]);
   sh.clear();
   sh.getRange(1, 1, 1, header.length).setValues([header]).setFontWeight("bold").setBackground(COLOR_HEADER).setWrap(true);
   sh.setFrozenRows(1);
@@ -164,11 +164,11 @@ function writeOverview(sh, rawName, data) {
 
   // summary per species and avatar gender
   w.section("Auf einen Blick: Spezies × Avatar-Geschlecht");
-  w.note("Runde 1 und 3: Die Person teilt 100 CHF auf; angegeben ist, wie viel sie dem Gegenüber im Schnitt abgibt (fair = 50 CHF). " +
-    "Runde 2: Das Gegenüber bietet fair " + R2_OFFER + " CHF an. Runde 4: Das Gegenüber bietet unfair " + R4_OFFER +
-    " CHF an. Angegeben ist jeweils, wie viele Personen annehmen.");
+  w.note("Runde 1 und 3: Die Person teilt 100 Münzen auf; angegeben ist, wie viel sie dem Gegenüber im Schnitt abgibt (fair = 50 Münzen). " +
+    "Runde 2: Das Gegenüber bietet fair " + R2_OFFER + " Münzen an. Runde 4: Das Gegenüber bietet unfair " + R4_OFFER +
+    " Münzen an. Angegeben ist jeweils, wie viele Personen annehmen.");
   w.gridHeader(["Spezies", "Avatar", "Personen", "Runde 1: Ø abgegeben", "Runde 3: Ø abgegeben",
-    "Runde 2: 50:50 angenommen", "Runde 4: 25 CHF angenommen", "Ø Kontostand"]);
+    "Runde 2: 50:50 angenommen", "Runde 4: 25 Münzen angenommen", "Ø Kontostand"]);
   const summary = (label, gender, group, bold) => {
     if (!group.length) {
       w.grid([{ v: label, b: bold }, { v: gender, b: bold }, { v: 0, f: "0", b: bold }, "–", "–", "–", "–", "–"]);
@@ -178,9 +178,9 @@ function writeOverview(sh, rawName, data) {
     const rate = f => group.filter(f).length / group.length;
     const o1 = mean(r => r.offer1), o3 = mean(r => r.offer3), a2 = rate(r => r.acc2 === 1), a4 = rate(r => r.acc4 === 1);
     w.grid([{ v: label, b: bold }, { v: gender, b: bold }, { v: group.length, f: "0", b: bold },
-      { v: o1, f: '0.0 "CHF"', bg: offerColor(o1), b: bold }, { v: o3, f: '0.0 "CHF"', bg: offerColor(o3), b: bold },
+      { v: o1, f: '0.0 "Münzen"', bg: offerColor(o1), b: bold }, { v: o3, f: '0.0 "Münzen"', bg: offerColor(o3), b: bold },
       { v: a2, f: "0%", bg: heat(a2), b: bold }, { v: a4, f: "0%", bg: heat(a4), b: bold },
-      { v: mean(r => r.bal), f: '0 "CHF"', b: bold }]);
+      { v: mean(r => r.bal), f: '0 "Münzen"', b: bold }]);
   };
   SPECIES.forEach((id, i) => {
     const group = runs.filter(r => r.s === i + 1);
@@ -195,17 +195,17 @@ function writeOverview(sh, rawName, data) {
 
   // every participant
   w.section("Alle Personen");
-  w.note("Sortiert nach Spezies und Avatar-Geschlecht. „gibt“ = Betrag, den die Person von 100 CHF dem Gegenüber abgibt; " +
-    "behält sie mehr als " + NPC_ACCEPT_MAX + " CHF, lehnt das Gegenüber ab und beide bekommen nichts.");
+  w.note("Sortiert nach Spezies und Avatar-Geschlecht. „gibt“ = Betrag, den die Person von 100 Münzen dem Gegenüber abgibt; " +
+    "behält sie mehr als " + NPC_ACCEPT_MAX + " Münzen, lehnt das Gegenüber ab und beide bekommen nichts.");
   const header = ["Teilnehmer-ID", "Avatar", "Geschlecht (Umfrage)", "Runde 1: teilt", "Runde 2: 50:50-Angebot",
-    "Runde 3: teilt", "Runde 4: 25-CHF-Angebot", "Kontostand", "Spieldauer", "Gerät"];
+    "Runde 3: teilt", "Runde 4: 25-Münzen-Angebot", "Kontostand", "Spieldauer", "Gerät"];
   const split = (offer, accepted) => accepted
-    ? { v: "gibt " + offer + " CHF", bg: offerColor(offer) }
-    : { v: "gibt " + offer + " CHF → abgelehnt", bg: offerColor(offer), fc: "#a50e0e" };
+    ? { v: "gibt " + offer + " Münzen", bg: offerColor(offer) }
+    : { v: "gibt " + offer + " Münzen → abgelehnt", bg: offerColor(offer), fc: "#a50e0e" };
   const answer = accepted => ({ v: accepted ? "angenommen" : "abgelehnt", bg: heat(accepted ? 1 : 0) });
   const person = r => w.grid([r.pid, speciesName(r.s) + ", " + (r.ag === "m" ? "männlich" : "weiblich"), genderName(r.gender),
     split(r.offer1, r.npc1), answer(r.acc2 === 1), split(r.offer3, r.npc3), answer(r.acc4 === 1),
-    { v: r.bal, f: '0 "CHF"' }, { v: r.dur, f: '0.0 "min"' }, r.dev === "mobile" ? "Handy/Tablet" : "Computer"]);
+    { v: r.bal, f: '0 "Münzen"' }, { v: r.dur, f: '0.0 "min"' }, r.dev === "mobile" ? "Handy/Tablet" : "Computer"]);
   SPECIES.forEach((id, i) => {
     const group = runs.filter(r => r.s === i + 1).sort((a, b) => a.ag.localeCompare(b.ag));
     w.sub(speciesName(i + 1) + " (" + group.length + (group.length === 1 ? " Person)" : " Personen)"));
@@ -282,9 +282,9 @@ function writeAnalysis(sh, rawName, data, comma) {
     g => [num(g.length / runs.length, "0%"), mean(g, r => r.dur), share(g, r => r.dev === "mobile")]);
 
   // 2 proposer
-  w.section("2  Runde 1 und 3: Die Person teilt 100 CHF auf");
-  w.note("Angebot = Betrag, den die Person dem Gegenüber abgibt (100 − behalten), in CHF. Fair = 50:50. " +
-    "Das Gegenüber lehnt ab, wenn die Person mehr als " + NPC_ACCEPT_MAX + " CHF behält; dann erhalten beide nichts. " +
+  w.section("2  Runde 1 und 3: Die Person teilt 100 Münzen auf");
+  w.note("Angebot = Betrag, den die Person dem Gegenüber abgibt (100 − behalten), in Münzen. Fair = 50:50. " +
+    "Das Gegenüber lehnt ab, wenn die Person mehr als " + NPC_ACCEPT_MAX + " Münzen behält; dann erhalten beide nichts. " +
     "SD = Standardabweichung. Runde 3 zeigt, ob sich das Verhalten nach den Erfahrungen aus Runde 1 und 2 ändert.");
   table(["Gruppe", "n", "R1 Ø Angebot", "R1 SD", "R1 Median", "R3 Ø Angebot", "R3 SD", "R3 Median", "Ø Angebot R1+R3"],
     g => [mean(g, r => r.offer1), sd(g, r => r.offer1), median(g, r => r.offer1),
@@ -296,7 +296,7 @@ function writeAnalysis(sh, rawName, data, comma) {
 
   // 3 responder
   w.section("3  Runde 2 und 4: Die Person nimmt ein Angebot an oder lehnt ab");
-  w.note("Runde 2: faires Angebot (" + R2_OFFER + " von 100 CHF). Runde 4: unfaires Angebot (" + R4_OFFER + " von 100 CHF). " +
+  w.note("Runde 2: faires Angebot (" + R2_OFFER + " von 100 Münzen). Runde 4: unfaires Angebot (" + R4_OFFER + " von 100 Münzen). " +
     "Wer ablehnt, verzichtet selbst auf Geld, damit auch das Gegenüber nichts bekommt (Bestrafung von Unfairness).");
   table(["Gruppe", "n", "R2 angenommen (Anzahl)", "R2 Annahmequote", "R4 angenommen (Anzahl)", "R4 Annahmequote", "R4 Ablehnungsquote"],
     g => [num(g.filter(r => r.acc2 === 1).length, "0"), share(g, r => r.acc2 === 1),
@@ -304,7 +304,7 @@ function writeAnalysis(sh, rawName, data, comma) {
 
   // 4 balance and decision times
   w.section("4  Endkontostand und Entscheidungszeiten");
-  w.note("Endkontostand: Summe der erhaltenen CHF aus allen 4 Runden (höchstens 255 CHF). " +
+  w.note("Endkontostand: Summe der erhaltenen Münzen aus allen 4 Runden (höchstens 245 Münzen). " +
     "Entscheidungszeit: Sekunden vom Erscheinen der Bedienelemente (nach dem fertig angezeigten Text) bis zur Entscheidung, inklusive 0,4 s Eingabesperre. " +
     "Für Zeiten wird der Median angegeben, weil einzelne sehr lange Pausen den Mittelwert stark verzerren.");
   table(["Gruppe", "n", "Ø Endkontostand", "SD", "Median Zeit R1 (s)", "Median Zeit R2 (s)", "Median Zeit R3 (s)", "Median Zeit R4 (s)"],
@@ -362,7 +362,7 @@ function writeAnalysis(sh, rawName, data, comma) {
   const pt = Stats.pairedT(runs.map(r => r.offer1), runs.map(r => r.offer3));
   w.row(["Angebot R1 vs. R3", "t-Test für verbundene Stichproben"].concat(isFinite(pt.p)
     ? ["t(" + pt.df + ") = " + dec(pt.t, 2), p(pt.p), "dz = " + dec(pt.dz, 2),
-       "Ø Veränderung " + dec(pt.diff, 1) + " CHF (positiv: in Runde 3 mehr abgegeben)"] : none("zu wenige Daten oder keine Veränderung")));
+       "Ø Veränderung " + dec(pt.diff, 1) + " Münzen (positiv: in Runde 3 mehr abgegeben)"] : none("zu wenige Daten oder keine Veränderung")));
   const rr = Stats.pearson(runs.map(r => r.offer1), runs.map(r => r.offer3));
   w.row(["Angebot R1 und R3", "Korrelation (Pearson)"].concat(isFinite(rr.p)
     ? ["r = " + dec(rr.r, 2).replace(/^(-?)0/, "$1"), p(rr.p), "–", "wie stabil das Verhalten einer Person ist"] : none("zu wenige Daten oder keine Streuung")));
@@ -382,16 +382,17 @@ const LEGEND = [
   ["g", "Geschlecht laut Umfrage A, unverändert: m = männlich, w = weiblich, alles andere (z. B. x oder leer) = andere Antwort oder keine Angabe."],
   ["ag", "Geschlecht des Avatars im Spiegel: m oder w. Bei g = m bzw. w gleich g, sonst zufällig 50:50."],
   ["s", "Spezies des Avatars 1–4, von Qualtrics gleichmäßig zugeteilt: " + SPECIES.map((id, i) => (i + 1) + " = " + id).join(", ") + "."],
-  ["r1", "Runde 1: Betrag (0–100 CHF in 5er-Schritten), den die Person von 100 CHF selbst behält. Das Gegenüber nimmt an, wenn er höchstens " + NPC_ACCEPT_MAX + " CHF beträgt, sonst erhalten beide 0 CHF."],
-  ["r2", "Runde 2: Das Gegenüber bietet " + R2_OFFER + " von 100 CHF an. 1 = angenommen, 0 = abgelehnt (beide erhalten 0 CHF)."],
+  ["r1", "Runde 1: Betrag (0–100 Münzen in 5er-Schritten), den die Person von 100 Münzen selbst behält. Das Gegenüber nimmt an, wenn er höchstens " + NPC_ACCEPT_MAX + " Münzen beträgt, sonst erhalten beide 0 Münzen."],
+  ["r2", "Runde 2: Das Gegenüber bietet " + R2_OFFER + " von 100 Münzen an. 1 = angenommen, 0 = abgelehnt (beide erhalten 0 Münzen)."],
   ["r3", "Runde 3: wie Runde 1."],
-  ["r4", "Runde 4: Das Gegenüber bietet " + R4_OFFER + " von 100 CHF an und behält " + (MONEY - R4_OFFER) + ". 1 = angenommen, 0 = abgelehnt (beide erhalten 0 CHF)."],
+  ["r4", "Runde 4: Das Gegenüber bietet " + R4_OFFER + " von 100 Münzen an und behält " + (MONEY - R4_OFFER) + ". 1 = angenommen, 0 = abgelehnt (beide erhalten 0 Münzen)."],
   ["t1 – t4", "Entscheidungszeit pro Runde in Millisekunden: vom Erscheinen der Bedienelemente (nach dem fertig angezeigten Text) bis zum Bestätigen bzw. Annehmen/Ablehnen, inklusive 0,4 s Eingabesperre."],
-  ["bal", "Endkontostand: Summe der erhaltenen CHF über alle 4 Runden (0–255 CHF)."],
+  ["bal", "Endkontostand: Summe der erhaltenen Münzen über alle 4 Runden (0–245 Münzen)."],
   ["dev", "Gerät: mobile = Smartphone oder Tablet, pc = Computer."],
   ["dur", "Spieldauer in Sekunden vom Spielstart bis zum Absenden."],
   ["test", "1 = Testlauf (ohne Umfrage gestartet oder mit debug=1), 0 = echter Durchgang. Testläufe sind in der Auswertung nicht enthalten."],
   ["ver", "Versionsnummer des Spiels."],
+  ["lang", "Sprache des Spiels: DE oder EN (aus Umfrage A)."],
 ];
 
 const num = (x, format) => (isFinite(x) ? { v: x, f: format } : "–");

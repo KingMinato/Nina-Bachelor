@@ -15,7 +15,8 @@ public class TutorialController : MonoBehaviour
     public async Awaitable Run(Config config)
     {
         texts = config.texts;
-        await ui.ShowPrompt(config.texts.intro, config.texts.next);
+        foreach (string page in config.texts.intro)
+            await ui.ShowPrompt(page, config.texts.next);
 
         progress = new TutorialProgress(config.turnAngle, config.tutorialSteps);
         if (progress.IsFinished)
@@ -30,6 +31,7 @@ public class TutorialController : MonoBehaviour
 
         playerActions.Performed -= OnPerformed;
         actionButtons.Hide();
+        await playerActions.StandUp();
         ui.HideInstruction();
     }
 

@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 
 // Balance plaque, visible from the start of the dialog until the redirect. Gains count up
-// and show a short "+N CHF". Starts inactive in the scene, UltimatumController activates it.
+// and show a short "+N Münzen". Starts inactive in the scene, UltimatumController activates it.
 public class BalanceUI : MonoBehaviour
 {
     [SerializeField] TMP_Text caption;
@@ -14,10 +14,12 @@ public class BalanceUI : MonoBehaviour
 
     int shown;
     int target;
+    string unit;
 
-    public void Show(string caption, int balance)
+    public void Show(string caption, string unit, int balance)
     {
         this.caption.text = caption;
+        this.unit = unit;
         shown = target = balance;
         value.text = Format(balance);
         gainText.gameObject.SetActive(false);
@@ -65,5 +67,6 @@ public class BalanceUI : MonoBehaviour
             gainText.gameObject.SetActive(false);
     }
 
-    static string Format(int amount) => $"{amount} CHF";
+    // Smaller unit so "245 Münzen" fits the plaque in one line.
+    string Format(int amount) => $"{amount} <size=60%>{unit}</size>";
 }

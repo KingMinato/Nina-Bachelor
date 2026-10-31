@@ -26,6 +26,7 @@ public class MirrorAvatarSync : MonoBehaviour
             return;
 
         world.Place(source, transform);
+        transform.localScale = source.localScale;
         for (int i = 1; i < sourceBones.Length; i++)
         {
             cloneBones[i].localPosition = sourceBones[i].localPosition;

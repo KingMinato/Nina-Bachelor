@@ -12,8 +12,13 @@ public class UltimatumController : MonoBehaviour
     public async Awaitable Run(Config config, SessionData session)
     {
         var texts = config.texts;
-        balanceUI.Show(texts.balance, session.Balance);
-        await ui.ShowPrompt(texts.npcGreeting, texts.next, texts.speaker);
+        if (config.showBalance)
+            balanceUI.Show(texts.balance, texts.coins, session.Balance);
+        foreach (string page in texts.npcGreeting)
+            await ui.ShowPrompt(page, texts.next, texts.speaker);
+        if (!await ui.ShowChoice(texts.rulesCheck, texts.yes, texts.no, texts.speaker))
+            foreach (string page in texts.rulesExplain)
+                await ui.ShowPrompt(page, texts.next, texts.speaker);
 
         for (int round = 1; round <= SessionData.RoundCount; round++)
         {
@@ -21,7 +26,6 @@ public class UltimatumController : MonoBehaviour
             string intro = RoundIntro(round, texts);
             RoundResult result;
             string resultLine;
-            string resultSpeaker;
 
             // Decision time runs from the options being shown (after the text is typed out) until the player confirms.
             double shownAt;
@@ -31,7 +35,6 @@ public class UltimatumController : MonoBehaviour
                 shownAt = splitInput.OptionsShownAt;
                 result = UltimatumRules.PlayerSplit(keeps, config);
                 resultLine = result.Accepted ? texts.npcAccepted : texts.npcRejected;
-                resultSpeaker = texts.speaker;
             }
             else
             {
@@ -41,7 +44,6 @@ public class UltimatumController : MonoBehaviour
                 shownAt = ui.OptionsShownAt;
                 result = UltimatumRules.NpcOffer(npcKeeps, accepted, config);
                 resultLine = result.Accepted ? texts.playerAccepted : texts.playerRejected;
-                resultSpeaker = null;
             }
             int decisionMs = (int)System.Math.Round((Time.realtimeSinceStartupAsDouble - shownAt) * 1000);
 
@@ -49,7 +51,7 @@ public class UltimatumController : MonoBehaviour
             balanceUI.Set(session.Balance);
 
             string payout = Texts.Fill(texts.roundResult, result.PlayerGets, result.NpcGets);
-            await ui.ShowPrompt(resultLine + "\n\n" + payout, texts.next, resultSpeaker);
+            await ui.ShowPrompt(resultLine + "\n\n" + payout, texts.next, texts.speaker);
         }
     }
 

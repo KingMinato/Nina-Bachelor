@@ -27,7 +27,8 @@ public class UltimatumRulesTests
 
     [TestCase(0, true)]
     [TestCase(50, true)]
-    [TestCase(90, true)]
+    [TestCase(85, true)]
+    [TestCase(90, false)]
     [TestCase(95, false)]
     [TestCase(100, false)]
     public void PlayerSplit_NpcAcceptsUpToThreshold(int keeps, bool accepted)
@@ -70,14 +71,14 @@ public class UltimatumRulesTests
         Assert.AreEqual(expected, UltimatumRules.SnapToStep(value, C));
     }
 
-    // Every accept/reject combination of the four rounds: round 1 keeps 60 or 95, round 3 keeps 90 or 100.
+    // Every accept/reject combination of the four rounds: round 1 keeps 60 or 95, round 3 keeps 85 or 100.
     static IEnumerable<TestCaseData> AllCombinations()
     {
         for (int mask = 0; mask < 16; mask++)
         {
             bool a1 = (mask & 1) != 0, a2 = (mask & 2) != 0, a3 = (mask & 4) != 0, a4 = (mask & 8) != 0;
-            int expected = (a1 ? 60 : 0) + (a2 ? 50 : 0) + (a3 ? 90 : 0) + (a4 ? 25 : 0);
-            yield return new TestCaseData(a1 ? 60 : 95, a2, a3 ? 90 : 100, a4, expected);
+            int expected = (a1 ? 60 : 0) + (a2 ? 50 : 0) + (a3 ? 85 : 0) + (a4 ? 25 : 0);
+            yield return new TestCaseData(a1 ? 60 : 95, a2, a3 ? 85 : 100, a4, expected);
         }
     }
 
@@ -107,7 +108,7 @@ public class UltimatumRulesTests
     [Test]
     public void Fill_ReplacesAmounts()
     {
-        Assert.AreEqual("Du: 60 CHF / Gegenüber: 40 CHF", Texts.Fill(C.texts.splitShares, 60, 40));
+        Assert.AreEqual("Du: 60 Münzen / Wächter: 40 Münzen", Texts.Fill(C.texts.splitShares, 60, 40));
         Assert.AreEqual("", Texts.Fill(null, 1, 2));
     }
 }

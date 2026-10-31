@@ -49,6 +49,8 @@ public class TutorialProgress
 
     bool Counts(string action)
     {
+        if (Current.action == TutorialStep.Crouch)
+            return action == TutorialStep.StandUp;
         if (Current.action != TutorialStep.TurnAround)
             return action == Current.action;
 
@@ -67,6 +69,7 @@ public class TutorialProgress
     static bool IsKnown(string action)
     {
         return action == TutorialStep.TurnLeft || action == TutorialStep.TurnRight
-            || action == TutorialStep.TurnAround || action == TutorialStep.Jump;
+            || action == TutorialStep.TurnAround || action == TutorialStep.Jump
+            || action == TutorialStep.Crouch || action == TutorialStep.CrouchJump;
     }
 }

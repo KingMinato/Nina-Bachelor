@@ -16,19 +16,38 @@ public class WorldButton : MonoBehaviour
     // Shows the button and completes when it is tapped.
     public async Awaitable WaitForClick(string caption)
     {
-        label.text = caption;
-        button.interactable = false;
-        gameObject.SetActive(true);
-        await Awaitable.WaitForSecondsAsync(inputDelaySeconds);
-        button.interactable = true;
+        await FirstClick((this, caption));
+    }
 
-        var clicked = new AwaitableCompletionSource();
-        void OnClick() => clicked.TrySetResult();
-        button.onClick.AddListener(OnClick);
-        await clicked.Awaitable;
-        button.onClick.RemoveListener(OnClick);
+    // Shows all buttons (empty caption = no tag) and returns the one tapped first; all are hidden again.
+    public static async Awaitable<WorldButton> FirstClick(params (WorldButton button, string caption)[] options)
+    {
+        foreach (var (b, caption) in options)
+        {
+            b.label.text = caption;
+            b.label.transform.parent.gameObject.SetActive(!string.IsNullOrEmpty(caption));
+            b.button.interactable = false;
+            b.gameObject.SetActive(true);
+        }
+        await Awaitable.WaitForSecondsAsync(options[0].button.inputDelaySeconds);
 
-        button.interactable = false;
-        gameObject.SetActive(false);
+        var clicked = new AwaitableCompletionSource<WorldButton>();
+        var handlers = new UnityEngine.Events.UnityAction[options.Length];
+        for (int i = 0; i < options.Length; i++)
+        {
+            var b = options[i].button;
+            handlers[i] = () => clicked.TrySetResult(b);
+            b.button.onClick.AddListener(handlers[i]);
+            b.button.interactable = true;
+        }
+        var result = await clicked.Awaitable;
+        for (int i = 0; i < options.Length; i++)
+        {
+            var b = options[i].button;
+            b.button.onClick.RemoveListener(handlers[i]);
+            b.button.interactable = false;
+            b.gameObject.SetActive(false);
+        }
+        return result;
     }
 }

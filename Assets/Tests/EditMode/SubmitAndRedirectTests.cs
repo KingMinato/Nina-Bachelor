@@ -19,7 +19,7 @@ public class SubmitAndRedirectTests
         string json = ResultJson.Build(Fields());
         StringAssert.StartsWith("{\"pid\":\"R_1\",\"g\":\"m\",\"ag\":\"m\",\"s\":2,\"r1\":60,\"r2\":1,", json);
         StringAssert.Contains("\"bal\":110,\"dev\":\"pc\"", json);
-        StringAssert.EndsWith("\"test\":0,\"ver\":\"0.1.0\"}", json);
+        StringAssert.EndsWith("\"test\":0,\"ver\":\"0.1.0\",\"lang\":\"DE\"}", json);
     }
 
     [Test]

@@ -442,6 +442,10 @@ public static class UiStyleBuilder
         // style manager on the canvas
         var uiStyles = GetOrAdd<UiStyles>(ui.gameObject);
         Set(uiStyles, "styles", styles);
+        // Holz, the thesis author's favourite (2026-10-31).
+        var startSo = new SerializedObject(uiStyles);
+        startSo.FindProperty("startIndex").intValue = 2;
+        startSo.ApplyModifiedPropertiesWithoutUndo();
         var source = GetOrAdd<AudioSource>(ui.gameObject);
         source.playOnAwake = false;
         source.spatialBlend = 0;
@@ -579,7 +583,21 @@ public static class UiStyleBuilder
         AddImage(jumpIcon);
         Skin(jumpIcon, "Jump.Icon");
         wants["Jump"] = Want(jump, "Jump.Want");
+        // crouch: a copy of the jump button with the icon pointing down, both side by side
+        var crouch = actions.Find("Crouch");
+        if (crouch == null)
+        {
+            crouch = Object.Instantiate(jump.gameObject, actions).transform;
+            crouch.name = "Crouch";
+        }
+        crouch.Find("Icon").localScale = new Vector3(1, -1, 1);
+        var jumpRect = (RectTransform)jump;
+        jumpRect.anchoredPosition = new Vector2(220, jumpRect.anchoredPosition.y);
+        ((RectTransform)crouch).anchoredPosition = new Vector2(-220, jumpRect.anchoredPosition.y);
         var actionButtons = actions.GetComponent<ActionButtonsUI>();
+        Set(actionButtons, "crouchButton", crouch.GetComponent<Button>());
+        Set(actionButtons, "crouchLabel", crouch.Find("Label").GetComponent<TMP_Text>());
+        Set(actionButtons, "crouchWant", crouch.Find("Want").gameObject);
         Set(actionButtons, "turnLeftWant", wants["TurnLeft"]);
         Set(actionButtons, "turnRightWant", wants["TurnRight"]);
         Set(actionButtons, "jumpWant", wants["Jump"]);

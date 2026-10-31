@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// Runs the whole sequence: Init -> Tutorial -> GoToDoor -> WalkToNPC -> Dialog -> Submit -> Redirect.
+// Runs the whole sequence: Init -> Tutorial -> GoToDoor -> KeyRoom -> LeverRoom -> WalkToNPC -> Dialog -> Submit -> Redirect.
 public class GameFlow : MonoBehaviour
 {
     [SerializeField] UIManager ui;
@@ -15,9 +15,21 @@ public class GameFlow : MonoBehaviour
     [SerializeField] TutorialController tutorial;
     [SerializeField] PlayerActions playerActions;
     [SerializeField] ActionButtonsUI actionButtons;
+    [Tooltip("Room1..Room4 and their mirror worlds (same order, null = none). Only the rooms in use are active:" +
+             " Room 4 overlaps the mirror world behind Room 1's bottom mirror.")]
+    [SerializeField] GameObject[] roomGroups;
+    [SerializeField] GameObject[] roomMirrors;
     [SerializeField] Door door;
     [SerializeField] WorldButton doorButton;
     [SerializeField] WalkPath walkToDoor;
+    [SerializeField] WalkPath walkIntoRoom2;
+    [SerializeField] KeyRoom keyRoom;
+    [SerializeField] Door door2;
+    [SerializeField] WalkPath walkToDoor2;
+    [SerializeField] WalkPath walkIntoRoom3;
+    [SerializeField] LeverRoom leverRoom;
+    [SerializeField] Door door3;
+    [SerializeField] WalkPath walkToDoor3;
     [SerializeField] WalkPath walkToNpc;
     [SerializeField] AvatarSpawner avatarSpawner;
     [SerializeField] NpcLookAt npc;
@@ -38,6 +50,7 @@ public class GameFlow : MonoBehaviour
 
     async void Start()
     {
+        ShowRooms(0, 1);
         urlParams = UrlParams.Parse(GetUrl(), new System.Random());
         if (urlParams.Debug)
             debugOverlay.Show(urlParams);
@@ -53,6 +66,7 @@ public class GameFlow : MonoBehaviour
 
         SetState(GameState.Init);
         config = await ConfigLoader.LoadAsync();
+        config.UseLanguage(urlParams.Language);
         session = new SessionData(urlParams, config.version, Application.isMobilePlatform, Time.realtimeSinceStartupAsDouble);
         submitter = new ResultSubmitter(config.appsScriptUrl);
         playerActions.TurnAngle = config.turnAngle;
@@ -85,13 +99,17 @@ public class GameFlow : MonoBehaviour
         await doorButton.WaitForClick(config.texts.goToDoor);
         actionButtons.Hide();
         ui.HideInstruction();
-        while (playerActions.IsBusy)
-            await Awaitable.NextFrameAsync();
+        await playerActions.StandUp();
+        await GoThrough(walkToDoor, door, walkIntoRoom2, 0);
 
+        SetState(GameState.KeyRoom);
+        await keyRoom.Run(config.texts);
+        await GoThrough(walkToDoor2, door2, walkIntoRoom3, 1);
+
+        SetState(GameState.LeverRoom);
+        await leverRoom.Run(config.texts);
         SetState(GameState.WalkToNPC);
-        await walkToDoor.Walk(playerActions.transform);
-        await door.Open();
-        await walkToNpc.Walk(playerActions.transform);
+        await GoThrough(walkToDoor3, door3, walkToNpc, 2);
         npc.LookAt(cameraAim.transform);
         cameraAim.Aim(npc.Face);
         await ui.ShowButton(config.texts.talk);
@@ -117,6 +135,29 @@ public class GameFlow : MonoBehaviour
 
         SetState(GameState.Redirect);
         Redirector.Go(Redirector.BuildUrl(config.returnUrlTemplate, fields));
+    }
+
+    // Walks up to the door, through it into the next room and closes it behind the player.
+    async Awaitable GoThrough(WalkPath toDoor, Door through, WalkPath into, int fromRoom)
+    {
+        Transform rig = playerActions.transform;
+        await toDoor.Walk(rig);
+        ShowRooms(fromRoom, fromRoom + 1);
+        await through.Open();
+        await into.Walk(rig);
+        await through.Close();
+        ShowRooms(fromRoom + 1, fromRoom + 1);
+    }
+
+    void ShowRooms(int first, int last)
+    {
+        for (int i = 0; i < roomGroups.Length; i++)
+        {
+            bool active = i >= first && i <= last;
+            roomGroups[i].SetActive(active);
+            if (roomMirrors[i] != null)
+                roomMirrors[i].SetActive(active);
+        }
     }
 
     string GetUrl()

@@ -20,6 +20,16 @@ public class UrlParamsTests
         Assert.IsFalse(p.Debug);
     }
 
+    [TestCase("", "DE")]
+    [TestCase("&lang=de", "DE")]
+    [TestCase("&lang=en", "EN")]
+    [TestCase("&lang=EN-GB", "EN")]
+    [TestCase("&lang=fr", "DE")]
+    public void Language_IsEnglishOnlyForEn(string query, string expected)
+    {
+        Assert.AreEqual(expected, Parse("?pid=x" + query).Language);
+    }
+
     [TestCase("m", "m")]
     [TestCase("w", "w")]
     [TestCase("M", "m")]

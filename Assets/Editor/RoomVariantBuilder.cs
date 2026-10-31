@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
-// Builds the furnishing variants of Room 1 and Room 2 in the open scene (Main.unity) as mockups to compare:
+// Builds the furnishing variants of Rooms 1-4 in the open scene (Main.unity) as mockups to compare:
 // materials for the shell (floor, walls, ceiling, door leaf), furniture from the Synty packs and door models.
 // The shell itself (walls, mirror openings, door, waypoints) is not changed. Rebuilding replaces all variants.
 // Menu: Mirror Game/Build Room Variants. Requires the licensed Synty packs (Office, Dungeon, Western Frontier),
@@ -22,11 +22,13 @@ public static class RoomVariantBuilder
     const string MaterialFolder = "Assets/Art/Environment/Rooms/";
     const string MeshFolder = "Assets/Art/Environment/ShellMeshes/";
     // Variant the game starts with (RoomVariants.startIndex).
-    const string StartVariant = "Stein";
+    const string StartVariant = "Holz";
 
-    // Room interiors (inner wall faces). Room 1 is centred at the origin, Room 2 behind the door wall.
-    // Both rooms span z = -Side..Side, Room 1 also x = -Side..Side.
-    const float Side = 3f, R2MinX = 3.2f, R2MaxX = 9.2f, Height = 3f, DoorHalfWidth = 0.6f;
+    // Room interiors are 2 * Side wide (inner wall faces), centres as in RoomBuilder.
+    const float Side = 3f, Height = 3f, DoorHalfWidth = 0.6f;
+    static readonly Vector3[] Centres = { Vector3.zero, new Vector3(6.2f, 0, 0), new Vector3(6.2f, 0, -6.2f), new Vector3(0, 0, -6.2f) };
+    // Walls with a door, per room (for the baseboards).
+    static readonly Wall[][] DoorWalls = { new[] { Wall.PlusX }, new[] { Wall.MinusX, Wall.MinusZ }, new[] { Wall.PlusZ, Wall.MinusX }, new[] { Wall.PlusX } };
 
     enum Wall { None, PlusX, MinusX, PlusZ, MinusZ }
 
@@ -34,53 +36,65 @@ public static class RoomVariantBuilder
     {
         public string name;
         public Material floor, wall, ceiling, door;
-        public Transform room1, room2, doorModel;
+        public Transform[] rooms;
+        public Transform[] doorModels;
         public bool plainDoorLeaf = true;
+        public Transform room1 => rooms[0];
+        public Transform room2 => rooms[1];
+        public Transform room3 => rooms[2];
+        public Transform room4 => rooms[3];
     }
+
+    // Position relative to the centre of room i (0-based).
+    static Vector3 In(int room, float dx, float y, float dz) => Centres[room] + new Vector3(dx, y, dz);
 
     [MenuItem("Mirror Game/Build Room Variants")]
     public static void Build()
     {
         var world = GameObject.Find("World").transform;
-        var room1 = world.Find("Room1");
-        var room2 = world.Find("Room2");
-        var hinge = room1.Find("DoorHinge");
-        var doorLeaf = hinge.Find("DoorLeaf").gameObject;
+        var rooms = new[] { world.Find("Room1"), world.Find("Room2"), world.Find("Room3"), world.Find("Room4") };
+        var doors = world.Find("Doors");
+        var hinges = new[] { doors.Find("Door1"), doors.Find("Door2"), doors.Find("Door3") };
+        var doorLeaves = System.Array.ConvertAll(hinges, h => h.Find("DoorLeaf").gameObject);
 
-        foreach (var t in new[] { room1, room2, hinge, world })
+        foreach (var t in rooms.Concat(hinges).Append(world))
         {
             var old = t.Find(t == world ? "RoomVariants" : "Variants");
             if (old != null)
                 Object.DestroyImmediate(old.gameObject);
         }
-        doorLeaf.SetActive(true);
+        foreach (var leaf in doorLeaves)
+            leaf.SetActive(true);
 
         Directory.CreateDirectory(MaterialFolder);
+        // Shell meshes are regenerated, old ones (removed walls) must not linger.
+        AssetDatabase.DeleteAsset(MeshFolder.TrimEnd('/'));
         Directory.CreateDirectory(MeshFolder);
-        PrepareShell(room1);
-        PrepareShell(room2);
+        AssetDatabase.Refresh();
+        foreach (var room in rooms)
+            PrepareShell(room);
+        PrepareShell(doors);
 
         var manager = new GameObject("RoomVariants");
         manager.transform.SetParent(world, false);
         var variants = new List<RoomVariant>();
         foreach (var (name, build) in new (string, System.Action<Variant>)[]
-                 { ("Grau", Grau), ("Buero", Buero), ("Holz", Holz), ("Stein", Stein), ("Beton", Beton), ("Huette", Huette) })
+                 { ("Grau", Grau), ("Buero", Buero), ("Holz", Holz), ("Stein", Stein), ("Huette", Huette) })
         {
             var v = new Variant
             {
                 name = name,
-                room1 = Group(room1, name),
-                room2 = Group(room2, name),
-                doorModel = Group(hinge, name),
+                rooms = System.Array.ConvertAll(rooms, r => Group(r, name)),
+                doorModels = System.Array.ConvertAll(hinges, h => Group(h, name)),
             };
             build(v);
-            variants.Add(CreateVariant(manager.transform, v, doorLeaf));
+            variants.Add(CreateVariant(manager.transform, v, doorLeaves));
         }
 
-        var rooms = manager.AddComponent<RoomVariants>();
-        var so = new SerializedObject(rooms);
+        var roomVariants = manager.AddComponent<RoomVariants>();
+        var so = new SerializedObject(roomVariants);
         SetArray(so.FindProperty("variants"), variants.ToArray());
-        SetArray(so.FindProperty("rooms"), new Object[] { room1, room2 });
+        SetArray(so.FindProperty("rooms"), rooms.Append(doors).ToArray<Object>());
         SetArray(so.FindProperty("mirrorWorlds"), world.Find("MirrorWorlds").GetComponentsInChildren<MirrorWorld>(true));
         int start = Mathf.Max(0, variants.FindIndex(v => v.name == StartVariant));
         so.FindProperty("startIndex").intValue = start;
@@ -97,7 +111,7 @@ public static class RoomVariantBuilder
             if (user == null)
                 continue;
             var reference = new SerializedObject(user);
-            reference.FindProperty("rooms").objectReferenceValue = rooms;
+            reference.FindProperty("rooms").objectReferenceValue = roomVariants;
             reference.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -120,15 +134,21 @@ public static class RoomVariantBuilder
         v.ceiling = Mat("Buero_Ceiling", null, new Color(0.92f, 0.92f, 0.92f));
         Baseboards(v, Mat("Buero_Trim", null, new Color(0.35f, 0.36f, 0.38f)));
         DoorModel(v, P(Office, "SM_Bld_Door_02"));
+        for (int i = 0; i < 4; i++)
+            Put(v.rooms[i], P(Office, "SM_Bld_Ceiling_Panel_Light_01"), In(i, i == 3 ? -0.8f : 0f, Height, 0f), ceiling: true);
 
-        Put(v.room1, P(Office, "SM_Bld_Ceiling_Panel_Light_01"), new Vector3(0f, Height, 0f), ceiling: true);
         Put(v.room1, P(Office, "SM_Prop_Plant_13"), new Vector3(-2.4f, 0f, 2.4f), 20f);
 
-        Put(v.room2, P(Office, "SM_Bld_Ceiling_Panel_Light_01"), new Vector3(7f, Height, 0f), ceiling: true);
-        Put(v.room2, P(Office, "SM_Prop_Shelf_01"), new Vector3(R2MaxX, 0f, -1.9f), -90f, wall: Wall.PlusX);
-        Put(v.room2, P(Office, "SM_Prop_Plant_02"), new Vector3(8.75f, 0f, 1.9f));
-        Put(v.room2, P(Office, "SM_Prop_WaterCooler_01"), new Vector3(8.4f, 0f, Side), 180f, wall: Wall.PlusZ);
-        Put(v.room2, P(Office, "SM_Prop_Cabinets_02"), new Vector3(7.6f, 0f, -Side), 0f, wall: Wall.MinusZ);
+        Put(v.room2, P(Office, "SM_Prop_Plant_13"), In(1, 2.4f, 0f, 2.4f), 70f);
+        Put(v.room2, P(Office, "SM_Prop_Shelf_01"), In(1, -1.9f, 0f, -Side), 0f, wall: Wall.MinusZ);
+
+        Put(v.room3, P(Office, "SM_Prop_Plant_02"), In(2, 2.5f, 0f, 2.5f));
+        Put(v.room3, P(Office, "SM_Prop_WaterCooler_01"), In(2, -2.4f, 0f, -Side), 0f, wall: Wall.MinusZ);
+
+        Put(v.room4, P(Office, "SM_Prop_Shelf_01"), In(3, -Side, 0f, -1.9f), 90f, wall: Wall.MinusX);
+        Put(v.room4, P(Office, "SM_Prop_Plant_02"), In(3, -2.55f, 0f, 1.9f));
+        Put(v.room4, P(Office, "SM_Prop_WaterCooler_01"), In(3, -2.2f, 0f, Side), 180f, wall: Wall.PlusZ);
+        Put(v.room4, P(Office, "SM_Prop_Cabinets_02"), In(3, -1.4f, 0f, -Side), 0f, wall: Wall.MinusZ);
     }
 
     // Warm: wooden floor, warm white walls, round ceiling lamps, wooden door.
@@ -139,15 +159,22 @@ public static class RoomVariantBuilder
         v.ceiling = Mat("Holz_Ceiling", null, new Color(0.95f, 0.93f, 0.88f));
         Baseboards(v, Mat("Holz_Trim", null, new Color(0.42f, 0.3f, 0.2f)));
         DoorModel(v, P(Office, "SM_Bld_Door_05"));
+        for (int i = 0; i < 4; i++)
+            Put(v.rooms[i], P(Office, "SM_Prop_Light_07"), In(i, i == 3 ? -0.8f : 0f, Height, 0f), ceiling: true);
 
-        Put(v.room1, P(Office, "SM_Prop_Light_07"), new Vector3(0f, Height, 0f), ceiling: true);
         Put(v.room1, P(Office, "SM_Prop_Rug_05"), new Vector3(0f, 0.005f, 0f));
 
-        Put(v.room2, P(Office, "SM_Prop_Light_07"), new Vector3(7f, Height, 0f), ceiling: true);
-        Put(v.room2, P(Office, "SM_Prop_Shelf_05"), new Vector3(R2MaxX, 0f, -1.9f), -90f, wall: Wall.PlusX);
-        Put(v.room2, P(Office, "SM_Prop_Table_03"), new Vector3(7.6f, 0f, Side - 0.05f), 0f, wall: Wall.PlusZ);
-        Put(v.room2, P(Western, "SM_Prop_Chair_01"), new Vector3(7.2f, 0f, 2.1f), 160f);
-        Put(v.room2, P(Office, "SM_Prop_Plant_04"), new Vector3(8.7f, 0f, 1.6f), 40f);
+        Put(v.room2, P(Office, "SM_Prop_Shelf_05"), In(1, Side, 0f, 2.2f), -90f, wall: Wall.PlusX);
+        Put(v.room2, P(Office, "SM_Prop_Plant_04"), In(1, -2.5f, 0f, -2.5f), 40f);
+
+        Put(v.room3, P(Office, "SM_Prop_Table_03"), In(2, -1.9f, 0f, Side - 0.05f), 0f, wall: Wall.PlusZ);
+        Put(v.room3, P(Western, "SM_Prop_Chair_01"), In(2, -2.3f, 0f, 1.9f), 160f);
+        Put(v.room3, P(Office, "SM_Prop_Plant_04"), In(2, 2.5f, 0f, -2.5f), 10f);
+
+        Put(v.room4, P(Office, "SM_Prop_Shelf_05"), In(3, -Side, 0f, -1.9f), 90f, wall: Wall.MinusX);
+        Put(v.room4, P(Office, "SM_Prop_Table_03"), In(3, -1.4f, 0f, Side - 0.05f), 0f, wall: Wall.PlusZ);
+        Put(v.room4, P(Western, "SM_Prop_Chair_01"), In(3, -1f, 0f, 2.1f), -160f);
+        Put(v.room4, P(Office, "SM_Prop_Plant_04"), In(3, -2.5f, 0f, 1.6f), -40f);
     }
 
     // Stone: stone floor tiles, light stone walls, plank door, hanging lanterns (no light).
@@ -159,32 +186,23 @@ public static class RoomVariantBuilder
         v.ceiling = Mat("Stein_Ceiling", GenericTextures + "Generic_Plaster.png", new Color(0.8f, 0.78f, 0.75f), 3f);
         Baseboards(v, Mat("Stein_Trim", null, new Color(0.4f, 0.39f, 0.37f)), 0.15f, 0.04f);
         DoorModel(v, P(Dungeon, "SM_Env_Door_03"));
+        for (int i = 0; i < 4; i++)
+        {
+            Put(v.rooms[i], P(Dungeon, "SM_Env_Tiles_Texture_01"), In(i, 0f, 0.005f, 0f), scale: 1.2f);
+            Put(v.rooms[i], P(Dungeon, "SM_Prop_Lantern_02"), In(i, i == 3 ? -0.8f : 0f, Height, 0f), ceiling: true);
+        }
 
-        foreach (var (room, x) in new[] { (v.room1, 0f), (v.room2, 6.2f) })
-            Put(room, P(Dungeon, "SM_Env_Tiles_Texture_01"), new Vector3(x, 0.005f, 0f), scale: 1.2f);
-        Put(v.room1, P(Dungeon, "SM_Prop_Lantern_02"), new Vector3(0f, Height, 0f), ceiling: true);
+        Put(v.room2, P(Dungeon, "SM_Prop_Bench_01"), In(1, 2f, 0f, Side), 180f, wall: Wall.PlusZ);
+        Put(v.room2, P(Dungeon, "SM_Prop_Vase_01"), In(1, -2.5f, 0f, -2.6f));
 
-        Put(v.room2, P(Dungeon, "SM_Prop_Lantern_02"), new Vector3(7f, Height, 0f), ceiling: true);
-        Put(v.room2, P(Dungeon, "SM_Prop_Bench_01"), new Vector3(7.2f, 0f, Side), 180f, wall: Wall.PlusZ);
-        Put(v.room2, P(Dungeon, "SM_Prop_Table_Round_01"), new Vector3(8.3f, 0f, -2.1f));
-        Put(v.room2, P(Dungeon, "SM_Prop_Stool_01"), new Vector3(7.3f, 0f, -2.2f), 15f);
-        Put(v.room2, P(Dungeon, "SM_Prop_Vase_01"), new Vector3(8.8f, 0f, 2.6f));
-    }
+        Put(v.room3, P(Dungeon, "SM_Prop_Table_Round_01"), In(2, -2.3f, 0f, -2.3f));
+        Put(v.room3, P(Dungeon, "SM_Prop_Stool_01"), In(2, -1.6f, 0f, -2.6f), 15f);
+        Put(v.room3, P(Dungeon, "SM_Prop_Vase_01"), In(2, 2.5f, 0f, 2.5f));
 
-    // Gallery: grey concrete floor and walls, almost empty.
-    static void Beton(Variant v)
-    {
-        v.floor = Mat("Beton_Floor", GenericTextures + "Generic_Concrete.png", new Color(0.66f, 0.7f, 0.76f), 3f);
-        v.wall = Mat("Beton_Wall", GenericTextures + "Generic_Concrete.png", new Color(1.15f, 1.2f, 1.28f), 3f);
-        v.ceiling = Mat("Beton_Ceiling", null, new Color(0.96f, 0.96f, 0.96f));
-        v.door = Mat("Beton_Door", null, new Color(0.82f, 0.82f, 0.8f));
-
-        Put(v.room1, P(Office, "SM_Prop_Light_06"), new Vector3(0f, Height, 0f), ceiling: true);
-
-        Put(v.room2, P(Office, "SM_Prop_Light_06"), new Vector3(7f, Height, 0f), ceiling: true);
-        Put(v.room2, P(Office, "SM_Prop_Benchseat_01"), new Vector3(7.2f, 0f, -Side), 0f, wall: Wall.MinusZ);
-        var cube = Put(v.room2, P(Office, "SM_Prop_Concrete_Cube_01"), new Vector3(8.6f, 0f, 2.4f), 10f);
-        Put(v.room2, P(Office, "SM_Prop_Plant_11"), new Vector3(8.6f, Bounds(cube).max.y, 2.4f));
+        Put(v.room4, P(Dungeon, "SM_Prop_Bench_01"), In(3, -1f, 0f, Side), 180f, wall: Wall.PlusZ);
+        Put(v.room4, P(Dungeon, "SM_Prop_Table_Round_01"), In(3, -2.1f, 0f, -2.1f));
+        Put(v.room4, P(Dungeon, "SM_Prop_Stool_01"), In(3, -1.1f, 0f, -2.2f), -15f);
+        Put(v.room4, P(Dungeon, "SM_Prop_Vase_01"), In(3, -2.6f, 0f, 2.6f));
     }
 
     // Cabin: wooden planks on walls and floor, lantern, simple wooden furniture.
@@ -197,24 +215,32 @@ public static class RoomVariantBuilder
 
         Put(v.room1, P(Western, "SM_Prop_Lantern_01"), new Vector3(-2.6f, 0f, 2.6f), 30f);
 
-        var table = Put(v.room2, P(Western, "SM_Prop_Table_01"), new Vector3(7.4f, 0f, Side - 0.1f), 90f, wall: Wall.PlusZ);
-        Put(v.room2, P(Western, "SM_Prop_Chair_01"), new Vector3(7.4f, 0f, 1.8f), 170f);
-        Put(v.room2, P(Western, "SM_Prop_Lantern_01"), new Vector3(7.7f, Bounds(table).max.y, 2.6f));
-        Put(v.room2, P(Office, "SM_Prop_Shelf_06"), new Vector3(R2MaxX, 0f, -1.9f), -90f, wall: Wall.PlusX);
-        Put(v.room2, P(Western, "SM_Prop_PlantPot_02"), new Vector3(8.7f, 0f, 2.5f));
+        Put(v.room2, P(Western, "SM_Prop_Lantern_01"), In(1, -2.6f, 0f, 2.6f), 30f);
+        Put(v.room2, P(Office, "SM_Prop_Shelf_06"), In(1, Side, 0f, -2.2f), -90f, wall: Wall.PlusX);
+
+        Put(v.room3, P(Western, "SM_Prop_PlantPot_02"), In(2, 2.5f, 0f, 2.5f));
+        Put(v.room3, P(Western, "SM_Prop_Chair_01"), In(2, -2.3f, 0f, -2.3f), 45f);
+        Put(v.room3, P(Western, "SM_Prop_Lantern_01"), In(2, 2.6f, 0f, -2.6f));
+
+        var table = Put(v.room4, P(Western, "SM_Prop_Table_01"), In(3, -1.2f, 0f, Side - 0.1f), -90f, wall: Wall.PlusZ);
+        Put(v.room4, P(Western, "SM_Prop_Chair_01"), In(3, -1.2f, 0f, 1.8f), -170f);
+        Put(v.room4, P(Western, "SM_Prop_Lantern_01"), In(3, -1.5f, Bounds(table).max.y, 2.6f));
+        Put(v.room4, P(Office, "SM_Prop_Shelf_06"), In(3, -Side, 0f, -1.9f), 90f, wall: Wall.MinusX);
+        Put(v.room4, P(Western, "SM_Prop_PlantPot_02"), In(3, -2.5f, 0f, 2.5f));
     }
 
     // ---------------------------------------------------------------- helpers
 
-    static RoomVariant CreateVariant(Transform manager, Variant v, GameObject doorLeaf)
+    static RoomVariant CreateVariant(Transform manager, Variant v, GameObject[] doorLeaves)
     {
         var go = new GameObject(v.name);
         go.transform.SetParent(manager, false);
         var variant = go.AddComponent<RoomVariant>();
-        var parts = new List<Object> { v.room1.gameObject, v.room2.gameObject, v.doorModel.gameObject };
+        var groups = v.rooms.Concat(v.doorModels).ToArray();
+        var parts = new List<Object>(groups.Select(t => t.gameObject));
         if (v.plainDoorLeaf)
-            parts.Add(doorLeaf);
-        foreach (var t in new[] { v.room1, v.room2, v.doorModel })
+            parts.AddRange(doorLeaves);
+        foreach (var t in groups)
             foreach (var child in t.GetComponentsInChildren<Transform>(true))
                 GameObjectUtility.SetStaticEditorFlags(child.gameObject, 0);
 
@@ -303,46 +329,53 @@ public static class RoomVariantBuilder
         if (prefab == null)
             return;
         v.plainDoorLeaf = false;
-        var hinge = v.doorModel.parent.parent;
-        var leaf = hinge.Find("DoorLeaf");
-        var target = leaf.GetComponent<Renderer>().bounds;
+        foreach (var group in v.doorModels)
+        {
+            var hinge = group.parent.parent;
+            // Fitted with the hinge turned to identity (leaf along z), so world bounds line up with the leaf.
+            var turned = hinge.rotation;
+            hinge.rotation = Quaternion.identity;
+            var target = hinge.Find("DoorLeaf").GetComponent<Renderer>().bounds;
 
-        var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab, v.doorModel);
-        Strip(go);
-        // The model's width is its local x: turn it so the width runs along the door opening (z).
-        go.transform.rotation = Quaternion.Euler(0f, 90f, 0f);
-        var b = Bounds(go);
-        go.transform.localScale = new Vector3(target.size.z / b.size.z, target.size.y / b.size.y, 1f);
-        b = Bounds(go);
-        go.transform.position += target.center - b.center;
+            var go = (GameObject)PrefabUtility.InstantiatePrefab(prefab, group);
+            Strip(go);
+            // The model's width is its local x: turn it so the width runs along the door opening (z).
+            go.transform.rotation = Quaternion.Euler(0f, 90f, 0f);
+            var b = Bounds(go);
+            go.transform.localScale = new Vector3(target.size.z / b.size.z, target.size.y / b.size.y, 1f);
+            b = Bounds(go);
+            go.transform.position += target.center - b.center;
+            hinge.rotation = turned;
+        }
     }
 
     static void Baseboards(Variant v, Material material, float height = 0.1f, float depth = 0.02f)
     {
-        void Board(Transform parent, float x0, float z0, float x1, float z1, Vector3 normal)
+        void Board(Transform parent, Vector3 a, Vector3 b, Vector3 normal)
         {
             var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
             Object.DestroyImmediate(go.GetComponent<Collider>());
             go.name = "Baseboard";
             go.transform.SetParent(parent, false);
-            var size = new Vector3(Mathf.Max(Mathf.Abs(x1 - x0), depth), height, Mathf.Max(Mathf.Abs(z1 - z0), depth));
-            go.transform.localScale = size;
-            go.transform.position = new Vector3((x0 + x1) / 2f, height / 2f, (z0 + z1) / 2f) + normal * depth / 2f;
+            go.transform.localScale = new Vector3(Mathf.Max(Mathf.Abs(b.x - a.x), depth), height, Mathf.Max(Mathf.Abs(b.z - a.z), depth));
+            go.transform.position = (a + b) / 2f + Vector3.up * height / 2f + normal * depth / 2f;
             go.GetComponent<Renderer>().sharedMaterial = material;
         }
-        float d = DoorHalfWidth;
-        // Room 1: left (mirror), top (mirror), bottom (mirror), door wall.
-        Board(v.room1, -Side, -Side, -Side, Side, Vector3.right);
-        Board(v.room1, -Side, Side, Side, Side, Vector3.back);
-        Board(v.room1, -Side, -Side, Side, -Side, Vector3.forward);
-        Board(v.room1, Side, -Side, Side, -d, Vector3.left);
-        Board(v.room1, Side, d, Side, Side, Vector3.left);
-        // Room 2: door wall, far wall, side walls.
-        Board(v.room2, R2MinX, -Side, R2MinX, -d, Vector3.right);
-        Board(v.room2, R2MinX, d, R2MinX, Side, Vector3.right);
-        Board(v.room2, R2MaxX, -Side, R2MaxX, Side, Vector3.left);
-        Board(v.room2, R2MinX, Side, R2MaxX, Side, Vector3.back);
-        Board(v.room2, R2MinX, -Side, R2MaxX, -Side, Vector3.forward);
+        var sides = new[] { (Wall.PlusX, Vector3.right), (Wall.MinusX, Vector3.left), (Wall.PlusZ, Vector3.forward), (Wall.MinusZ, Vector3.back) };
+        for (int r = 0; r < 4; r++)
+        {
+            foreach (var (wall, outward) in sides)
+            {
+                Vector3 mid = Centres[r] + outward * Side, along = new Vector3(outward.z, 0f, outward.x);
+                if (System.Array.IndexOf(DoorWalls[r], wall) < 0)
+                {
+                    Board(v.rooms[r], mid - along * Side, mid + along * Side, -outward);
+                    continue;
+                }
+                Board(v.rooms[r], mid - along * Side, mid - along * DoorHalfWidth, -outward);
+                Board(v.rooms[r], mid + along * DoorHalfWidth, mid + along * Side, -outward);
+            }
+        }
     }
 
     static Material Mat(string name, string texture, Color color, float tileMetres = 1f, float smoothness = 0.1f)
@@ -445,7 +478,7 @@ public static class RoomVariantBuilder
     static string PathFrom(Transform t)
     {
         string path = t.name;
-        for (var p = t.parent; p != null && p.name != "Room1" && p.name != "Room2"; p = p.parent)
+        for (var p = t.parent; p != null && !p.name.StartsWith("Room") && p.name != "Doors"; p = p.parent)
             path = p.name + "/" + path;
         return path;
     }

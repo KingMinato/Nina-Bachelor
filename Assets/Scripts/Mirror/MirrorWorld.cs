@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-// Fake mirror: a reflected copy of Room 1 behind one mirror wall, plus a clone of the player avatar.
+// Fake mirror: a reflected copy of a room behind one of its mirror walls, plus a clone of the player avatar.
 // Sits on the mirror plane with local z pointing into the wall and scale (1, 1, -1), so anything
 // placed under it with plane-relative coordinates appears reflected. Unity fixes the triangle winding.
 public class MirrorWorld : MonoBehaviour
@@ -12,8 +12,8 @@ public class MirrorWorld : MonoBehaviour
 
     [SerializeField] Transform room;
     [SerializeField] MirrorWall ownMirror;
-    [Tooltip("Moving parts of the room (e.g. the door hinge) whose local pose is copied every frame.")]
-    [SerializeField] Transform[] movingParts;
+    [Tooltip("Objects outside the room seen in this mirror too (the doors to the neighbouring rooms). Copied, pose synced every frame.")]
+    [SerializeField] Transform[] sharedParts;
     [Tooltip("Player avatar. Can also be set later with SetAvatar, e.g. by the avatar spawner.")]
     [SerializeField] Transform avatar;
 
@@ -29,7 +29,7 @@ public class MirrorWorld : MonoBehaviour
             SetAvatar(avatar);
     }
 
-    // Copies Room 1 again, e.g. after switching the room variant. Before Start this does nothing,
+    // Copies the room again, e.g. after switching the room variant. Before Start this does nothing,
     // Start makes the first copy.
     public void RebuildRoom()
     {
@@ -41,16 +41,21 @@ public class MirrorWorld : MonoBehaviour
 
     void CopyRoom()
     {
-        var copy = Instantiate(room.gameObject, transform).transform;
-        roomCopy = copy.gameObject;
-        copy.name = room.name + " (Mirror)";
-        Place(room, copy);
-        AdaptMirrors(copy);
-        RemoveInactive(copy);
-
+        // Container with identity local pose, so its children are placed in this mirror world's frame.
+        roomCopy = new GameObject(room.name + " (Mirror)");
+        roomCopy.transform.SetParent(transform, false);
+        AdaptMirrors(Copy(room));
         synced.Clear();
-        foreach (var part in movingParts)
-            synced.Add((part, copy.Find(PathFrom(room, part))));
+        foreach (var part in sharedParts)
+            synced.Add((part, Copy(part)));
+        RemoveInactive(roomCopy.transform);
+    }
+
+    Transform Copy(Transform source)
+    {
+        var copy = Instantiate(source.gameObject, roomCopy.transform).transform;
+        Place(source, copy);
+        return copy;
     }
 
     // Replaces the previous clone, so the avatar can be switched at runtime (debug UI).
@@ -82,10 +87,7 @@ public class MirrorWorld : MonoBehaviour
     void LateUpdate()
     {
         foreach (var (source, copy) in synced)
-        {
-            copy.localPosition = source.localPosition;
-            copy.localRotation = source.localRotation;
-        }
+            Place(source, copy);
     }
 
     // The own mirror wall lies on the mirror plane and is removed from the copy; the others turn dark.
@@ -109,13 +111,5 @@ public class MirrorWorld : MonoBehaviour
         foreach (var t in copy.GetComponentsInChildren<Transform>(true))
             if (!t.gameObject.activeSelf)
                 Destroy(t.gameObject);
-    }
-
-    static string PathFrom(Transform root, Transform part)
-    {
-        string path = part.name;
-        for (var t = part.parent; t != root; t = t.parent)
-            path = t.name + "/" + path;
-        return path;
     }
 }

@@ -10,7 +10,7 @@ public class ConfigTests
     {
         var c = Config.FromJson("");
         Assert.AreEqual(100, c.moneyPerRound);
-        Assert.AreEqual(4, c.tutorialSteps.Length);
+        Assert.AreEqual(6, c.tutorialSteps.Length);
         Assert.AreEqual("Zur Tür", c.texts.goToDoor);
         // a missing or broken config must never show debug tools to participants
         Assert.IsFalse(c.debugTools);
@@ -21,7 +21,7 @@ public class ConfigTests
     {
         LogAssert.Expect(LogType.Warning, new System.Text.RegularExpressions.Regex("Invalid config"));
         var c = Config.FromJson("{ not json");
-        Assert.AreEqual(90, c.npcAcceptMaxPlayerKeeps);
+        Assert.AreEqual(85, c.npcAcceptMaxPlayerKeeps);
     }
 
     [Test]
@@ -32,7 +32,7 @@ public class ConfigTests
         Assert.AreEqual(5, c.splitStep);
         Assert.AreEqual("Ja", c.texts.accept);
         Assert.AreEqual("Ablehnen", c.texts.reject);
-        Assert.AreEqual(4, c.tutorialSteps.Length);
+        Assert.AreEqual(6, c.tutorialSteps.Length);
     }
 
     [Test]
@@ -44,10 +44,24 @@ public class ConfigTests
         Assert.IsNotEmpty(c.tutorialSteps);
         foreach (var step in c.tutorialSteps)
         {
-            CollectionAssert.Contains(new[] { TutorialStep.TurnLeft, TutorialStep.TurnRight, TutorialStep.TurnAround, TutorialStep.Jump }, step.action);
+            CollectionAssert.Contains(new[] { TutorialStep.TurnLeft, TutorialStep.TurnRight, TutorialStep.TurnAround, TutorialStep.Jump,
+                TutorialStep.Crouch, TutorialStep.CrouchJump }, step.action);
+            Assert.IsNotEmpty(step.textEn);
             Assert.Greater(step.count, 0);
         }
         StringAssert.Contains("{pid}", c.returnUrlTemplate);
+        StringAssert.Contains("{lang}", c.returnUrlTemplate);
+    }
+
+    [Test]
+    public void UseLanguage_SwitchesTextsAndStepsToEnglish()
+    {
+        var c = Config.FromJson("{ \"textsEn\": { \"accept\": \"Accept\" }, \"tutorialSteps\": [ { \"text\": \"Springen\", \"textEn\": \"Jump\", \"action\": \"jump\" } ] }");
+        c.UseLanguage("DE");
+        Assert.AreEqual("Annehmen", c.texts.accept);
+        c.UseLanguage("EN");
+        Assert.AreEqual("Accept", c.texts.accept);
+        Assert.AreEqual("Jump", c.tutorialSteps[0].text);
     }
 
     [Test]

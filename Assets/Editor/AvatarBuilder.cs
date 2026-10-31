@@ -118,7 +118,8 @@ public static class AvatarBuilder
         Debug.Log("Avatars built: " + string.Join(", ", entries.Select(e => e.id)));
     }
 
-    // Idle -> Jump (trigger, speed from JumpSpeed) -> Idle. Shared by all avatars and the NPC.
+    // Idle -> Jump (trigger, speed from JumpSpeed) -> Idle, Idle <-> Crouch (bool), Crouch -> Jump.
+    // Shared by all avatars and the NPC.
     static AnimatorController BuildController()
     {
         // Rebuilt in place so the asset keeps its GUID.
@@ -131,6 +132,7 @@ public static class AvatarBuilder
             states.RemoveState(child.state);
         controller.AddParameter("Jump", AnimatorControllerParameterType.Trigger);
         controller.AddParameter("JumpSpeed", AnimatorControllerParameterType.Float);
+        controller.AddParameter("Crouch", AnimatorControllerParameterType.Bool);
         controller.parameters = controller.parameters.Select(p =>
         {
             if (p.name == "JumpSpeed") p.defaultFloat = 1f;
@@ -158,6 +160,22 @@ public static class AvatarBuilder
         back.hasExitTime = true;
         back.exitTime = 0.95f;
         back.duration = 0.05f;
+
+        var crouch = sm.AddState("Crouch");
+        crouch.motion = Clip(Anim + "Humanoid_Crouch.anim");
+        // Jumping out of the crouch comes first, it also clears Crouch.
+        var crouchJump = crouch.AddTransition(jump);
+        crouchJump.AddCondition(AnimatorConditionMode.If, 0, "Jump");
+        crouchJump.hasExitTime = false;
+        crouchJump.duration = 0.15f;
+        var down = idle.AddTransition(crouch);
+        down.AddCondition(AnimatorConditionMode.If, 0, "Crouch");
+        down.hasExitTime = false;
+        down.duration = 0.3f;
+        var up = crouch.AddTransition(idle);
+        up.AddCondition(AnimatorConditionMode.IfNot, 0, "Crouch");
+        up.hasExitTime = false;
+        up.duration = 0.3f;
         return controller;
     }
 
@@ -173,6 +191,7 @@ public static class AvatarBuilder
         o.runtimeAnimatorController = controller;
         o["Humanoid_Idle"] = idle;
         o["Humanoid_Jump"] = jump;
+        o["Humanoid_Crouch"] = idle;
         EditorUtility.SetDirty(o);
         return o;
     }

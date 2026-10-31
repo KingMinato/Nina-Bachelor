@@ -33,6 +33,7 @@ Data is linked across all three via `pid` (Qualtrics ResponseID from Survey A).
 | `a` | avatar species id | Test runs only (no `pid` or `debug=1`): shows this avatar regardless of `s`, e.g. `?a=slime&g=w`. Ignored in real runs |
 | `room` | room variant name | Test runs only: starts with this furnishing variant (see section 5a), e.g. `?debug=1&room=Holz`. Ignored in real runs |
 | `ui` | UI style name | Test runs only: starts with this UI style (see section 6a), e.g. `?debug=1&ui=Skizze`. Ignored in real runs |
+| `lang` | `de`, `en` | Language. Starts with `en` (any case) -> English (`textsEn`, `textEn` of the tutorial steps), anything else or missing -> German |
 
 Parse from `Application.absoluteURL`. If `pid` is missing, generate `test-<timestamp>` and treat as a test run (still playable, flagged in data).
 
@@ -44,16 +45,17 @@ Parse from `Application.absoluteURL`. If `pid` is missing, generate `test-<times
 | `g` | raw gender value received |
 | `ag` | avatar gender actually used (`m`/`w`) |
 | `s` | species actually used (1-4) |
-| `r1` | Round 1: amount player keeps (0-100) |
+| `r1` | Round 1: amount player keeps (0-100 coins) |
 | `r2` | Round 2: 1 = accepted, 0 = rejected |
 | `r3` | Round 3: amount player keeps (0-100) |
 | `r4` | Round 4: 1 = accepted, 0 = rejected |
 | `t1`-`t4` | decision time per round in ms (from options shown to confirm) |
-| `bal` | final balance in CHF |
+| `bal` | final balance in coins |
 | `dev` | `mobile` / `pc` (`Application.isMobilePlatform`) |
 | `dur` | total duration in seconds (game start to submit) |
 | `test` | `1` if no pid was provided or debug mode, else `0` |
 | `ver` | build version string |
+| `lang` | language used, `DE` or `EN` (also passed to Survey B as `Q_Lang`, so Qualtrics shows the same language) |
 
 ---
 
@@ -63,35 +65,39 @@ Parse from `Application.absoluteURL`. If `pid` is missing, generate `test-<times
 - First person. Plain, minimal room.
 - Mirrors on three walls (left, top, bottom in the design sketch). Body-sized, not wall-wide: just large enough for the player to see themselves fully, including jumps. Door on the fourth wall (right), closed.
 - Player sees their own avatar in all three mirrors.
+- Intro: `texts.intro` pages ("Weiter" between them), then the tutorial.
 - Tutorial: a sequence of instructions shown as text. Player completes each with UI buttons (click adventure style, identical on PC and mobile).
-  - Buttons: **arrow left** at the left screen edge and **arrow right** at the right edge (turn), **jump** at the bottom.
-  - Example steps: "Dreh dich nach links", "Spring einmal", "Dreh dich einmal komplett um". Steps are defined in config (text + required action + count). Actions: `turnLeft`, `turnRight`, `jump`, `turnAround` (a full 360 deg turn in either direction, independent of `turnAngle`; count = number of full turns). Turns in the wrong direction are performed but not counted.
+  - Buttons: **arrow left** at the left screen edge and **arrow right** at the right edge (turn), **Ducken** and **Springen** at the bottom. "Ducken" toggles: while crouched its label is "Aufstehen" (`texts.standUp`), the camera drops to 65 % of the eye height, humanoids play `Humanoid_Crouch`, creatures squash their root scale.
+  - Steps are defined in config (text, `textEn`, required action, count). Actions: `turnLeft`, `turnRight`, `jump`, `turnAround` (a full 360 deg turn in either direction, independent of `turnAngle`; count = number of full turns), `crouch` (crouch and stand up again, counted on standing up), `crouchJump` (jump while crouched). Other actions are performed but not counted. The player is stood up automatically at the end of the tutorial and before every walk.
   - The button(s) the current step asks for are highlighted; after each completed step a short "Geschafft!" (`texts.stepDone`) appears without blocking.
 - After the last step: the door stays closed and the whole door becomes tappable (world-space button covering the door, with a style-specific outline and a **"Zur Tür"** tag). The turn arrows stay visible so the player can turn towards the door.
 
-### Transition
-- Tapping the door: the player walks up to the door, the door opens, then automatic movement continues (scripted camera path or simple lerp) through the door into Room 2, ending in front of the NPC.
-- Button **"Ansprechen"** appears. Pressing it starts the dialog.
+### Rooms 2-4 (thesis author's sketch, 2026-10-31)
+Every door works the same way (`GameFlow.GoThrough`): tap the door, the player walks up to it, the door opens, the player walks through, the door closes behind and the previous room is hidden. The turn arrows stay available in every room.
+- **Room 2, key room**: mirror on the wall opposite the entrance. The door to Room 3 is locked: tapping it shows `texts.lockedKey`. The key hangs on the wall opposite that door; tapping it walks the player there and takes it (`texts.keyTaken`), then the door can be opened. (`KeyRoom`)
+- **Room 3, lever room**: mirror, locked door, three levers below a sign that shows the solution (lever 1 down, 2 and 3 up; all start down). Tapping the door before shows `texts.lockedLevers`; the first lever tap walks the player to the levers; when the levers match, `texts.leversSolved` and the door opens on tap. (`LeverRoom`, `Lever`)
+- **Room 4, NPC room**: the player walks in and stops in front of the NPC. Button **"Ansprechen"** appears. Pressing it starts the dialog.
 
-### Scene 2: NPC Room (Room 2)
+### NPC (Room 4)
 - One NPC: neutral human, as unrecognizable as possible (e.g. hooded figure, no clear facial features, neutral colors). Same NPC for all players regardless of avatar.
 - NPC behaviour and appearance must not influence the player: idle animation only, no emotional reactions.
 
 ### Dialog: Ultimatum Game (4 rounds)
 - Dialog cannot be exited. No close button, no movement, no back navigation.
-- Balance displayed permanently. Starts at 0 CHF. Gains count up with a short "+N CHF". Round label "Runde 1 von 4" (`texts.round`, empty hides it). NPC lines carry a name tag (`texts.speaker`).
+- Currency is coins ("Münzen" / "coins", `texts.coins`). Balance displayed permanently while `showBalance` is true (the thesis author may drop it, see open points). Starts at 0. Gains count up with a short "+N Münzen". Round label "Runde 1 von 4" (`texts.round`, empty hides it). All NPC lines carry the name tag `texts.speaker` ("Wächter" / "Guardian").
+- Start: `texts.npcGreeting` pages, then `texts.rulesCheck` ("Alles klar?") with Ja/Nein. "Nein" shows the `texts.rulesExplain` pages, then the rounds start.
 - Dialog texts are typed out (speed per UI style, tapping the panel shows the rest); the buttons appear when the text is complete.
-- Each round, 100 CHF of new, neutral money comes into play. The player's share is added to the balance if the split is accepted.
+- Each round, 100 coins of new, neutral money come into play. The player's share is added to the balance if the split is accepted.
 - After each round, show the result (accepted/rejected, what each received), then continue.
 
 | Round | Who splits | Rule |
 |---|---|---|
-| 1 | Player | Player chooses how much to keep, 0-100 in steps of 5. NPC accepts if player keeps <= 90, otherwise rejects (both get 0) |
+| 1 | Player | Player chooses how much to keep, 0-100 in steps of 5. NPC accepts if player keeps <= 85 (`npcAcceptMaxPlayerKeeps`), otherwise rejects (both get 0); 90:10 is rejected (decided 2026-10-31) |
 | 2 | NPC | NPC offers 50:50. Player accepts or rejects |
 | 3 | Player | Same as round 1 |
 | 4 | NPC | NPC keeps 75, offers player 25. Player accepts or rejects |
 
-Split input for rounds 1 and 3: slider or +/- buttons, must be comfortable on touch screens. Show both shares live ("Du: 60 CHF / Gegenüber: 40 CHF"). Explicit confirm button.
+Split input for rounds 1 and 3: slider or +/- buttons, must be comfortable on touch screens. Show both shares live ("Du: 60 Münzen / Wächter: 40 Münzen"). Explicit confirm button.
 
 ### End
 - Short end text ("Danke, du wirst jetzt zur Umfrage weitergeleitet").
@@ -118,14 +124,14 @@ Target total duration: about 5 minutes.
   | `mushroom` | Lil Pupinduy `Mushroom_1` | one |
   | `cow` | Backrock Low Poly Animals `Cow_Holstein` | one |
 
-  Default mapping: 1 `humanC`, 2 `goblin`, 3 `robot`, 4 `cow`.
+  Mapping (thesis author's feedback 2026-10-31: Mensch, Goblin, Blob, Kuh): 1 `humanC`, 2 `goblin`, 3 `slime`, 4 `cow`. The other candidates stay built but unused.
 - Size (decided 2026-10-30): humanoids keep their size, creatures are roughly human-sized, the camera sits at each avatar's own eyes (humans 1.67 m, cow 1.17 m, mushroom 0.9 m, slime 0.85 m).
 - NPC: "V" from the Modular Fantasy Hero kit, grey hood + face cloth + long robe (`Assets/Prefabs/NPC.prefab`, material `Art/NPC/NPC_Grey.mat`).
 - Eye contact: when the player arrives in front of the NPC, `CameraAim` (on the main camera) tilts the camera towards the NPC's face, and `NpcLookAt` (on the NPC, humanoid look-at IK, IK Pass on in `Avatar.controller`) turns the NPC's head towards the player's eyes, so it looks down at small avatars.
 - No exaggerated gender features. Neutral colors. Differences only through e.g. long/short hair, angular/round face shape, broad/narrow shoulders.
 - Player cannot choose an avatar. Selected from `ag` + `s`.
 - Characters will come from the Unity Asset Store (free if possible). Build the avatar system so models can be swapped easily: an `AvatarDatabase` ScriptableObject mapping (species, gender) -> prefab.
-- All avatar prefabs share `Animations/Avatar.controller` (Idle, Jump with trigger `Jump` and speed parameter `JumpSpeed`). Humanoids and the NPC use the generated clips `Humanoid_Idle` / `Humanoid_Jump`; slime, mushroom and cow use `AnimatorOverrideController`s with their own clips (cow: Run as jump). No turn animation.
+- All avatar prefabs share `Animations/Avatar.controller` (Idle, Jump with trigger `Jump` and speed parameter `JumpSpeed`, Crouch with bool `Crouch`). Humanoids and the NPC use the generated clips `Humanoid_Idle` / `Humanoid_Jump` / `Humanoid_Crouch`; slime, mushroom and cow use `AnimatorOverrideController`s with their own clips (cow: Run as jump; crouch = idle, they squash via `AvatarBody.SetCrouch`). No turn animation.
 - Avatar prefab layout: root (`AvatarBody`) on the ground directly below the eyes, child `Eyes` marker, the model as nested prefab offset so its eyes sit above the root. The spawned player avatar is entirely on layer `FirstPersonHidden`, only its mirror clones are visible.
 - Editor tools (menu **Mirror Game**): `Build Humanoid Clips` (`Editor/HumanoidClipBuilder.cs`, poses as muscle values, jump timing matches `PlayerActions`), `Build Avatars` (`Editor/AvatarBuilder.cs`: controller, overrides, all prefabs, NPC, `Data/AvatarDatabase.asset`). Rerun after changing a model, scale or eye position.
 - Licensing: Synty, Creatures_3D, Lil Pupinduy and Backrock folders are git-ignored (public repo). Prefabs/controllers in the repo only reference them, so a fresh clone cannot build without the packs.
@@ -156,7 +162,7 @@ No reflection cameras or render textures. Mirrors are faked with copied geometry
 
 ## 5a. Room Variants (furnishing mockups, 2026-10-30)
 
-Several furnishing variants of both rooms live in `Main.unity` at the same time, so the look can be compared in game. Built by `Editor/RoomVariantBuilder.cs` (menu **Mirror Game/Build Room Variants**, rebuild replaces all variants; requires Synty Office, Dungeon and Western Frontier).
+Several furnishing variants of all four rooms live in `Main.unity` at the same time, so the look can be compared in game. Built by `Editor/RoomVariantBuilder.cs` (menu **Mirror Game/Build Room Variants**, rebuild replaces all variants; requires Synty Office, Dungeon and Western Frontier). Thesis author's feedback 2026-10-31: Holz favourite, Büro, Stein, Hütte also nice; Beton removed.
 
 | Name | Packs | Look |
 |---|---|---|
@@ -164,14 +170,13 @@ Several furnishing variants of both rooms live in `Main.unity` at the same time,
 | `Buero` | Office + Generic | carpet, light grey plaster, ceiling panel lights, office door |
 | `Holz` | Office (+1 Western chair) | wooden floor, warm white walls, rug in Room 1, wooden shelf/table |
 | `Stein` | Dungeon + Generic | stone floor tiles, light stone walls, plank door, hanging lanterns (no light) |
-| `Beton` | Office + Generic | grey concrete floor and walls, almost empty |
 | `Huette` | Western + Generic | wooden planks on walls/floor/ceiling, simple wooden furniture |
 
 - The shell (walls, mirror openings, door, waypoints, NPC position) is the same for all variants. Shell renderers carry `RoomSurface` (Floor/Wall/Ceiling/Door) and use generated meshes with UVs in metres (`Art/Environment/ShellMeshes`), so tiling textures have the same scale everywhere. Materials: `Art/Environment/Rooms/<Variant>_<Kind>.mat` (URP Lit referencing Synty textures).
-- Each variant (`World/RoomVariants/<Name>`, component `RoomVariant`) holds the four shell materials (empty = scene original) and its parts: `World/Room1/Variants/<Name>` (mirrored), `World/Room2/Variants/<Name>`, `World/Room1/DoorHinge/Variants/<Name>` (door model fitted into the opening; variants without one use the plain `DoorLeaf`).
-- `RoomVariants` (start variant `Stein`, index 3, set by `RoomVariantBuilder.StartVariant`) applies the start variant in `Awake`, before the mirror worlds copy Room 1; switching later rebuilds the mirror copies. Debug switcher `DebugRoomSwitcher` (button "Raum"; the debug buttons "Avatar", "Raum", "UI" sit small in the bottom-left corner; in the Editor always, in builds in test runs: no `pid` or `?debug=1`), URL `room=` in test runs.
+- Each variant (`World/RoomVariants/<Name>`, component `RoomVariant`) holds the four shell materials (empty = scene original) and its parts: `World/Room<N>/Variants/<Name>` for all four rooms (rooms 1-3 are mirrored), `World/Doors/Door<N>/Variants/<Name>` (door model fitted into each opening; variants without one use the plain `DoorLeaf`).
+- `RoomVariants` (start variant `Holz`, index 2, set by `RoomVariantBuilder.StartVariant`) applies the start variant in `Awake`, before the mirror worlds copy Room 1; switching later rebuilds the mirror copies. Debug switcher `DebugRoomSwitcher` (button "Raum"; the debug buttons "Avatar", "Raum", "UI" sit small in the bottom-left corner; in the Editor always, in builds in test runs: no `pid` or `?debug=1`), URL `room=` in test runs.
 - No colliders, lights or particles in the props (stripped by the builder), no static flags, nothing in the walk path or in front of the mirrors. Colours above 1 in some materials brighten darker textures, because the walls only get ambient light.
-- Cost (build 2026-10-30): all five variants together +1.2 MB compressed (Stein ~0.5 MB, the others 0.1-0.2 MB), +2 to +10 draw calls and at most +6k triangles over `Grau`. Their textures are limited to 1024 and compressed on WebGL (platform override).
+- Cost (build 2026-10-30, before rooms 3-4): all five variants together +1.2 MB compressed (Stein ~0.5 MB, the others 0.1-0.2 MB), +2 to +10 draw calls and at most +6k triangles over `Grau`. Their textures are limited to 1024 and compressed on WebGL (platform override).
 
 ## 6. Controls and UI
 
@@ -186,7 +191,7 @@ Several furnishing variants of both rooms live in `Main.unity` at the same time,
 
 ## 6a. UI Styles (2026-10-30)
 
-Three styles from the prototype round (Mockup Viewer, rated "Gut"), switchable at runtime: `Pixel` (Press Start 2P, navy boxes, stepped motion), `Skizze` (Patrick Hand, paper and felt pen, boiling outlines), `Holz` (Alegreya + Cinzel, wood, parchment, iron). Start style: `UiStyles.startIndex` on the `UI` canvas (0 = Pixel). Debug switcher button "UI" (`DebugUiSwitcher`, Editor always, builds in test runs), URL `ui=` in test runs.
+Three styles from the prototype round (Mockup Viewer, rated "Gut"), switchable at runtime: `Pixel` (Press Start 2P, navy boxes, stepped motion), `Skizze` (Patrick Hand, paper and felt pen, boiling outlines), `Holz` (Alegreya + Cinzel, wood, parchment, iron). Start style: `UiStyles.startIndex` on the `UI` canvas, set to 2 = Holz by the builder (thesis author's choice 2026-10-31). Debug switcher button "UI" (`DebugUiSwitcher`, Editor always, builds in test runs), URL `ui=` in test runs.
 
 - `UiStyle` (ScriptableObject, `Data/UiStyles/<Name>.asset`): fonts, typewriter speed and a `UiLook` per skin key (sprites/frames, colours, text size and font, rect override, motions: enter, exit, swap, idle, wantIdle, press, pulse).
 - `UiSkin` on every styled element names a key. It applies the look of `UiStyles.Current` (also to inactive objects) and plays the motions: enter on activation, exit on `UiSkin.Hide`, swap when shown again within 0.06 s (next dialog line), press on tap, idle loops, sprite frame cycling. `decoration` elements (tape, rollers, highlighter, icons) are invisible in styles without a look for their key. Logic scripts keep using `SetActive`; `UiSkin.Show/Hide` only adds transitions.
@@ -199,57 +204,56 @@ Three styles from the prototype round (Mockup Viewer, rated "Gut"), switchable a
 
 ## 7. Config
 
-`Assets/StreamingAssets/config.json`, loaded at startup via UnityWebRequest (WebGL cannot read StreamingAssets with File IO). Allows text and parameter changes without code changes.
+`Assets/StreamingAssets/config.json`, loaded at startup via UnityWebRequest (WebGL cannot read StreamingAssets with File IO). Allows text and parameter changes without code changes. The example below is shortened; the real file holds the thesis author's texts ("Text für Spiel.pdf", 2026-10-31) in German (`texts`) and English (`textsEn`, same keys). `intro`, `npcGreeting` and `rulesExplain` are arrays of pages. `Config.UseLanguage` swaps in the English texts.
 
 ```json
 {
   "version": "0.1.0",
   "moneyPerRound": 100,
   "splitStep": 5,
-  "npcAcceptMaxPlayerKeeps": 90,
+  "npcAcceptMaxPlayerKeeps": 85,
   "round2NpcKeeps": 50,
   "round4NpcKeeps": 75,
   "turnAngle": 90,
-  "species": ["humanC", "goblin", "robot", "cow"],
+  "species": ["humanC", "goblin", "slime", "cow"],
   "submitTimeoutSeconds": 5,
   "appsScriptUrl": "https://script.google.com/macros/s/XXXX/exec",
   "debugTools": true,
-  "returnUrlTemplate": "https://XXXX.qualtrics.com/jfe/form/SV_XXXX?pid={pid}&g={g}&ag={ag}&s={s}&r1={r1}&r2={r2}&r3={r3}&r4={r4}&t1={t1}&t2={t2}&t3={t3}&t4={t4}&bal={bal}&dev={dev}&dur={dur}&test={test}&ver={ver}",
+  "showBalance": true,
+  "returnUrlTemplate": "https://XXXX.qualtrics.com/jfe/form/SV_XXXX?pid={pid}&g={g}&ag={ag}&s={s}&r1={r1}&r2={r2}&r3={r3}&r4={r4}&t1={t1}&t2={t2}&t3={t3}&t4={t4}&bal={bal}&dev={dev}&dur={dur}&test={test}&ver={ver}&lang={lang}&Q_Lang={lang}",
   "tutorialSteps": [
-    { "text": "Dreh dich nach links.", "action": "turnLeft", "count": 2 },
-    { "text": "Dreh dich nach rechts.", "action": "turnRight", "count": 2 },
-    { "text": "Spring einmal.", "action": "jump", "count": 1 },
-    { "text": "Dreh dich einmal komplett um.", "action": "turnAround", "count": 1 }
+    { "text": "Nach links drehen", "textEn": "Turn to the left", "action": "turnLeft", "count": 2 },
+    { "text": "Ducken und wieder aufstehen", "textEn": "Crouch and stand back up", "action": "crouch", "count": 1 },
+    { "text": "Ducken und direkt hochspringen", "textEn": "Crouch and jump straight up", "action": "crouchJump", "count": 1 }
   ],
   "texts": {
-    "intro": "PLACEHOLDER",
-    "goToDoorHint": "PLACEHOLDER",
-    "jump": "Springen",
+    "intro": ["Willkommen! ...", "..."],
+    "goToDoorHint": "Gut gemacht! Geh nun zur Tür.",
+    "jump": "Springen", "crouch": "Ducken", "standUp": "Aufstehen",
     "stepDone": "Geschafft!",
     "goToDoor": "Zur Tür",
+    "key": "Schlüssel", "lockedKey": "...", "keyTaken": "Schlüssel gefunden!",
+    "lockedLevers": "...", "leversSolved": "Klick!",
     "talk": "Ansprechen",
-    "npcGreeting": "PLACEHOLDER",
-    "speaker": "Gegenüber",
+    "npcGreeting": ["...", "..."],
+    "rulesCheck": "... Alles klar?", "yes": "Ja", "no": "Nein",
+    "rulesExplain": ["...", "..."],
+    "speaker": "Wächter",
+    "coins": "Münzen",
     "round": "Runde {round} von {total}",
-    "round1Intro": "PLACEHOLDER",
-    "round2Intro": "PLACEHOLDER",
-    "round3Intro": "PLACEHOLDER",
-    "round4Intro": "PLACEHOLDER",
-    "accept": "Annehmen",
-    "reject": "Ablehnen",
-    "confirm": "Bestätigen",
-    "npcAccepted": "PLACEHOLDER",
-    "npcRejected": "PLACEHOLDER",
-    "playerAccepted": "Du hast das Angebot angenommen.",
-    "playerRejected": "Du hast das Angebot abgelehnt.",
-    "splitShares": "Du: {player} CHF / Gegenüber: {npc} CHF",
-    "npcOffer": "Dein Gegenüber behält {npc} CHF und bietet dir {player} CHF an.",
-    "roundResult": "Du erhältst {player} CHF, dein Gegenüber erhält {npc} CHF.",
+    "round1Intro": "...", "round2Intro": "...", "round3Intro": "...", "round4Intro": "...",
+    "accept": "Annehmen", "reject": "Ablehnen", "confirm": "Bestätigen",
+    "npcAccepted": "...", "npcRejected": "...",
+    "playerAccepted": "Alles klar!", "playerRejected": "Alles klar!",
+    "splitShares": "Du: {player} Münzen / Wächter: {npc} Münzen",
+    "npcOffer": "Ich behalte {npc} Münzen, du bekommst {player} Münzen.",
+    "roundResult": "Du erhältst {player} Münzen, ich erhalte {npc} Münzen.",
     "next": "Weiter",
     "balance": "Kontostand",
-    "end": "Danke! Du wirst jetzt zur Umfrage weitergeleitet.",
+    "end": "...",
     "rotateDevice": "Bitte Gerät drehen"
-  }
+  },
+  "textsEn": { "...": "same keys in English" }
 }
 ```
 
@@ -264,7 +268,7 @@ Assets/
   Scripts/
     Core/        GameFlow.cs, GameState.cs, Config.cs, ConfigLoader.cs, UrlParams.cs
     Tutorial/    TutorialController.cs, TutorialProgress.cs, PlayerActions.cs
-    World/       Door.cs, WalkPath.cs, CameraAim.cs, NpcLookAt.cs, RoomSurface.cs, RoomVariant.cs, RoomVariants.cs
+    World/       Door.cs, WalkPath.cs, CameraAim.cs, NpcLookAt.cs, RoomSurface.cs, RoomVariant.cs, RoomVariants.cs, KeyRoom.cs, LeverRoom.cs, Lever.cs
     Mirror/      MirrorWorld.cs, MirrorWall.cs, MirrorAvatarSync.cs
     Avatar/      AvatarDatabase.cs (ScriptableObject), AvatarSpawner.cs, AvatarBody.cs
     Dialog/      UltimatumController.cs, SplitInputUI.cs, BalanceUI.cs, RoundUI.cs
@@ -272,22 +276,24 @@ Assets/
     UI/          UIManager.cs, ActionButtonsUI.cs, WorldButton.cs, StepDoneUI.cs, OrientationOverlay.cs, DebugOverlay.cs, DebugAvatarSwitcher.cs, DebugRoomSwitcher.cs, DebugUiSwitcher.cs, DebugPanels.cs (only one switcher panel open)
     UI/Skin/     UiStyle.cs (ScriptableObject + UiLook), UiStyles.cs, UiSkin.cs, UiSfx.cs, UiMotion.cs, UiTypewriter.cs, UiMaxWidth.cs
   Plugins/WebGL/ Redirect.jslib
-  Editor/        BuildScript.cs, HumanoidClipBuilder.cs, AvatarBuilder.cs, RoomVariantBuilder.cs, UiStyleBuilder.cs, MockupViewer/ (MockupViewerWindow.cs, MockupGUI.cs)
+  Editor/        BuildScript.cs, HumanoidClipBuilder.cs, AvatarBuilder.cs, RoomBuilder.cs, RoomVariantBuilder.cs, UiStyleBuilder.cs, MockupViewer/ (MockupViewerWindow.cs, MockupGUI.cs)
   Art/UI/        Fonts/ (OFL TTFs + TMP assets), Styles/<Style>/*.png + sprites.json (generated by Tools/ui_sprites.py), Sounds/<Style>/*.wav (Tools/ui_sounds.py)
-  Animations/    Avatar.controller, Humanoid_Idle/Jump.anim, *.overrideController
+  Animations/    Avatar.controller, Humanoid_Idle/Jump/Crouch.anim, *.overrideController
   Prefabs/       Avatars/Avatar_<id>[_m|_w].prefab, NPC.prefab
   Data/          AvatarDatabase.asset, UiStyles/Pixel|Skizze|Holz.asset
   StreamingAssets/config.json
   Scenes/        Main.unity
 ```
 
-One scene. Room 1, Room 2, mirror worlds and NPC all live in `Main.unity`.
+One scene. Rooms 1-4, mirror worlds and NPC all live in `Main.unity`.
 
 **Mockups** (design variants: renders, images, sounds, prefabs) are reviewed in **Mirror Game/Mockup Viewer** (`Editor/MockupViewer/MockupViewerWindow.cs`, ported from WishOfHers). Claude writes `Assets/_Mockups/{Name}/mockup.json` (`title`, `description`, `question`, optional `loop`, `variants[]` with `name`, `description`, `files[]`; file paths relative to the folder or starting with `Assets/`) plus the files. The folder is git-ignored, local only, deleted after the decision. The developer drags variants into Gut / Anpassen / Nein, comments, and presses "Entscheidung abschicken"; Claude reads `feedback.json` next to `mockup.json`. Prefabs render live on a neutral floor next to an avatar for size (default `Avatar_humanC_m`); in Play mode "Im Spiel spawnen" places them 2 m in front of the camera. Self-check a prefab mockup with `MockupViewerWindow.RenderPng(prefabPath, time, outPng)` via `script eval`. Scripts inside `_Mockups` compile into the game, so delete the mockup before a build. A component with `public void MockupSample(float t, Camera cam)` can pose itself for the preview. A `*_anim.png` strip of square frames plays at 8 fps.
 
-**Scene layout** (greybox, milestone 2): both rooms 6 x 6 m interior, 3 m high, walls 0.2 m. Room 1 centred at the origin, mirrors on -x (left), +z (top), -z (bottom), door (1.2 x 2.2 m) in the +x wall. Room 2 directly behind it, centre x = 6.2. Player rig (`PlayerRig`, with `PlayerActions`, camera at 1.6 m and the avatar as children) starts at the origin facing the door (+x). `WalkToDoor` stops at (2.2, 0, 0) facing the door, then the door opens; `WalkToNpc`: doorway (3.1, 0, 0), then (6.0, 0, 0) facing +x; NPC at (7.4, 0, 0) facing -x. Mirrors are body-sized (1.5 x 2.4 m, bottom edge 0.15 m above the floor) centred on each mirror wall (`World/Room1/MirrorWall*`), with a dark frame and a subtle glass tint. The door hinge is part of Room 1. The avatar is spawned into `PlayerRig` at startup (`Game/AvatarSpawner`), which also moves the camera to the avatar's eye height. The NPC prefab sits under `NPC`. Jump: 0.15 s windup, 0.6 s in the air, 0.2 s landing (`PlayerActions`); the avatar's jump clip is stretched to that duration.
+**Scene layout** (greybox, milestone 2): both rooms 6 x 6 m interior, 3 m high, walls 0.2 m. Room 1 centred at the origin, mirrors on -x (left), +z (top), -z (bottom), door (1.2 x 2.2 m) in the +x wall. Room 2 directly behind it, centre x = 6.2. Player rig (`PlayerRig`, with `PlayerActions`, camera at 1.6 m and the avatar as children) starts at the origin facing the door (+x). `WalkToDoor` stops at (2.2, 0, 0) facing the door, then the door opens; `WalkToNpc`: doorway (3.1, 0, 0), then (6.0, 0, 0) facing +x; NPC at (7.4, 0, 0) facing -x. Mirrors are body-sized (1.5 x 2.4 m, bottom edge 0.15 m above the floor) centred on each mirror wall (`World/Room1/MirrorWall*`), with a dark frame and a subtle glass tint. The avatar is spawned into `PlayerRig` at startup (`Game/AvatarSpawner`), which also moves the camera to the avatar's eye height. The NPC prefab sits under `NPC`. Jump: 0.15 s windup, 0.6 s in the air, 0.2 s landing (`PlayerActions`); the avatar's jump clip is stretched to that duration.
 
-**GameFlow states:** `Init -> Tutorial -> GoToDoor -> WalkToNPC -> Dialog -> Submit -> Redirect`
+**Rooms 2-4** (`Editor/RoomBuilder.cs`, menu **Mirror Game/Build Rooms**, then rerun Build Room Variants; safe to rerun): Room 2 at (6.2, 0, 0) (mirror +x, door to Room 3 in -z), Room 3 at (6.2, 0, -6.2) (mirror -z, levers on +x, door to Room 4 in -x), Room 4 at (0, 0, -6.2) (NPC at (-1.2, 0, -6.2) facing +x, player stops at (0.2, 0, -6.2)). The greybox values above for Room 2 and the NPC are outdated. Every room has its own walls (0.1 m each side of a shared wall), so each mirror copy is complete. Doors are under `World/Doors` (Door1-3), key and levers under `World/Interactive`; neither is part of a room copy, the mirror worlds copy them as `sharedParts` and sync them every `LateUpdate`. Mirror worlds are grouped per room (`World/MirrorWorlds/Room1-3`). Room 4 overlaps the mirror world behind Room 1's bottom mirror, so `GameFlow` shows only the current room(s) and their mirror worlds (`roomGroups`, `roomMirrors`).
+
+**GameFlow states:** `Init -> Tutorial -> GoToDoor -> KeyRoom -> LeverRoom -> WalkToNPC -> Dialog -> Submit -> Redirect`
 
 `SessionData` holds all recorded values and the start timestamp. Only `ResultSubmitter` and `Redirector` read it at the end.
 
@@ -303,7 +309,7 @@ Apps Script, deployed as Web App with access "Anyone":
 function doPost(e) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
   const d = JSON.parse(e.postData.contents);
-  const cols = ["pid","g","ag","s","r1","r2","r3","r4","t1","t2","t3","t4","bal","dev","dur","test","ver"];
+  const cols = ["pid","g","ag","s","r1","r2","r3","r4","t1","t2","t3","t4","bal","dev","dur","test","ver","lang"];
   if (sheet.getLastRow() === 0) sheet.appendRow(["timestamp", ...cols]);
   sheet.appendRow([new Date(), ...cols.map(c => d[c] ?? "")]);
   return ContentService.createTextOutput("ok");
@@ -347,11 +353,11 @@ In the Editor, log the URL instead of redirecting. URL-encode all values.
 2. Survey Flow: after the gender question, Branch logic sets Embedded Data `gender` to `m` or `w`. Other answers set `gender = x` (game randomizes).
 3. Survey Flow: Randomizer with 4 Embedded Data elements (`species = 1`, `2`, `3`, `4`), "Randomly present 1 of the following elements", **Evenly Present Elements** enabled.
 4. End of Survey: Redirect to URL
-   `https://<host>/?pid=${e://Field/ResponseID}&g=${e://Field/gender}&s=${e://Field/species}`
+   `https://<host>/?pid=${e://Field/ResponseID}&g=${e://Field/gender}&s=${e://Field/species}&lang=${e://Field/Q_Language}`
    Free Qualtrics accounts cannot redirect ("Für Ihre Instanz nicht verfügbar"). Workaround used in the test setup: End of Survey -> Customize -> "Nachricht zum Umfragenende aus der Bibliothek" with a link (`<a href="<URL above>" target="_self">`). Piped fields work in that message. Switch back to a real redirect on a licensed account.
 
 **Survey B**
-1. First element in Survey Flow: Embedded Data block with fields `pid, g, ag, s, r1, r2, r3, r4, t1, t2, t3, t4, bal, dev, dur, test, ver` (values left empty, Qualtrics fills them from the URL).
+1. First element in Survey Flow: Embedded Data block with fields `pid, g, ag, s, r1, r2, r3, r4, t1, t2, t3, t4, bal, dev, dur, test, ver, lang` (values left empty, Qualtrics fills them from the URL). `Q_Lang` in the URL selects the survey language (Survey B needs an English translation).
 2. Follow-up questions.
 3. Datasets are merged via `pid`.
 
@@ -377,7 +383,7 @@ Note: "Evenly Present" counts assignments, not completions. Dropouts can unbalan
 
 ## 13. Milestones
 
-Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> Survey B verified 2026-10-29. Milestone 2 done (2026-10-29). Milestone 3 done (2026-10-29). Milestone 4 built 2026-10-30 (all 8 candidates and the NPC checked in the mirrors in play mode), waiting for review in Unity and the thesis author's final 4 species. Room furnishing mockups (6 variants, section 5a) built 2026-10-30, waiting for the developer's rating. Three UI styles (section 6a) built into the game 2026-10-30, switchable for comparison, waiting for the choice. Next: milestone 5.
+Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> Survey B verified 2026-10-29. Milestone 2 done (2026-10-29). Milestone 3 done (2026-10-29). Milestone 4 built 2026-10-30 (all 8 candidates and the NPC checked in the mirrors in play mode), waiting for review in Unity and the thesis author's final 4 species. Thesis author's feedback (2026-10-31) built in: 4 rooms (key, levers), crouch steps, species humanC/goblin/slime/cow, Holz room and UI as start, her texts in German and English (`lang`), coins instead of CHF, 90:10 rejected. Next: milestone 5.
 
 1. **Foundation** (done): BuildScript, config loading, URL params, GameFlow with placeholder UI, ultimatum logic, SessionData, submit + redirect. Primitives only. Goal: full run Qualtrics -> Game -> Sheet -> Qualtrics works end to end.
 2. **Rooms and movement** (done): Room 1 and 2 greybox, door, turn/jump buttons, tutorial steps from config, walk to NPC.
@@ -394,7 +400,9 @@ Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> S
 - [ ] `g=m`, `g=w`, `g=x`, `g` missing all handled correctly, `ag` logged
 - [ ] `s=1`-`4` and invalid `s` handled
 - [ ] `debug=1` skips tutorial, no Sheet POST
-- [ ] Round 1/3: keeps 90 -> accepted, keeps 95 -> rejected, keeps 100 -> rejected
+- [ ] `lang=en` shows English texts, `lang` arrives in Sheet and Survey B (Survey B in English)
+- [ ] Key and lever puzzles cannot be skipped, locked doors show their hint
+- [ ] Round 1/3: keeps 85 -> accepted, keeps 90 -> rejected, keeps 100 -> rejected
 - [ ] Round 2/4 accept and reject both recorded correctly
 - [ ] Balance correct in all combinations
 - [ ] Dialog cannot be left
@@ -411,11 +419,13 @@ Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> S
 
 ## 15. Open Points
 
-- Final 4 species not decided yet (8 candidates built, mapping in `config.json`).
-- Room variant not chosen yet (section 5a). After the choice: set `startIndex`, remove the other variants (and unused packs) from the builder.
-- UI style not chosen yet (section 6a). After the choice: set `UiStyles.startIndex`, remove the other styles from the builder (fonts, sprites, looks).
+- Species: "Mensch" mapped to `humanC` (Street, PDF letter C); confirm with the thesis author (alternative `humanI`). Mushroom, robot, skeleton, humanI stay built but unmapped.
+- Room variants: Holz is the start; Büro, Stein, Hütte kept for comparison. After the final choice remove the others (and unused packs) from the builder.
+- UI style Holz chosen. Remove Pixel and Skizze from the builder once confirmed (fonts, sprites, looks).
+- Balance display may be counterproductive (thesis author discusses with the lecturer): `showBalance` in config.json.
+- After the 2026-10-31 changes: redeploy the Apps Script with `lang` in `cols`, add `lang` to Survey B's embedded data, pass `&lang=${e://Field/Q_Language}` from Survey A, translate Survey A and B to English.
+- Texts written by Claude, not by the thesis author: `goToDoorHint`, `keyTaken`, `leversSolved` (DE/EN). The English lever hint says "set the levers the right way" instead of "in the right order" (the levers have no order).
 - Build size 2026-10-30: 38.4 MB (37.2 MB without room variants), over the 30 MB target. Main causes are avatar textures at 4096: mushroom (`T_Mushroom_*`, ~64 MB uncompressed), `Generic_Normals_01`, `Generic_01_A`, `Generic_Emissive_01_A`.
-- Final texts (intro, tutorial, NPC dialog) will be written by the thesis author.
 - Data storage rules of the university unknown. Google Sheet is the working assumption.
 - Texture sizes of the character packs not yet limited to 1024 (performance pass, milestone 5).
 - Test setup runs on the developer's Google account (Sheet + Apps Script) and free Qualtrics account (Survey A "Mirror Game – Teil A": https://qualtricsxmbxwbdbh7v.qualtrics.com/jfe/form/SV_5iPvenZKKZp0isC, Survey B "Mirror Game – Teil B"). Before the pilot, move everything (Sheet, Apps Script, Qualtrics surveys, e.g. via .qsf export/import) to the thesis author's account and update `appsScriptUrl` and `returnUrlTemplate` in config.json.

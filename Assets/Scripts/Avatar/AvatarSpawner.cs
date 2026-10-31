@@ -31,7 +31,11 @@ public class AvatarSpawner : MonoBehaviour
 
         onActionStarted = action =>
         {
-            if (action == TutorialStep.Jump)
+            if (action == TutorialStep.Crouch)
+                body.SetCrouch(true);
+            else if (action == TutorialStep.StandUp || action == TutorialStep.CrouchJump)
+                body.SetCrouch(false);
+            if (action == TutorialStep.Jump || action == TutorialStep.CrouchJump)
                 body.PlayJump(playerActions.JumpTotalSeconds);
         };
         playerActions.Started += onActionStarted;

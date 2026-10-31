@@ -431,7 +431,7 @@ All checked by the developer (2026-10-31, repeatedly), including data in Sheet a
 - UI style Holz chosen. Remove Pixel and Skizze from the builder once confirmed (fonts, sprites, looks).
 - Balance display may be counterproductive (thesis author discusses with the lecturer): `showBalance` in config.json.
 - After the 2026-10-31 changes: redeploy the Apps Script with `lang` in `cols`, add `lang` to Survey B's embedded data, pass `&lang=${e://Field/Q_Language}` from Survey A, translate Survey A and B to English. The free Qualtrics account cannot add languages, so the translation is done after the move to the thesis author's account (if the university licence has no translations either: English copies of both surveys plus a second return URL in config.json).
-- `lockedLevers` (thesis author's text) does not mention the wall hints yet; ask whether it should point to them.
+- `lockedLevers`: the thesis author's sentence plus a second sentence by Claude pointing to the wall hints ("Irgendwo an den Wänden stehen bestimmt Hinweise." / "There must be clues somewhere on the walls."). The lever hints on the walls differ from her sketch (sign above the levers); the developer shows her.
 - Texts written by Claude, not by the thesis author: `goToDoorHint`, `keyTaken`, `doorUnlocked`, `leversSolved` (DE/EN). The English lever hint says "set the levers the right way" instead of "in the right order" (the levers have no order).
 - Build size 2026-10-30: 38.4 MB, over the 30 MB target only because all UI styles, room variants and avatar candidates are still in; it drops below 30 MB once the unused ones are removed (developer, 2026-10-31).
 - Data storage rules of the university unknown. Google Sheet is the working assumption.

@@ -26,7 +26,7 @@ public class Config
     public TutorialStep[] tutorialSteps =
     {
         new TutorialStep("Nach links drehen", TutorialStep.TurnLeft, 2),
-        new TutorialStep("Nach rechts drehen", TutorialStep.TurnRight, 2),
+        new TutorialStep("Nach rechts drehen", TutorialStep.TurnRight, 1),
         new TutorialStep("Eine komplette Umdrehung vollführen", TutorialStep.TurnAround, 1),
         new TutorialStep("Einmal springen", TutorialStep.Jump, 1),
         new TutorialStep("Ducken und wieder aufstehen", TutorialStep.Crouch, 1),
@@ -117,7 +117,7 @@ public class Texts
     public string keyTaken = "Schlüssel gefunden!";
     public string doorUnlocked = "Aufgeschlossen!";
     // Room 3: door locked until the levers are set like on the sign, short note when solved.
-    public string lockedLevers = "Hm, wieder verschlossen. Vielleicht wenn ich die Hebel richtig betätige …?";
+    public string lockedLevers = "Hm, wieder verschlossen. Vielleicht wenn ich die Hebel richtig betätige …? Irgendwo an den Wänden stehen bestimmt Hinweise.";
     public string leversSolved = "Klick!";
     public string talk = "Ansprechen";
     public string[] npcGreeting = { "PLACEHOLDER" };

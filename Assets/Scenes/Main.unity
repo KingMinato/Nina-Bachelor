@@ -37382,7 +37382,7 @@ MonoBehaviour:
   avatarSpawner: {fileID: 1603114378}
   npc: {fileID: 318357681}
   cameraAim: {fileID: 330585548}
-  editorQuery: ?debug=1
+  editorQuery: 
   minEndSeconds: 1.5
 --- !u!114 &1603114375
 MonoBehaviour:

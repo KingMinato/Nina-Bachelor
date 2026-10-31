@@ -28,7 +28,7 @@
       "text": "Nach rechts drehen",
       "textEn": "Turn to the right",
       "action": "turnRight",
-      "count": 2
+      "count": 1
     },
     {
       "text": "Eine komplette Umdrehung vollführen",
@@ -73,7 +73,7 @@
     "lockedKey": "Hm, die Tür ist verschlossen. Ob es wohl irgendwo einen Schlüssel hat?",
     "keyTaken": "Schlüssel gefunden!",
     "doorUnlocked": "Aufgeschlossen!",
-    "lockedLevers": "Hm, wieder verschlossen. Vielleicht wenn ich die Hebel richtig betätige …?",
+    "lockedLevers": "Hm, wieder verschlossen. Vielleicht wenn ich die Hebel richtig betätige …? Irgendwo an den Wänden stehen bestimmt Hinweise.",
     "leversSolved": "Klick!",
     "talk": "Ansprechen",
     "npcGreeting": [
@@ -130,7 +130,7 @@
     "lockedKey": "Hmm, the door is locked. I wonder if there’s a key somewhere around here?",
     "keyTaken": "Key found!",
     "doorUnlocked": "Unlocked!",
-    "lockedLevers": "Hmm, locked again. Maybe if I set the levers the right way …?",
+    "lockedLevers": "Hmm, locked again. Maybe if I set the levers the right way …? There must be clues somewhere on the walls.",
     "leversSolved": "Click!",
     "talk": "Talk",
     "npcGreeting": [

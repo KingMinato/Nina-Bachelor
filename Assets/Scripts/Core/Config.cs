@@ -151,7 +151,7 @@ public class Texts
     // Unit after amounts on the balance plaque.
     public string coins = "Münzen";
     public string end = "Vielen Dank für deine Teilnahme. Du wirst nun wieder zur Umfrage zurückkehren.";
-    public string rotateDevice = "Bitte Gerät drehen";
+    public string rotateDevice = "Bitte Gerät quer halten. Dreht sich das Bild nicht, die Ausrichtungssperre ausschalten.";
 
     public static string Fill(string template, int player, int npc)
     {

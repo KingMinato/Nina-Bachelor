@@ -110,7 +110,7 @@
     "balance": "Kontostand",
     "coins": "Münzen",
     "end": "Vielen Dank für deine Teilnahme. Du wirst nun wieder zur Umfrage zurückkehren.",
-    "rotateDevice": "Bitte Gerät drehen"
+    "rotateDevice": "Bitte Gerät quer halten. Dreht sich das Bild nicht, die Ausrichtungssperre ausschalten."
   },
   "textsEn": {
     "intro": [
@@ -167,6 +167,6 @@
     "balance": "Balance",
     "coins": "coins",
     "end": "Thanks a lot for taking part! You’ll now be redirected back to the survey.",
-    "rotateDevice": "Please rotate your device"
+    "rotateDevice": "Please turn your device sideways. If the screen does not rotate, switch off the rotation lock."
   }
 }

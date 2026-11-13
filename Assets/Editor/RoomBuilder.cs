@@ -309,7 +309,8 @@ public static class RoomBuilder
     {
         var hinge = Child(doors, name);
         hinge.SetPositionAndRotation(pos, Quaternion.Euler(0, yaw, 0));
-        var leaf = Box("DoorLeaf", hinge, new Vector3(0, DoorH / 2, DoorHalfW), new Vector3(0.06f, DoorH - 0.01f, 2 * DoorHalfW - 0.02f), doorMat, local: true);
+        // Reaches 2 cm into the jambs and the lintel: a closed door leaves no gap to see through into the next room.
+        var leaf = Box("DoorLeaf", hinge, new Vector3(0, DoorH / 2 + 0.01f, DoorHalfW), new Vector3(0.06f, DoorH + 0.01f, 2 * DoorHalfW + 0.04f), doorMat, local: true);
         GameObjectUtility.SetStaticEditorFlags(leaf.gameObject, 0);
         return hinge.gameObject.AddComponent<Door>();
     }

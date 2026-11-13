@@ -194,7 +194,7 @@ public static class RoomVariantBuilder
         Put(r2, O("SM_Prop_Rug_02"), In(1, 0f, 0.005f, 0f), 90f);
         var shelf2 = Bounds(Put(r2, O("SM_Prop_Shelf_05"), In(1, Side, 0f, 2.2f), -90f, wall: Wall.PlusX));
         // The former cow avatar as a figurine (thesis author's wish, 2026-11-13).
-        OnBoard(r2, shelf2, 2, -0.15f, P(Cow, "Cow_Holstein"), -20f, 0.15f);
+        OnBoard(r2, shelf2, 2, -0.15f, P(Cow, "Cow_Holstein"), 205f, 0.15f); // faces right, a little towards the room
         OnBoard(r2, shelf2, 2, 0.4f, O("SM_Prop_Book_Group_07"), -90f, 0.7f);
         OnBoard(r2, shelf2, 1, 0f, O("SM_Prop_Book_Group_03"), -90f, 0.9f);
         OnBoard(r2, shelf2, 0, 0.3f, O("SM_Prop_Book_Group_05"), -90f, 0.75f);
@@ -385,7 +385,22 @@ public static class RoomVariantBuilder
     {
         var axis = shelf.size.z > shelf.size.x ? Vector3.forward : Vector3.right;
         var c = shelf.center + axis * along;
-        Put(parent, prefab, new Vector3(c.x, shelf.min.y + Shelf05Boards[board], c.z), yaw, scale: scale);
+        var t = Put(parent, prefab, new Vector3(c.x, shelf.min.y + Shelf05Boards[board], c.z), yaw, scale: scale)?.transform;
+        if (t == null)
+            return;
+        // Pivots are not always at the lowest vertex (the cow's hooves were 1.7 cm above it): set it down on the board.
+        float low = float.MaxValue;
+        foreach (var mf in t.GetComponentsInChildren<MeshFilter>())
+            foreach (var p in mf.sharedMesh.vertices) low = Mathf.Min(low, mf.transform.TransformPoint(p).y);
+        foreach (var smr in t.GetComponentsInChildren<SkinnedMeshRenderer>())
+        {
+            var m = new Mesh();
+            smr.BakeMesh(m, true);
+            foreach (var p in m.vertices) low = Mathf.Min(low, smr.transform.TransformPoint(p).y);
+            Object.DestroyImmediate(m);
+        }
+        if (low < float.MaxValue)
+            t.position += Vector3.up * (shelf.min.y + Shelf05Boards[board] - low);
     }
 
     // A framed painting (texture from Tools/paintings.py) hanging on a wall, pos = its centre on the wall plane.

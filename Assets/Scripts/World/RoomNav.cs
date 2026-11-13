@@ -108,8 +108,10 @@ public class RoomNav : MonoBehaviour
     void Follow(int i)
     {
         Vector3 screen = Camera.main.WorldToScreenPoint(points[i]);
-        var t = arrows[i].transform;
-        t.position = new Vector3(screen.x, screen.y, 0f);
+        var t = (RectTransform)arrows[i].transform;
+        // Tall avatars see the floor point lower on screen: keep the whole arrow (plus a small gap) above the bottom edge.
+        float half = t.rect.height * 0.6f * t.parent.lossyScale.y; // own scale is 0 while hidden
+        t.position = new Vector3(screen.x, Mathf.Max(screen.y, half), 0f);
         // Behind the camera: hidden until the player turns towards it.
         t.localScale = screen.z > 0f ? Vector3.one : Vector3.zero;
     }

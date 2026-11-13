@@ -8,7 +8,7 @@ using UnityEngine;
 // Builds the furnishing variants of Rooms 1-4 in the open scene (Main.unity) as mockups to compare:
 // materials for the shell (floor, walls, ceiling, door leaf), furniture from the Synty packs and door models.
 // The shell itself (walls, mirror openings, door, waypoints) is not changed. Rebuilding replaces all variants.
-// Menu: Mirror Game/Build Room Variants. Requires the licensed Synty packs (Office, Dungeon, Western Frontier),
+// Menu: Mirror Game/Build Room Variants. Requires the licensed Synty packs (Office, Dungeon, Western Frontier) and Backrock (cow figurine),
 // which are not in the repository.
 //
 // Rules (CLAUDE.md, sections 5 and 8): everything visible in the mirrors is a child of Room1, nothing is
@@ -18,6 +18,7 @@ public static class RoomVariantBuilder
     const string Office = "Assets/Synty/PolygonOffice";
     const string Dungeon = "Assets/Synty/PolygonDungeon";
     const string Western = "Assets/Synty/PolygonWesternFrontier";
+    const string Cow = "Assets/Backrock/LowPolyAnimals";
     const string GenericTextures = "Assets/Synty/PolygonGeneric/Textures/";
     const string MaterialFolder = "Assets/Art/Environment/Rooms/";
     const string MeshFolder = "Assets/Art/Environment/ShellMeshes/";
@@ -164,7 +165,9 @@ public static class RoomVariantBuilder
 
         Put(v.room1, P(Office, "SM_Prop_Rug_05"), new Vector3(0f, 0.005f, 0f));
 
-        Put(v.room2, P(Office, "SM_Prop_Shelf_05"), In(1, Side, 0f, 2.2f), -90f, wall: Wall.PlusX);
+        var shelf = Bounds(Put(v.room2, P(Office, "SM_Prop_Shelf_05"), In(1, Side, 0f, 2.2f), -90f, wall: Wall.PlusX));
+        // The former cow avatar as a figurine on the shelf (thesis author's wish, 2026-11-13).
+        Put(v.room2, P(Cow, "Cow_Holstein"), new Vector3(shelf.center.x, shelf.max.y, shelf.center.z), -30f, scale: 0.15f);
         Put(v.room2, P(Office, "SM_Prop_Plant_04"), In(1, -2.5f, 0f, -2.5f), 40f);
 
         ChairAt(v.room3, P(Western, "SM_Prop_Chair_01"), Put(v.room3, P(Office, "SM_Prop_Table_03"), In(2, -1.9f, 0f, Side - 0.05f), 0f, wall: Wall.PlusZ));

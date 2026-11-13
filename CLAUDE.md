@@ -28,7 +28,7 @@ Data is linked across all three via `pid` (Qualtrics ResponseID from Survey A).
 |---|---|---|
 | `pid` | string | Qualtrics ResponseID |
 | `g` | `m`, `w`, anything else | Gender from survey. `m`/`w` used directly, anything else or missing -> random 50/50 |
-| `s` | `1`-`4` | Species, assigned and balanced by Qualtrics. Missing/invalid -> random |
+| `s` | `1`-`4` | Condition (race x size, see section 4), assigned and balanced by Qualtrics. Missing/invalid -> random |
 | `debug` | `1` | Skips tutorial, shows the debug overlay, does NOT post to Google Sheet. The debug switchers (buttons "Avatar": all species, m/w, jump; "Raum"; "UI") are shown in every test run (no `pid` or `debug=1`), always in the Unity Editor and, while `debugTools` is `true` in config.json, also in runs coming from Survey A. `debugTools` must be `false` for the pilot |
 | `a` | avatar species id | Test runs only (no `pid` or `debug=1`): shows this avatar regardless of `s`, e.g. `?a=slime&g=w`. Ignored in real runs |
 | `room` | room variant name | Test runs only: starts with this furnishing variant (see section 5a), e.g. `?debug=1&room=Holz`. Ignored in real runs |
@@ -44,7 +44,7 @@ Parse from `Application.absoluteURL`. If `pid` is missing, generate `test-<times
 | `pid` | from input |
 | `g` | raw gender value received |
 | `ag` | avatar gender actually used (`m`/`w`) |
-| `s` | species actually used (1-4) |
+| `s` | condition actually used (1-4) |
 | `r1` | Round 1: amount player keeps (0-100 coins) |
 | `r2` | Round 2: 1 = accepted, 0 = rejected |
 | `r3` | Round 3: amount player keeps (0-100) |
@@ -115,7 +115,8 @@ Target total duration: about 5 minutes.
 
 ## 4. Avatars
 
-- 4 species x 2 genders. The thesis author has not fixed the 4 species yet, so 8 candidates are built and `config.json` (`species`) maps `s` = 1-4 to candidate ids:
+- **Size study (thesis author's feedback 2026-11-13):** the research question is now the effect of the avatar's size, not of 4 species. 2 races x 2 sizes, `config.json` (`species`) maps `s` = 1-4 to avatar ids: 1 `humanC_big`, 2 `humanC_small`, 3 `goblin_big`, 4 `goblin_small`. The second race is open (Goblin or Blob = `slime_big` / `slime_small`, mockup `_Mockups/Groesse`); Goblin is the interim choice. Big / small: eyes one head (0.25 m) above / below the NPC's eyes (1.67 m), so 1.92 m / 1.42 m, the same for m and w (`AvatarBuilder.SizeSpecs`, `eyeHeight`). The blob is stretched only vertically (`keepWidth`), scaled uniformly it would be 3-4 m wide. The characters should not look threatening, only bigger or smaller. The rooms stay unchanged, the size shows through the camera height (door, furniture, NPC). Mirrors need no change: from 1.2 m away a 2.4 m mirror shows the big avatar's jump completely.
+- Candidates (from the earlier 4-species design; all built, the unscaled ones unmapped):
 
   | id | Model | Variants |
   |---|---|---|
@@ -128,7 +129,7 @@ Target total duration: about 5 minutes.
   | `mushroom` | Lil Pupinduy `Mushroom_1` | one |
   | `cow` | Backrock Low Poly Animals `Cow_Holstein` | one |
 
-  Mapping (thesis author's feedback 2026-10-31: Mensch, Goblin, Blob, Kuh): 1 `humanC`, 2 `goblin`, 3 `slime`, 4 `cow`. The other candidates stay built but unused.
+  Former mapping (2026-10-31): 1 `humanC`, 2 `goblin`, 3 `slime`, 4 `cow`. The cow is now a figurine on the shelf in Room 2 (Holz variant, thesis author's wish).
 - Size (decided 2026-10-30): humanoids keep their size, creatures are roughly human-sized, the camera sits at each avatar's own eyes (humans 1.67 m, cow 1.17 m, mushroom 0.9 m, slime 0.85 m).
 - NPC: "V" from the Modular Fantasy Hero kit, grey hood + face cloth + long robe (`Assets/Prefabs/NPC.prefab`, material `Art/NPC/NPC_Grey.mat`).
 - Eye contact: when the player arrives in front of the NPC, `CameraAim` (on the main camera) tilts the camera towards the NPC's face, and `NpcLookAt` (on the NPC, humanoid look-at IK, IK Pass on in `Avatar.controller`) turns the NPC's head towards the player's eyes, so it looks down at small avatars.
@@ -172,7 +173,7 @@ Several furnishing variants of all four rooms live in `Main.unity` at the same t
 |---|---|---|
 | `Grau` | none | the greybox, reference |
 | `Buero` | Office + Generic | carpet, light grey plaster, ceiling panel lights, office door |
-| `Holz` | Office (+1 Western chair) | wooden floor, warm white walls, rug in Room 1, wooden shelf/table |
+| `Holz` | Office (+1 Western chair, Backrock cow figurine) | wooden floor, warm white walls, rug in Room 1, wooden shelf/table, small cow on the Room 2 shelf |
 | `Stein` | Dungeon + Generic | stone floor tiles, light stone walls, plank door, hanging lanterns (no light) |
 | `Huette` | Western + Generic | wooden planks on walls/floor/ceiling, simple wooden furniture |
 
@@ -220,7 +221,7 @@ Three styles from the prototype round (Mockup Viewer, rated "Gut"), switchable a
   "round2NpcKeeps": 50,
   "round4NpcKeeps": 75,
   "turnAngle": 90,
-  "species": ["humanC", "goblin", "slime", "cow"],
+  "species": ["humanC_big", "humanC_small", "goblin_big", "goblin_small"],
   "submitTimeoutSeconds": 5,
   "appsScriptUrl": "https://script.google.com/macros/s/XXXX/exec",
   "debugTools": true,
@@ -323,7 +324,7 @@ function doPost(e) {
 
 Important: send the POST with `Content-Type: text/plain` (JSON in the body) to avoid a CORS preflight, which Apps Script does not answer. Use `UnityWebRequest` with an `UploadHandlerRaw` and set the header manually.
 
-Analysis: `Tools/sheet_analysis.gs` (second script file in the same Apps Script project, run `updateAnalysis` once, then menu "Mirror Game > Auswertung aktualisieren", also refreshes on open). It writes the sheets "Auswertung" (at a glance: colour-coded summary species x avatar gender, then every participant with avatar, gender and the four decisions in words), "Statistik" (sample, descriptives per species / avatar gender / survey gender / device, ANOVA + Kruskal-Wallis, Welch t + Mann-Whitney, chi-square, paired t R1 vs R3, effect sizes, legend) and "Daten (bereinigt)" (one row per pid, readable columns, derived offers, for CSV export). Only test = 0, first run per pid. Values are computed in the script, not as sheet formulas (formulas written by Apps Script broke in the German-locale sheet). The statistics were checked against scipy. Keep `SPECIES` and the round parameters at the top in sync with config.json.
+Analysis: `Tools/sheet_analysis.gs` (second script file in the same Apps Script project, run `updateAnalysis` once, then menu "Mirror Game > Auswertung aktualisieren", also refreshes on open). It writes the sheets "Auswertung" (at a glance: colour-coded summary per condition x avatar gender, plus per size and per race, then every participant with avatar, gender and the four decisions in words), "Statistik" (sample, descriptives per condition / size / race / avatar gender / survey gender / device, two-way ANOVA size x race (type III, checked against a numpy regression), ANOVA + Kruskal-Wallis, Welch t + Mann-Whitney, chi-square, paired t R1 vs R3, effect sizes, legend) and "Daten (bereinigt)" (one row per pid, readable columns, derived offers, for CSV export). Only test = 0, first run per pid. Values are computed in the script, not as sheet formulas (formulas written by Apps Script broke in the German-locale sheet). The statistics were checked against scipy. Keep `SPECIES` (ids `<race>_<size>`, race and size are derived from them) and the round parameters at the top in sync with config.json.
 
 Note: the university may have data storage rules. Keep the submitter behind an interface so the backend can be swapped later.
 
@@ -388,7 +389,7 @@ Note: "Evenly Present" counts assignments, not completions. Dropouts can unbalan
 
 ## 13. Milestones
 
-Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> Survey B verified 2026-10-29. Milestone 2 done (2026-10-29). Milestone 3 done (2026-10-29). Milestone 4 built 2026-10-30 (all 8 candidates and the NPC checked in the mirrors in play mode), waiting for review in Unity and the thesis author's final 4 species. Thesis author's feedback (2026-10-31) built in: 4 rooms (key, levers), crouch steps, species humanC/goblin/slime/cow, Holz room and UI as start, her texts in German and English (`lang`), coins instead of CHF, 90:10 rejected. Next: milestone 5.
+Status: milestone 1 done (2026-10-27). Full chain Survey A -> Game -> Sheet -> Survey B verified 2026-10-29. Milestone 2 done (2026-10-29). Milestone 3 done (2026-10-29). Milestone 4 built 2026-10-30 (all 8 candidates and the NPC checked in the mirrors in play mode), waiting for review in Unity and the thesis author's final 4 species. Thesis author's feedback (2026-10-31) built in: 4 rooms (key, levers), crouch steps, species humanC/goblin/slime/cow, Holz room and UI as start, her texts in German and English (`lang`), coins instead of CHF, 90:10 rejected. Thesis author's feedback 2026-11-13: size study (2 races x 2 sizes, section 4), cow figurine. Next: milestone 5.
 
 1. **Foundation** (done): BuildScript, config loading, URL params, GameFlow with placeholder UI, ultimatum logic, SessionData, submit + redirect. Primitives only. Goal: full run Qualtrics -> Game -> Sheet -> Qualtrics works end to end.
 2. **Rooms and movement** (done): Room 1 and 2 greybox, door, turn/jump buttons, tutorial steps from config, walk to NPC.
@@ -426,7 +427,7 @@ All checked by the developer (2026-10-31, repeatedly), including data in Sheet a
 
 ## 15. Open Points
 
-- Species: "Mensch" mapped to `humanC` (Street, PDF letter C); confirm with the thesis author (alternative `humanI`). Mushroom, robot, skeleton, humanI stay built but unmapped.
+- Size study: second race Goblin or Blob (thesis author decides with the mockup images); "Mensch" is `humanC` (alternative `humanI`). Survey B / the thesis must know that `s` now means race x size. After the decision remove the unused candidates from the builder (build size).
 - Room variants: Holz is the start; Büro, Stein, Hütte kept for comparison. After the final choice remove the others (and unused packs) from the builder.
 - UI style Holz chosen. Remove Pixel and Skizze from the builder once confirmed (fonts, sprites, looks).
 - Balance display may be counterproductive (thesis author discusses with the lecturer): `showBalance` in config.json.

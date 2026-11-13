@@ -12,6 +12,7 @@ using UnityEngine;
 //
 // Size rule (decided 2026-10-30): humanoids keep their size, creatures are scaled to roughly human
 // size, the camera sits at each avatar's own eyes.
+// Size study (thesis author, 2026-11-13): "_big" / "_small" variants have their eyes one head above / below the NPC's.
 public static class AvatarBuilder
 {
     const string Gen = "Assets/Synty/PolygonGeneric/Prefabs/Characters/";
@@ -30,6 +31,9 @@ public static class AvatarBuilder
     // Humanoid eye position relative to the head bone (Synty rig).
     static readonly Vector3 HumanEyeOffset = new Vector3(0f, 0.1f, 0.08f);
 
+    // The NPC shares the Synty rig of the human and goblin, eyes at 1.67 m.
+    const float NpcEyes = 1.67f, Head = 0.25f, Big = NpcEyes + Head, Small = NpcEyes - Head;
+
     class Spec
     {
         public string id;
@@ -39,6 +43,8 @@ public static class AvatarBuilder
         public string[] eyeBones;        // midpoint of these bones; neither set = humanoid head bone + offset
         public string[] removeComponents = new string[0];
         public string overrideController; // null = shared humanoid controller
+        public float eyeHeight;          // > 0: scaled so the eyes end up at this height
+        public bool keepWidth;           // with eyeHeight: stretch only vertically (a uniformly scaled blob gets metres wide)
     }
 
     static readonly Spec[] Specs =
@@ -56,6 +62,16 @@ public static class AvatarBuilder
             overrideController = "Mushroom" },
         new Spec { id = "cow", male = Cow + "Prefabs/Cow_Holstein.prefab", eyes = new Vector3(0f, 1.17f, 1.18f),
             overrideController = "Cow" },
+    };
+
+    // The size variants: the same models scaled, eyes one head above / below the NPC's.
+    static readonly Spec[] SizeSpecs = Specs.Where(s => s.id == "humanC" || s.id == "goblin" || s.id == "slime")
+        .SelectMany(s => new[] { Sized(s, "_big", Big), Sized(s, "_small", Small) }).ToArray();
+
+    static Spec Sized(Spec s, string suffix, float eyes) => new Spec
+    {
+        id = s.id + suffix, male = s.male, female = s.female, scale = s.scale, eyes = s.eyes, eyeBones = s.eyeBones,
+        removeComponents = s.removeComponents, overrideController = s.overrideController, eyeHeight = eyes, keepWidth = s.id == "slime",
     };
 
     // NPC "V": grey hood with face cloth and a long robe from the Modular Fantasy Hero kit.
@@ -89,7 +105,7 @@ public static class AvatarBuilder
         };
 
         var entries = new List<AvatarDatabase.Species>();
-        foreach (var spec in Specs)
+        foreach (var spec in Specs.Concat(SizeSpecs))
         {
             RuntimeAnimatorController ctrl = spec.overrideController == null ? controller : overrides[spec.overrideController];
             var male = BuildAvatar(spec, spec.male, spec.female == null ? spec.id : spec.id + "_m", ctrl);
@@ -275,6 +291,13 @@ public static class AvatarBuilder
                 eyes = spec.eyes.Value * spec.scale;
             else
                 eyes = animator.GetBoneTransform(HumanBodyBones.Head).position + HumanEyeOffset * spec.scale;
+            if (spec.eyeHeight > 0f)
+            {
+                // The model sits at the origin, so its eye position scales with it.
+                float k = spec.eyeHeight / eyes.y, kw = spec.keepWidth ? 1f : k;
+                model.transform.localScale = Vector3.Scale(model.transform.localScale, new Vector3(kw, k, kw));
+                eyes = Vector3.Scale(eyes, new Vector3(kw, k, kw));
+            }
 
             // Root on the ground below the eyes.
             model.transform.localPosition = new Vector3(-eyes.x, 0f, -eyes.z);

@@ -7,10 +7,10 @@
   "round4NpcKeeps": 75,
   "turnAngle": 90,
   "species": [
-    "humanC",
-    "goblin",
-    "slime",
-    "cow"
+    "humanC_big",
+    "humanC_small",
+    "goblin_big",
+    "goblin_small"
   ],
   "submitTimeoutSeconds": 5,
   "appsScriptUrl": "https://script.google.com/macros/s/AKfycbxSzp_JSOD9seyMz0s4_OTsAFD7WxqrvOFcRndbEbzNJ9SjKMJgF96rdgxavEkB4VI/exec",

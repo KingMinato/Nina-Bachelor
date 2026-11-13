@@ -72,6 +72,6 @@ public class ConfigTests
         Assert.AreEqual("d", c.SpeciesId(4));
         Assert.AreEqual("", c.SpeciesId(0));
         Assert.AreEqual("", c.SpeciesId(5));
-        Assert.AreEqual("humanC", new Config().SpeciesId(1));
+        Assert.AreEqual("humanC_big", new Config().SpeciesId(1));
     }
 }

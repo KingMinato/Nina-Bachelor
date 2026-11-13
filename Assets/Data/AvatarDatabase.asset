@@ -37,3 +37,21 @@ MonoBehaviour:
   - id: cow
     male: {fileID: 6084984957756528620, guid: 6d85eb0afa0d4b7448a5366476adeb1a, type: 3}
     female: {fileID: 6084984957756528620, guid: 6d85eb0afa0d4b7448a5366476adeb1a, type: 3}
+  - id: humanC_big
+    male: {fileID: 5214018608580454650, guid: 670a37a6662c45541bfbd3efe42f57e0, type: 3}
+    female: {fileID: 665772667623416458, guid: 98f28d8a23fe46f459767247a4b95eb1, type: 3}
+  - id: humanC_small
+    male: {fileID: 8275857252858811994, guid: 822565cf501d02b40a5d239e4c5dd000, type: 3}
+    female: {fileID: 7355064687187682176, guid: 2979c62249d784e46a56634383795ae4, type: 3}
+  - id: goblin_big
+    male: {fileID: 8655371654810833550, guid: d6b7b1546fad62345b4d1f922eb1dc4a, type: 3}
+    female: {fileID: 5641370642784540061, guid: 721ae6ec8a6aa344b85afea0d8070461, type: 3}
+  - id: goblin_small
+    male: {fileID: 5483393172433546214, guid: cadc0fab774d8fb43ac59ec5457fd376, type: 3}
+    female: {fileID: 4195088394502938445, guid: 413546e09f206a4448cc050942a70c80, type: 3}
+  - id: slime_big
+    male: {fileID: 4357049070867542095, guid: f372860faef395b4d8ee4911ba363f23, type: 3}
+    female: {fileID: 4357049070867542095, guid: f372860faef395b4d8ee4911ba363f23, type: 3}
+  - id: slime_small
+    male: {fileID: 2406396042742176229, guid: 7729e6a793961b846bb1c9d28e88bb6a, type: 3}
+    female: {fileID: 2406396042742176229, guid: 7729e6a793961b846bb1c9d28e88bb6a, type: 3}

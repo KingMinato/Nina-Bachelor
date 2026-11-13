@@ -2,7 +2,7 @@
  * Mirror Game: analysis of the game results for the thesis, inside the results spreadsheet.
  *
  * Creates three sheets next to the raw data (sheet 1, written by doPost):
- *   "Auswertung"         at a glance: colour-coded summary per species and avatar gender, then every participant
+ *   "Auswertung"         at a glance: colour-coded summary per condition (race x size) and avatar gender, then every participant
  *                        with avatar, gender and all four decisions in plain words
  *   "Statistik"          sample, descriptive statistics per group, group comparisons (tests + effect sizes), legend
  *   "Daten (bereinigt)"  one row per participant with readable column names and derived variables,
@@ -16,9 +16,15 @@
  */
 
 // Game parameters, keep in sync with config.json.
-const SPECIES = ["humanC", "goblin", "slime", "cow"]; // "species": s = 1-4
-const SPECIES_NAMES = { humanC: "Mensch (C)", humanI: "Mensch (I)", goblin: "Goblin", robot: "Roboter", skeleton: "Skelett",
-  slime: "Schleim", mushroom: "Pilz", cow: "Kuh" };
+// "species": s = 1-4, ids are <race>_<size> (size study, 2026-11-13).
+const SPECIES = ["humanC_big", "humanC_small", "goblin_big", "goblin_small"];
+const RACE_NAMES = { humanC: "Mensch", humanI: "Mensch (I)", goblin: "Goblin", robot: "Roboter", skeleton: "Skelett",
+  slime: "Blob", mushroom: "Pilz", cow: "Kuh" };
+const SIZE_NAMES = { big: "groß", small: "klein" };
+const raceOf = s => (SPECIES[s - 1] || "?").split("_")[0];
+const sizeOf = s => (SPECIES[s - 1] || "").split("_")[1] || "?";
+const RACES = SPECIES.map((id, i) => raceOf(i + 1)).filter((r, i, a) => a.indexOf(r) === i);
+const SIZES = ["big", "small"];
 const MONEY = 100;          // moneyPerRound
 const NPC_ACCEPT_MAX = 85;  // npcAcceptMaxPlayerKeeps: the NPC accepts if the player keeps at most this
 const R2_OFFER = 50;        // MONEY - round2NpcKeeps
@@ -96,7 +102,7 @@ function readRuns(sheet) {
     const g = String(get("g")).trim().toLowerCase();
     runs.push({
       time: get("timestamp"), pid, g, ag: String(get("ag")), s,
-      species: SPECIES[s - 1] || "?",
+      species: SPECIES[s - 1] || "?", race: raceOf(s), size: sizeOf(s),
       gender: g === "m" ? "m" : g === "w" ? "w" : "andere",
       dev: String(get("dev")),
       keep1, keep3, acc2, acc4,
@@ -113,11 +119,11 @@ function readRuns(sheet) {
 // ------------------------------------------------------------ clean data sheet
 
 function writeClean(sh, runs) {
-  const header = ["Teilnehmer-ID (pid)", "Datum", "Geschlecht Umfrage (g)", "Avatar-Geschlecht (ag)", "Spezies-Nr (s)", "Spezies",
-    "Gerät", "R1 behalten", "R1 Angebot", "R1 vom Gegenüber angenommen", "R2 angenommen (Angebot 50)",
+  const header = ["Teilnehmer-ID (pid)", "Datum", "Geschlecht Umfrage (g)", "Avatar-Geschlecht (ag)", "Bedingung-Nr (s)", "Bedingung",
+    "Rasse", "Größe", "Gerät", "R1 behalten", "R1 Angebot", "R1 vom Gegenüber angenommen", "R2 angenommen (Angebot 50)",
     "R3 behalten", "R3 Angebot", "R3 vom Gegenüber angenommen", "R4 angenommen (Angebot 25)", "Ø Angebot R1+R3",
     "R1 Zeit (s)", "R2 Zeit (s)", "R3 Zeit (s)", "R4 Zeit (s)", "Endkontostand (Münzen)", "Spieldauer (min)", "Version", "Sprache"];
-  const rows = runs.map(r => [r.pid, r.time, r.g, r.ag, r.s, r.species, r.dev, r.keep1, r.offer1, r.npc1, r.acc2,
+  const rows = runs.map(r => [r.pid, r.time, r.g, r.ag, r.s, r.species, raceName(r.race), SIZE_NAMES[r.size] || r.size, r.dev, r.keep1, r.offer1, r.npc1, r.acc2,
     r.keep3, r.offer3, r.npc3, r.acc4, r.offerMean, ...r.times, r.bal, r.dur, r.ver, r.lang]);
   sh.clear();
   sh.getRange(1, 1, 1, header.length).setValues([header]).setFontWeight("bold").setBackground(COLOR_HEADER).setWrap(true);
@@ -125,9 +131,9 @@ function writeClean(sh, runs) {
   if (rows.length) {
     sh.getRange(2, 1, rows.length, header.length).setValues(rows);
     sh.getRange(2, 2, rows.length, 1).setNumberFormat("dd.MM.yyyy HH:mm");
-    sh.getRange(2, 16, rows.length, 1).setNumberFormat("0.0");
-    sh.getRange(2, 17, rows.length, 4).setNumberFormat("0.00");
-    sh.getRange(2, 22, rows.length, 1).setNumberFormat("0.0");
+    sh.getRange(2, 18, rows.length, 1).setNumberFormat("0.0");
+    sh.getRange(2, 19, rows.length, 4).setNumberFormat("0.00");
+    sh.getRange(2, 24, rows.length, 1).setNumberFormat("0.0");
   }
   sh.setRowHeight(1, 48);
   sh.setColumnWidth(1, 180);
@@ -136,7 +142,8 @@ function writeClean(sh, runs) {
 
 // ------------------------------------------------------------ overview sheet
 
-const speciesName = s => SPECIES_NAMES[SPECIES[s - 1]] || SPECIES[s - 1] || "?";
+const raceName = r => RACE_NAMES[r] || r;
+const speciesName = s => (SPECIES[s - 1] ? raceName(raceOf(s)) + ", " + (SIZE_NAMES[sizeOf(s)] || sizeOf(s)) : "?");
 const genderName = g => (g === "m" ? "männlich" : g === "w" ? "weiblich" : "andere / keine Angabe");
 
 // Red (0) over yellow to green (1).
@@ -162,12 +169,12 @@ function writeOverview(sh, rawName, data) {
     return;
   }
 
-  // summary per species and avatar gender
-  w.section("Auf einen Blick: Spezies × Avatar-Geschlecht");
+  // summary per condition and avatar gender
+  w.section("Auf einen Blick: Bedingung (Rasse, Größe) × Avatar-Geschlecht");
   w.note("Runde 1 und 3: Die Person teilt 100 Münzen auf; angegeben ist, wie viel sie dem Gegenüber im Schnitt abgibt (fair = 50 Münzen). " +
     "Runde 2: Das Gegenüber bietet fair " + R2_OFFER + " Münzen an. Runde 4: Das Gegenüber bietet unfair " + R4_OFFER +
     " Münzen an. Angegeben ist jeweils, wie viele Personen annehmen.");
-  w.gridHeader(["Spezies", "Avatar", "Personen", "Runde 1: Ø abgegeben", "Runde 3: Ø abgegeben",
+  w.gridHeader(["Bedingung", "Avatar", "Personen", "Runde 1: Ø abgegeben", "Runde 3: Ø abgegeben",
     "Runde 2: 50:50 angenommen", "Runde 4: 25 Münzen angenommen", "Ø Kontostand"]);
   const summary = (label, gender, group, bold) => {
     if (!group.length) {
@@ -188,6 +195,8 @@ function writeOverview(sh, rawName, data) {
     summary("", "weiblich", group.filter(r => r.ag === "w"));
     summary("", "zusammen", group, true);
   });
+  SIZES.forEach(size => summary("Alle " + SIZE_NAMES[size] + "en", "zusammen", runs.filter(r => r.size === size), true));
+  RACES.forEach(race => summary(raceName(race) + " (beide Größen)", "zusammen", runs.filter(r => r.race === race), true));
   summary("Alle", "männlich", runs.filter(r => r.ag === "m"));
   summary("", "weiblich", runs.filter(r => r.ag === "w"));
   summary("", "zusammen", runs, true);
@@ -195,7 +204,7 @@ function writeOverview(sh, rawName, data) {
 
   // every participant
   w.section("Alle Personen");
-  w.note("Sortiert nach Spezies und Avatar-Geschlecht. „gibt“ = Betrag, den die Person von 100 Münzen dem Gegenüber abgibt; " +
+  w.note("Sortiert nach Bedingung und Avatar-Geschlecht. „gibt“ = Betrag, den die Person von 100 Münzen dem Gegenüber abgibt; " +
     "behält sie mehr als " + NPC_ACCEPT_MAX + " Münzen, lehnt das Gegenüber ab und beide bekommen nichts.");
   const header = ["Teilnehmer-ID", "Avatar", "Geschlecht (Umfrage)", "Runde 1: teilt", "Runde 2: 50:50-Angebot",
     "Runde 3: teilt", "Runde 4: 25-Münzen-Angebot", "Kontostand", "Spieldauer", "Gerät"];
@@ -215,7 +224,7 @@ function writeOverview(sh, rawName, data) {
   });
   const other = runs.filter(r => !(r.s >= 1 && r.s <= SPECIES.length));
   if (other.length) {
-    w.sub("Unbekannte Spezies (" + other.length + ")");
+    w.sub("Unbekannte Bedingung (" + other.length + ")");
     w.gridHeader(header);
     other.forEach(person);
   }
@@ -250,7 +259,9 @@ function writeAnalysis(sh, rawName, data, comma) {
   }
 
   const groups = [["Alle", null, () => true]];
-  SPECIES.forEach((id, i) => groups.push([(i + 1) + " – " + id, "Spezies (s)", r => r.s === i + 1]));
+  SPECIES.forEach((id, i) => groups.push([(i + 1) + " – " + speciesName(i + 1), "Bedingung (s)", r => r.s === i + 1]));
+  SIZES.forEach(size => groups.push([SIZE_NAMES[size], "Größe des Avatars", r => r.size === size]));
+  RACES.forEach(race => groups.push([raceName(race), "Rasse des Avatars", r => r.race === race]));
   groups.push(["m – männlich", "Avatar-Geschlecht (ag)", r => r.ag === "m"]);
   groups.push(["w – weiblich", "Avatar-Geschlecht (ag)", r => r.ag === "w"]);
   groups.push(["männlich", "Geschlecht laut Umfrage A (g)", r => r.gender === "m"]);
@@ -352,8 +363,21 @@ function writeAnalysis(sh, rawName, data, comma) {
     });
     w.blank();
   };
-  const bySpecies = SPECIES.map((id, i) => [(i + 1) + " " + id, runs.filter(r => r.s === i + 1)]);
-  compare("Spezies", bySpecies);
+  const cell = (race, size) => runs.filter(r => r.race === race && r.size === size);
+  w.sub("Zweifaktorielle ANOVA Größe × Rasse (Typ-III-Quadratsummen; n pro Bedingung: " +
+    [].concat(...RACES.map(race => SIZES.map(size => raceName(race) + " " + SIZE_NAMES[size] + " " + cell(race, size).length))).join(", ") + ")");
+  w.header(testHeader);
+  metric.forEach(([label, f]) => {
+    const a = Stats.anova2x2(RACES.map(race => SIZES.map(size => cell(race, size).map(f))));
+    [["Größe", a.cols], ["Rasse", a.rows], ["Größe × Rasse (Interaktion)", a.inter]].forEach(([effect, e]) =>
+      w.row([label, "ANOVA: " + effect].concat(e && isFinite(e.p)
+        ? ["F(1, " + a.df2 + ") = " + dec(e.F, 2), p(e.p), "partielles η² = " + dec(e.eta2, 2).replace(/^(-?)0/, "$1"), ""]
+        : none("jede der 4 Bedingungen braucht Daten, insgesamt mehr als 4 Personen, und Streuung"))));
+  });
+  w.blank();
+  compare("Größe", SIZES.map(size => [SIZE_NAMES[size], runs.filter(r => r.size === size)]));
+  compare("Rasse", RACES.map(race => [raceName(race), runs.filter(r => r.race === race)]));
+  compare("Bedingung", SPECIES.map((id, i) => [(i + 1) + " " + speciesName(i + 1), runs.filter(r => r.s === i + 1)]));
   compare("Avatar-Geschlecht", [["m", runs.filter(r => r.ag === "m")], ["w", runs.filter(r => r.ag === "w")]]);
   compare("Geschlecht laut Umfrage A", [["männlich", runs.filter(r => r.gender === "m")], ["weiblich", runs.filter(r => r.gender === "w")]]);
 
@@ -381,7 +405,8 @@ const LEGEND = [
   ["pid", "Teilnehmer-ID: ResponseID aus Umfrage A. Verbindet Umfrage A, Spiel und Umfrage B. Beginnt sie mit „test-“, wurde das Spiel ohne Umfrage gestartet."],
   ["g", "Geschlecht laut Umfrage A, unverändert: m = männlich, w = weiblich, alles andere (z. B. x oder leer) = andere Antwort oder keine Angabe."],
   ["ag", "Geschlecht des Avatars im Spiegel: m oder w. Bei g = m bzw. w gleich g, sonst zufällig 50:50."],
-  ["s", "Spezies des Avatars 1–4, von Qualtrics gleichmäßig zugeteilt: " + SPECIES.map((id, i) => (i + 1) + " = " + id).join(", ") + "."],
+  ["s", "Bedingung 1–4 (Rasse und Größe des Avatars), von Qualtrics gleichmäßig zugeteilt: " + SPECIES.map((id, i) => (i + 1) + " = " + speciesName(i + 1)).join(", ") +
+    ". Groß: Augenhöhe einen Kopf (0,25 m) über der des Gegenübers, klein: einen Kopf darunter."],
   ["r1", "Runde 1: Betrag (0–100 Münzen in 5er-Schritten), den die Person von 100 Münzen selbst behält. Das Gegenüber nimmt an, wenn er höchstens " + NPC_ACCEPT_MAX + " Münzen beträgt, sonst erhalten beide 0 Münzen."],
   ["r2", "Runde 2: Das Gegenüber bietet " + R2_OFFER + " von 100 Münzen an. 1 = angenommen, 0 = abgelehnt (beide erhalten 0 Münzen)."],
   ["r3", "Runde 3: wie Runde 1."],
@@ -661,6 +686,23 @@ const Stats = {
     });
     const df = table.length - 1;
     return { chi2, df, N, p: Stats.pChi2(chi2, df), V: Math.sqrt(chi2 / N), lowExpected };
+  },
+
+  // 2 x 2 between-subjects ANOVA, cells[row][col] = values. Type III sums of squares: in a 2 x 2 design each effect
+  // is one contrast of the cell means, SS = L^2 / sum(1 / n), which stays correct for unequal cell sizes.
+  anova2x2(cells) {
+    const flat = [].concat(...cells);
+    if (flat.length !== 4 || flat.some(g => g.length === 0)) return { df2: "–" };
+    const N = Stats.sum(flat.map(g => g.length)), m = flat.map(Stats.mean);
+    const ssw = Stats.sum(flat.map((g, i) => Stats.sum(g.map(x => (x - m[i]) * (x - m[i])))));
+    const df2 = N - 4;
+    if (df2 < 1 || ssw === 0) return { df2: "–" };
+    const inv = Stats.sum(flat.map(g => 1 / g.length));
+    const effect = c => {
+      const L = Stats.sum(c.map((x, i) => x * m[i])), ss = L * L / inv, F = ss / (ssw / df2);
+      return { F, p: Stats.pF(F, 1, df2), eta2: ss / (ss + ssw) };
+    };
+    return { df2, rows: effect([1, 1, -1, -1]), cols: effect([1, -1, 1, -1]), inter: effect([1, -1, -1, 1]) };
   },
 
   // diff = b - a (positive: higher in b).

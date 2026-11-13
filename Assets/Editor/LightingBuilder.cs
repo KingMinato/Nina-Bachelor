@@ -166,6 +166,9 @@ public static class LightingBuilder
             // are not always lightmap UVs (the globe came out cyan).
             bool shell = go.GetComponent<RoomSurface>() != null && !root.name.StartsWith("Doors");
             renderer.receiveGI = shell ? ReceiveGI.Lightmaps : ReceiveGI.LightProbes;
+            // The bake honours both: RoomBuilder's boxes had them off, so lamps shone through walls into the next room.
+            renderer.shadowCastingMode = ShadowCastingMode.On;
+            renderer.receiveShadows = true;
         }
     }
 }

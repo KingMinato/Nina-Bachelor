@@ -154,7 +154,7 @@ public static class RoomBuilder
         var door2Back = WorldButtonAt(doorButton, "Door2BackButton", new Vector3(R2.x, 0f, -Half - T - 0.12f), 0f, 0.001f, new Vector2(1200, 2200), DoorTagY);
         var door3Back = WorldButtonAt(doorButton, "Door3BackButton", new Vector3(Half - 0.02f, 0f, R4.z), 90f, 0.001f, new Vector2(1200, 2200), DoorTagY);
 
-        var npcButton = WorldButtonAt(doorButton, "NpcButton", new Vector3(R4.x - 2.1f, 0f, R4.z), 270f, 0.001f, new Vector2(900, 2000), -1150);
+        var npcButton = WorldButtonAt(doorButton, "NpcButton", new Vector3(R4.x - 2.1f, 0f, R4.z), 270f, 0.001f, new Vector2(900, 2000), -700); // tag at 1.3 m: in view of tall avatars at the NPC spot
 
         // Walking spots per room, spot 0 = home. Door spots: where the walk through the door starts.
         var nav = Child(world, "Nav");

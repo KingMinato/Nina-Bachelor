@@ -49,6 +49,7 @@ MonoBehaviour:
   animator: {fileID: 913064565233068120}
   eyes: {fileID: 3193337410791729857}
   jumpClipSeconds: 1
+  jumpHeightScale: 0.6
 --- !u!1 &5378091092871468461
 GameObject:
   m_ObjectHideFlags: 0

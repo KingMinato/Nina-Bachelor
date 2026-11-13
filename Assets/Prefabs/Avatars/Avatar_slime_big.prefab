@@ -80,6 +80,7 @@ MonoBehaviour:
   animator: {fileID: 4069314336333751397}
   eyes: {fileID: 4749693310971211633}
   jumpClipSeconds: 1
+  jumpHeightScale: 0.6
 --- !u!1001 &3067544439532937017
 PrefabInstance:
   m_ObjectHideFlags: 0

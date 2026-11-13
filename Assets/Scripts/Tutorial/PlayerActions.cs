@@ -25,6 +25,9 @@ public class PlayerActions : MonoBehaviour
     public event Action<string> Performed;
 
     // Whole jump including windup and landing, so the avatar's jump animation can match it.
+    // Set per avatar by AvatarSpawner.
+    public float JumpHeightScale { get; set; } = 1f;
+
     public float JumpTotalSeconds => jumpWindupSeconds + jumpSeconds + jumpLandSeconds;
 
     public bool IsBusy { get; private set; }
@@ -122,7 +125,7 @@ public class PlayerActions : MonoBehaviour
         for (float t = 0f; t < jumpSeconds; t += Time.deltaTime)
         {
             float x = t / jumpSeconds;
-            transform.position = ground + Vector3.up * (4f * jumpHeight * x * (1f - x));
+            transform.position = ground + Vector3.up * (4f * jumpHeight * JumpHeightScale * x * (1f - x));
             if (!landed && t >= jumpSeconds - landSoundLead)
             {
                 landed = true;

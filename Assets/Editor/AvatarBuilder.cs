@@ -43,6 +43,7 @@ public static class AvatarBuilder
         public string[] removeComponents = new string[0];
         public string overrideController; // null = shared humanoid controller
         public float eyeHeight;          // > 0: scaled so the eyes end up at this height
+        public float jumpHeightScale = 1f;
     }
 
     static readonly Spec[] Specs =
@@ -55,7 +56,7 @@ public static class AvatarBuilder
         // 1.0 m wide and 0.65 m high unscaled.
         new Spec { id = "slime", male = Slime + "Resources/Prefabs/slime.prefab", scale = 1.8f,
             eyeBones = new[] { "Eye.L", "Eye.R" },
-            removeComponents = new[] { "CharacterController", "SlimeScript" }, overrideController = "Slime" },
+            removeComponents = new[] { "CharacterController", "SlimeScript" }, overrideController = "Slime", jumpHeightScale = 0.6f },
         new Spec { id = "mushroom", male = Mushroom + "Prefabs/Mushroom_1.prefab", eyes = new Vector3(0f, 0.9f, 0.19f),
             overrideController = "Mushroom" },
     };
@@ -68,6 +69,7 @@ public static class AvatarBuilder
     {
         id = s.id + suffix, male = s.male, female = s.female, scale = s.scale, eyes = s.eyes, eyeBones = s.eyeBones,
         removeComponents = s.removeComponents, overrideController = s.overrideController, eyeHeight = eyes,
+        jumpHeightScale = s.jumpHeightScale,
     };
 
     // NPC "V": grey hood with face cloth and a long robe from the Modular Fantasy Hero kit.
@@ -306,6 +308,7 @@ public static class AvatarBuilder
             so.FindProperty("animator").objectReferenceValue = animator;
             so.FindProperty("eyes").objectReferenceValue = eyesMarker;
             so.FindProperty("jumpClipSeconds").floatValue = jumpClip.length;
+            so.FindProperty("jumpHeightScale").floatValue = spec.jumpHeightScale;
             so.ApplyModifiedPropertiesWithoutUndo();
 
             var prefab = PrefabUtility.SaveAsPrefabAsset(root, PrefabFolder + root.name + ".prefab");

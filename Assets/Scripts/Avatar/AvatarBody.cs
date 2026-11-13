@@ -13,8 +13,11 @@ public class AvatarBody : MonoBehaviour
     [SerializeField] Transform eyes;
     [Tooltip("Length of the jump clip, used to stretch it to the duration of the player's jump.")]
     [SerializeField] float jumpClipSeconds = 1f;
+    [Tooltip("Factor on the player's jump height (the blob looks too high at the full height).")]
+    [SerializeField] float jumpHeightScale = 1f;
 
     public float EyeHeight => eyes.localPosition.y;
+    public float JumpHeightScale => jumpHeightScale;
 
     bool crouched;
     float squash = 1f;

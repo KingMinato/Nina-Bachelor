@@ -87,6 +87,17 @@ public class UiSkin : MonoBehaviour, IPointerDownHandler
         origOffsetMax = rect.offsetMax;
     }
 
+    // Mirrors the element vertically on top of its motions (the crouch icon points up while crouched).
+    public void SetFlipY(bool flip)
+    {
+        EnsureInit();
+        if (baseScale.y < 0 == flip)
+            return;
+        baseScale.y = -baseScale.y;
+        var s = rect.localScale;
+        rect.localScale = new Vector3(s.x, -s.y, s.z);
+    }
+
     public void Apply(UiStyle style)
     {
         EnsureInit();

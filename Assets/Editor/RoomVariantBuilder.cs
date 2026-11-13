@@ -427,11 +427,11 @@ public static class RoomVariantBuilder
         }
     }
 
-    // Colliders are not needed, lights and particles would break the symmetric mirror lighting.
+    // Colliders are not needed, lights and particles would break the symmetric mirror lighting, props stand still (cow figurine).
     static void Strip(GameObject go)
     {
         foreach (var c in go.GetComponentsInChildren<Component>(true))
-            if (c is Collider || c is Light || c is ParticleSystem || c is LODGroup)
+            if (c is Collider || c is Light || c is ParticleSystem || c is LODGroup || c is Animator)
                 Object.DestroyImmediate(c);
     }
 

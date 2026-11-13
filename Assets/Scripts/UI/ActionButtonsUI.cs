@@ -21,9 +21,11 @@ public class ActionButtonsUI : MonoBehaviour
     [SerializeField] GameObject crouchWant;
 
     Texts texts;
+    UiSkin crouchIcon;
 
     void Awake()
     {
+        crouchIcon = crouchButton.transform.Find("Icon").GetComponent<UiSkin>();
         turnLeftButton.onClick.AddListener(playerActions.TurnLeft);
         turnRightButton.onClick.AddListener(playerActions.TurnRight);
         jumpButton.onClick.AddListener(playerActions.Jump);
@@ -78,5 +80,7 @@ public class ActionButtonsUI : MonoBehaviour
         crouchButton.interactable = ready;
         if (texts != null)
             crouchLabel.text = playerActions.IsCrouched ? texts.standUp : texts.crouch;
+        // The icon points down for "Ducken" and up for "Aufstehen".
+        crouchIcon.SetFlipY(!playerActions.IsCrouched);
     }
 }

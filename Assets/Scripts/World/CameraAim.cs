@@ -50,12 +50,19 @@ public class CameraAim : MonoBehaviour
         if (at != null)
         {
             Vector3 to = at.Value - transform.position;
-            // Turning away from it looks at the floor arrows again.
-            if (Vector3.Angle(Vector3.ProjectOnPlane(to, Vector3.up), transform.parent.forward) < frontAngle)
+            float angle = Vector3.Angle(Vector3.ProjectOnPlane(to, Vector3.up), transform.parent.forward);
+            Quaternion look = Quaternion.LookRotation(to);
+            if (target != null && angle < frontAngle)
             {
-                Quaternion look = Quaternion.LookRotation(to);
-                float pitch = target != null ? look.eulerAngles.x + pitchDown : Mathf.Min(Mathf.DeltaAngle(0f, look.eulerAngles.x), rest);
-                local = Quaternion.Inverse(transform.parent.rotation) * Quaternion.Euler(pitch, look.eulerAngles.y, 0f);
+                local = Quaternion.Inverse(transform.parent.rotation) * Quaternion.Euler(look.eulerAngles.x + pitchDown, look.eulerAngles.y, 0f);
+            }
+            else if (target == null)
+            {
+                // Points lie straight ahead of their spot: only the pitch follows, and it fades back to rest while the
+                // player turns away, so turning stays one smooth motion (holding the yaw on the point made it jump at frontAngle).
+                float pitch = Mathf.Min(Mathf.DeltaAngle(0f, look.eulerAngles.x), rest);
+                float weight = 1f - Mathf.InverseLerp(frontAngle * 0.5f, frontAngle, angle);
+                local = Quaternion.Euler(Mathf.Lerp(rest, pitch, weight), 0f, 0f);
             }
         }
         transform.localRotation = Quaternion.Slerp(transform.localRotation, local, 1f - Mathf.Exp(-sharpness * Time.deltaTime));

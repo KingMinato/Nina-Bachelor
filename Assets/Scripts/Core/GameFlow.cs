@@ -60,11 +60,6 @@ public class GameFlow : MonoBehaviour
             Debug.LogWarning("Unknown room variant: " + urlParams.RoomOverride);
         if (urlParams.UiOverride != "" && !uiStyles.Apply(urlParams.UiOverride))
             Debug.LogWarning("Unknown UI style: " + urlParams.UiOverride);
-        if (urlParams.Debug)
-        {
-            debugOverlay.ShowRoom(rooms.Current.DisplayName);
-            debugOverlay.ShowUi(UiStyles.Current.displayName);
-        }
 
         SetState(GameState.Init);
         config = await ConfigLoader.LoadAsync();
@@ -78,6 +73,7 @@ public class GameFlow : MonoBehaviour
         // also in runs coming from the survey. Turn debugTools off before the pilot.
         if (urlParams.IsTest || config.debugTools || Application.isEditor)
         {
+            avatarSwitcher.study = config.species;
             avatarSwitcher.gameObject.SetActive(true);
             roomSwitcher.gameObject.SetActive(true);
             uiSwitcher.gameObject.SetActive(true);
@@ -85,8 +81,6 @@ public class GameFlow : MonoBehaviour
 
         string avatarId = urlParams.AvatarOverride != "" ? urlParams.AvatarOverride : config.SpeciesId(urlParams.Species);
         avatarSpawner.Spawn(avatarId, urlParams.AvatarGender);
-        if (urlParams.Debug)
-            debugOverlay.ShowAvatar(avatarId, urlParams.AvatarGender);
 
         if (!urlParams.Debug)
         {

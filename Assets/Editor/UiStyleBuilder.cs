@@ -672,7 +672,6 @@ public static class UiStyleBuilder
         var toggle = uiSwitcher.Find("Toggle");
         toggle.GetComponentInChildren<TMP_Text>().text = "UI";
         Set(switcher, "styles", uiStyles);
-        Set(switcher, "overlay", Object.FindFirstObjectByType<DebugOverlay>(FindObjectsInactive.Include));
         Set(switcher, "toggleButton", toggle.GetComponent<Button>());
         Set(switcher, "panel", uiSwitcher.Find("Panel").gameObject);
         Set(switcher, "grid", uiSwitcher.Find("Panel"));
@@ -839,39 +838,70 @@ public static class UiStyleBuilder
         so.ApplyModifiedPropertiesWithoutUndo();
     }
 
-    // Debug tools small in the bottom-left corner: toggles stacked (UI, Raum, Avatar from the bottom),
-    // overlay text above them, the opened grid right next to the toggles.
+    // Debug tools as one column in the top-right corner, clear of the game buttons: the overlay card (state, parameters)
+    // below the balance slot, then one row per switcher (Avatar, Raum, UI) showing its current value; a row opens
+    // its panel to the left, with titled button groups (DebugPanels.Section).
     static void LayoutDebug(Transform ui)
     {
-        string[] switchers = { "DebugUiSwitcher", "DebugRoomSwitcher", "DebugAvatarSwitcher" };
+        const float right = -20, top = -150, width = 440, rowH = 46, gap = 6, cardH = 100;
+        var round = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+        Image Panel(Component c, UnityEngine.Color color)
+        {
+            var image = GetOrAdd<Image>(c.gameObject);
+            image.sprite = round;
+            image.type = Image.Type.Sliced;
+            image.color = color;
+            return image;
+        }
+        void TopRight(RectTransform r, Vector2 pos, Vector2 size)
+        {
+            r.anchorMin = r.anchorMax = r.pivot = Vector2.one;
+            r.anchoredPosition = pos;
+            r.sizeDelta = size;
+        }
+        var dark = new UnityEngine.Color(0.08f, 0.09f, 0.11f, 0.9f);
+
+        var overlay = (RectTransform)ui.Find("DebugOverlay");
+        TopRight(overlay, new Vector2(right, top), new Vector2(width, cardH));
+        Panel(overlay, dark).raycastTarget = false;
+        var label = SmallText(overlay, 18);
+        label.alignment = TextAlignmentOptions.MidlineLeft;
+        label.color = UnityEngine.Color.white;
+        label.rectTransform.offsetMin = new Vector2(16, 8);
+        label.rectTransform.offsetMax = new Vector2(-12, -8);
+
+        string[] switchers = { "DebugAvatarSwitcher", "DebugRoomSwitcher", "DebugUiSwitcher" };
         for (int i = 0; i < switchers.Length; i++)
         {
             var root = ui.Find(switchers[i]);
             var toggle = (RectTransform)root.Find("Toggle");
-            toggle.anchorMin = toggle.anchorMax = toggle.pivot = Vector2.zero;
-            toggle.anchoredPosition = new Vector2(16, 16 + i * 52);
-            toggle.sizeDelta = new Vector2(120, 44);
-            SmallText(toggle, 22);
+            TopRight(toggle, new Vector2(right, top - cardH - gap - i * (rowH + gap)), new Vector2(width, rowH));
+            Panel(toggle, dark);
+            var text = SmallText(toggle, 20);
+            text.alignment = TextAlignmentOptions.MidlineLeft;
+            text.rectTransform.offsetMin = new Vector2(16, 0);
+            text.rectTransform.offsetMax = new Vector2(-12, 0);
 
             var panel = (RectTransform)root.Find("Panel");
-            panel.anchorMin = panel.anchorMax = panel.pivot = Vector2.zero;
-            panel.anchoredPosition = new Vector2(148, 16);
+            TopRight(panel, new Vector2(right - width - 12, top), panel.sizeDelta);
+            Panel(panel, dark);
             var grid = panel.GetComponent<GridLayoutGroup>();
-            grid.cellSize = new Vector2(170, 48);
-            grid.spacing = new Vector2(8, 8);
-            grid.padding = new RectOffset(10, 10, 10, 10);
+            if (grid != null)
+                Object.DestroyImmediate(grid);
+            var column = GetOrAdd<VerticalLayoutGroup>(panel.gameObject);
+            column.padding = new RectOffset(14, 14, 4, 14);
+            column.spacing = 4;
+            column.childAlignment = TextAnchor.UpperLeft;
+            column.childControlWidth = column.childControlHeight = true;
+            column.childForceExpandWidth = column.childForceExpandHeight = false;
             var fitter = GetOrAdd<ContentSizeFitter>(panel.gameObject);
             fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
             fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-            SmallText(root.Find("ButtonTemplate"), 20);
-        }
 
-        var overlay = (RectTransform)ui.Find("DebugOverlay");
-        overlay.anchorMin = overlay.anchorMax = overlay.pivot = Vector2.zero;
-        overlay.anchoredPosition = new Vector2(16, 172);
-        overlay.sizeDelta = new Vector2(1000, 60);
-        var label = SmallText(overlay, 18);
-        label.alignment = TextAlignmentOptions.BottomLeft;
+            var template = root.Find("ButtonTemplate");
+            Panel(template, dark);
+            SmallText(template, 19).color = UnityEngine.Color.white;
+        }
     }
 
     // Portrait cover on top of everything (last child), shown by OrientationOverlay while the screen is taller than wide.

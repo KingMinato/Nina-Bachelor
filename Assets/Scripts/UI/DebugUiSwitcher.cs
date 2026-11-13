@@ -1,64 +1,44 @@
-using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 // Test tool (starts inactive, GameFlow activates it in the Unity Editor and in test runs):
-// switches the UI style instantly. The "UI" button opens a grid with all styles and close.
-// The grid buttons are created from an inactive template button at startup.
+// switches the UI style instantly. The "UI" row opens a panel with all of them.
+// The buttons are created from an inactive template button at startup.
 public class DebugUiSwitcher : MonoBehaviour
 {
-    static readonly Color Normal = Color.white;
-    static readonly Color Selected = new Color(1f, 0.85f, 0.4f);
-
     [SerializeField] UiStyles styles;
-    [SerializeField] DebugOverlay overlay;
     [SerializeField] Button toggleButton;
     [SerializeField] GameObject panel;
     [SerializeField] Transform grid;
     [SerializeField] Button template;
 
-    Button[] styleButtons;
+    Button[] buttons;
 
     void Start()
     {
         var all = styles.Styles;
-        styleButtons = new Button[all.Length];
+        var section = DebugPanels.Section(grid, template, "UI-Stil");
+        buttons = new Button[all.Length];
         for (int i = 0; i < all.Length; i++)
         {
-            var style = all[i];
-            styleButtons[i] = AddButton(style.displayName, () => Switch(style));
+            var item = all[i];
+            buttons[i] = DebugPanels.AddButton(section, template, item.displayName, () =>
+            {
+                styles.Apply(item);
+                Highlight();
+            });
         }
-        AddButton("Schließen", () => panel.SetActive(false));
-
-        toggleButton.onClick.AddListener(() =>
-        {
-            DebugPanels.Toggle(panel);
-            Highlight();
-        });
+        toggleButton.onClick.AddListener(() => DebugPanels.Toggle(panel, toggleButton));
         panel.SetActive(false);
-    }
-
-    Button AddButton(string label, UnityAction onClick)
-    {
-        var button = Instantiate(template, grid);
-        button.gameObject.SetActive(true);
-        button.GetComponentInChildren<TMP_Text>().text = label;
-        button.onClick.AddListener(onClick);
-        return button;
-    }
-
-    void Switch(UiStyle style)
-    {
-        styles.Apply(style);
-        overlay.ShowUi(style.displayName);
+        DebugPanels.Mark(toggleButton, false);
         Highlight();
     }
 
     void Highlight()
     {
+        DebugPanels.SetRow(toggleButton, "UI", UiStyles.Current.displayName);
         var all = styles.Styles;
         for (int i = 0; i < all.Length; i++)
-            styleButtons[i].image.color = all[i] == UiStyles.Current ? Selected : Normal;
+            DebugPanels.Mark(buttons[i], all[i] == UiStyles.Current);
     }
 }

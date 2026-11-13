@@ -1,39 +1,21 @@
 using TMPro;
 using UnityEngine;
 
-// Only shown with ?debug=1. Displays the current state and the received parameters.
-// Starts inactive in the scene, GameFlow activates it.
+// Only shown with ?debug=1: card at the top right with the game state and the received parameters.
+// Avatar, room and UI style are shown by the switcher rows below it. Starts inactive, GameFlow activates it.
 public class DebugOverlay : MonoBehaviour
 {
+    const string Muted = "#9AA3AD";
+
     [SerializeField] TMP_Text label;
 
-    string paramsLine = "";
-    string avatarLine = "";
-    string roomLine = "";
-    string uiLine = "";
+    UrlParams p;
     GameState state;
 
     public void Show(UrlParams p)
     {
-        paramsLine = $"pid={p.Pid}  g='{p.RawGender}'  ag={p.AvatarGender}  s={p.Species}  test={p.IsTest}";
+        this.p = p;
         gameObject.SetActive(true);
-    }
-
-    public void ShowAvatar(string speciesId, string gender)
-    {
-        avatarLine = $"  avatar={speciesId} {gender}";
-        Refresh();
-    }
-
-    public void ShowRoom(string name)
-    {
-        roomLine = $"  room={name}";
-        Refresh();
-    }
-
-    public void ShowUi(string name)
-    {
-        uiLine = $"  ui={name}";
         Refresh();
     }
 
@@ -45,6 +27,11 @@ public class DebugOverlay : MonoBehaviour
 
     void Refresh()
     {
-        label.text = $"{state}\n{paramsLine}{avatarLine}{roomLine}{uiLine}";
+        if (p == null)
+            return;
+        string g = p.RawGender == "" ? "–" : p.RawGender;
+        label.text = $"<b>DEBUG</b>   {state}\n"
+            + $"<color={Muted}>pid</color>  {p.Pid}\n"
+            + $"<color={Muted}>Umfrage</color>  g {g} → {p.AvatarGender}   s {p.Species}   {p.Language}   {(p.IsTest ? "Test" : "echt")}";
     }
 }

@@ -182,7 +182,10 @@ public static class RoomVariantBuilder
         OnBoard(r1, shelf1, 2, 0f, O("SM_Prop_Book_Group_05"), 90f, 0.75f);
         OnBoard(r1, shelf1, 3, 0.25f, O("SM_Prop_Globe_01"), 60f);
         Put(r1, O("SM_Prop_Couch_06"), In(0, 2.3f, 0f, 2.3f), -135f);
-        Put(r1, O("SM_Prop_Plant_Flowers_02"), On(Put(r1, O("SM_Prop_CoffeeTable_03"), In(0, 1.2f, 0f, Side), 0f, wall: Wall.PlusZ)));
+        var coffee1 = Put(r1, O("SM_Prop_CoffeeTable_03"), In(0, 1.2f, 0f, Side), 0f, wall: Wall.PlusZ);
+        Put(r1, O("SM_Prop_Plant_Flowers_02"), On(coffee1) + new Vector3(-0.2f, 0f, 0f));
+        // Table and pendant lamps get their light from LightingBuilder.
+        Put(r1, O("SM_Prop_DeskLamp_07"), On(coffee1) + new Vector3(0.3f, 0f, 0f), 0f, scale: 0.9f);
         Put(r1, O("SM_Prop_Plant_14"), In(0, 2.2f, 0f, -2.2f), 20f);
         Put(r1, O("SM_Prop_Couch_04"), In(0, -1.95f, 0f, -Side), 0f, wall: Wall.MinusZ);
         Painting(r1, "mountains", In(0, -1.95f, 1.55f, -Side), Wall.MinusZ, 0.9f, trim);
@@ -205,8 +208,10 @@ public static class RoomVariantBuilder
         OnBoard(r2, shelf2, 3, -0.3f, O("SM_Prop_Plant_10"), 0f, 0.6f);
         Put(r2, O("SM_Prop_Plant_04"), In(1, -2.5f, 0f, -2.5f), 40f);
         Put(r2, O("SM_Prop_Couch_06"), In(1, -2.3f, 0f, 2.3f), 135f);
+        Put(r2, O("SM_Prop_Light_04"), In(1, -2.2f, Height, 2.2f), ceiling: true); // reading light over the armchair
         Painting(r2, "sunset", In(1, -1.55f, 1.6f, Side), Wall.PlusZ, 0.8f, trim);
-        Put(r2, P(Western, "SM_Prop_Chest_01"), In(1, 1.9f, 0f, -Side), 0f, wall: Wall.MinusZ);
+        var chest2 = Put(r2, P(Western, "SM_Prop_Chest_01"), In(1, 1.9f, 0f, -Side), 0f, wall: Wall.MinusZ);
+        Put(r2, O("SM_Prop_DeskLamp_06"), On(chest2) + new Vector3(0.25f, 0f, 0f), 0f, scale: 0.9f);
         Put(r2, O("SM_Prop_Child_Art_01"), In(1, -1.7f, 1.2f, -Side), 0f, wall: Wall.MinusZ);
 
         // Room 3 (levers on +x, mirror on -z, doors on +z and -x): calm, nothing near the wall hints.
@@ -230,6 +235,8 @@ public static class RoomVariantBuilder
         var table4 = Put(r4, O("SM_Prop_Table_03"), In(3, -1.4f, 0f, Side - 0.05f), 0f, wall: Wall.PlusZ);
         ChairAt(r4, P(Western, "SM_Prop_Chair_01"), table4);
         Put(r4, O("SM_Prop_FruitBowl_01"), On(table4) + new Vector3(0.3f, 0f, 0f));
+        var t4 = Bounds(table4);
+        Put(r4, O("SM_Prop_Light_05"), new Vector3(t4.center.x, Height, t4.center.z), ceiling: true); // over the table
         Put(r4, O("SM_Prop_Plant_04"), In(3, -2.5f, 0f, 1.6f), -40f);
         Painting(r4, "mountains", In(3, -1.4f, 1.6f, Side), Wall.PlusZ, 0.9f, trim);
         Put(r4, O("SM_Prop_Couch_04"), In(3, 0.9f, 0f, -Side), 0f, wall: Wall.MinusZ);
@@ -603,6 +610,7 @@ public static class RoomVariantBuilder
         mesh.SetTriangles(triangles, 0);
         mesh.RecalculateBounds();
         mesh.RecalculateTangents();
+        Unwrapping.GenerateSecondaryUVSet(mesh); // lightmap UVs for the baked lighting (LightingBuilder)
         if (create)
             AssetDatabase.CreateAsset(mesh, path);
         else

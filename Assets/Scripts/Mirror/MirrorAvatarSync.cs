@@ -9,6 +9,7 @@ public class MirrorAvatarSync : MonoBehaviour
     Transform source;
     Transform[] sourceBones;
     Transform[] cloneBones;
+    (Renderer, Renderer)[] probeLit;
 
     public void Init(Transform source, MirrorWorld world)
     {
@@ -17,6 +18,7 @@ public class MirrorAvatarSync : MonoBehaviour
         // Same hierarchy, so both lists are in the same order. Index 0 is the root itself.
         sourceBones = source.GetComponentsInChildren<Transform>(true);
         cloneBones = GetComponentsInChildren<Transform>(true);
+        probeLit = MirrorProbes.Pairs(source, transform);
         LateUpdate();
     }
 
@@ -33,5 +35,9 @@ public class MirrorAvatarSync : MonoBehaviour
             cloneBones[i].localRotation = sourceBones[i].localRotation;
             cloneBones[i].localScale = sourceBones[i].localScale;
         }
+        // Baked lighting: the avatar's probe lighting at its real position, mirrored (see MirrorProbes).
+        if (MirrorProbes.Baked)
+            foreach (var (a, b) in probeLit)
+                MirrorProbes.Apply(a, b, world.transform.forward);
     }
 }

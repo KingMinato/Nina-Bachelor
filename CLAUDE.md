@@ -159,7 +159,7 @@ No reflection cameras or render textures. Mirrors are faked with copied geometry
 - Everything that should appear in the mirrors must be a child of `Room1`. Room 1 objects must not be static-batched (instantiated copies of batched renderers keep drawing at the original position).
 - `MirrorWorld.SetAvatar` clones the player avatar, moves layer `FirstPersonHidden` parts to Default, disables Animators and adds `MirrorAvatarSync`, which reflects the root pose and copies all bone local transforms. `AvatarSpawner` calls `SetAvatar` after spawning.
 - Mirror walls are thin (0.02 m) so the opening has no depth that would hide part of the reflection.
-- Lighting must look the same in the reflection: the directional light points straight down (unchanged by reflection at vertical planes). Baked lighting later must also be symmetric or be baked into the copies.
+- Lighting (2026-11-13): baked only, no realtime lights (`Editor/LightingBuilder.cs`, menu **Mirror Game/Bake Lighting**; rerun after Build Rooms or Build Room Variants, it bakes the active variant). Every lamp in the furnishing gets its light (ceiling panel `SM_Prop_Light_07` = soft area light, pendant `Light_04/05` and table lamps `DeskLamp_06/07` = warm point lights, the Room 3 desk lamp = spot), under `World/Lighting/Room<N>` with a light probe grid per room. Moods: Room 1 bright, Room 2 warm, Room 3 dim (cool panel, warm desk lamp), Room 4 calm (`LightingBuilder.Panel`). Only the shell (RoomSurface meshes, UV2 from `RoomVariantBuilder.MetreUvBox`) is lightmapped; the pack props' UV2s are not reliable (the globe came out cyan), so props, avatar, NPC, doors, key and levers use the probes. Lamps themselves are not static (they would block their own light). The old directional light is disabled. Mirror copies: `MirrorProbes.CopyBaked` gives the copied renderers their originals' lightmap slots (Instantiate drops them) and the original's probe lighting mirrored (SH coefficients odd in the mirror axis negated); the avatar clone updates that every frame (`MirrorAvatarSync`). Other room variants are lit with the Holz bake (debug only).
 - Through the reflected door, Room 2 is not shown (dark). Only visible if the player looks into a mirror while the door is open, which the flow does not allow.
 
 ---
@@ -172,7 +172,7 @@ Several furnishing variants of all four rooms live in `Main.unity` at the same t
 |---|---|---|
 | `Grau` | none | the greybox, reference |
 | `Buero` | Office + Generic | carpet, light grey plaster, ceiling panel lights, office door |
-| `Holz` | Office, Generic, Dungeon (bookcase), Western (chairs, chest), Backrock (cow) | wooden floor, warm white walls, furnished like a home (2026-11-13): shelves with books, armchairs, sofas, plants, side table, clocks, coat rack, rugs, framed paintings; the cow figurine stands in the Room 2 shelf |
+| `Holz` | Office, Generic, Dungeon (bookcase), Western (chairs, chest), Backrock (cow) | wooden floor, warm white walls, furnished like a home (2026-11-13): shelves with books, armchairs, sofas, plants, side table, clocks, coat rack, rugs, framed paintings, lamps (table lamps in Rooms 1 and 2, pendants over the Room 2 armchair and the Room 4 table, never over a walking spot: tall avatars would jump into them); the cow figurine stands in the Room 2 shelf |
 | `Stein` | Dungeon + Generic | stone floor tiles, light stone walls, plank door, hanging lanterns (no light) |
 | `Huette` | Western + Generic | wooden planks on walls/floor/ceiling, simple wooden furniture |
 
@@ -275,14 +275,14 @@ Assets/
     Core/        GameFlow.cs, GameState.cs, Config.cs, ConfigLoader.cs, UrlParams.cs
     Tutorial/    TutorialController.cs, TutorialProgress.cs, PlayerActions.cs
     World/       Door.cs, WalkPath.cs, CameraAim.cs, NpcLookAt.cs, RoomNav.cs, RoomSurface.cs, RoomVariant.cs, RoomVariants.cs, KeyRoom.cs, KeyInventory.cs, LeverRoom.cs, Lever.cs
-    Mirror/      MirrorWorld.cs, MirrorWall.cs, MirrorAvatarSync.cs
+    Mirror/      MirrorWorld.cs, MirrorWall.cs, MirrorAvatarSync.cs, MirrorProbes.cs
     Avatar/      AvatarDatabase.cs (ScriptableObject), AvatarSpawner.cs, AvatarBody.cs
     Dialog/      UltimatumController.cs, SplitInputUI.cs, BalanceUI.cs, RoundUI.cs
     Data/        SessionData.cs, IResultSubmitter.cs, ResultSubmitter.cs, ResultJson.cs, Redirector.cs
     UI/          UIManager.cs, ActionButtonsUI.cs, WorldButton.cs, StepDoneUI.cs, OrientationOverlay.cs, DebugOverlay.cs, DebugAvatarSwitcher.cs, DebugRoomSwitcher.cs, DebugUiSwitcher.cs, DebugPanels.cs (shared row/section/button helpers, only one switcher panel open)
     UI/Skin/     UiStyle.cs (ScriptableObject + UiLook), UiStyles.cs, UiSkin.cs, UiSfx.cs, UiMotion.cs, UiTypewriter.cs, UiMaxWidth.cs
   Plugins/WebGL/ Redirect.jslib
-  Editor/        BuildScript.cs, HumanoidClipBuilder.cs, AvatarBuilder.cs, RoomBuilder.cs, RoomVariantBuilder.cs, UiStyleBuilder.cs, MockupViewer/ (MockupViewerWindow.cs, MockupGUI.cs)
+  Editor/        BuildScript.cs, HumanoidClipBuilder.cs, AvatarBuilder.cs, RoomBuilder.cs, RoomVariantBuilder.cs, LightingBuilder.cs, UiStyleBuilder.cs, MockupViewer/ (MockupViewerWindow.cs, MockupGUI.cs)
   Art/UI/        Fonts/ (OFL TTFs + TMP assets), Styles/<Style>/*.png + sprites.json (generated by Tools/ui_sprites.py), Sounds/<Style>/*.wav (Tools/ui_sounds.py)
   Animations/    Avatar.controller, Humanoid_Idle/Jump/Crouch.anim, *.overrideController
   Prefabs/       Avatars/Avatar_<id>[_m|_w].prefab, NPC.prefab
@@ -382,7 +382,7 @@ Note: "Evenly Present" counts assignments, not completions. Dropouts can unbalan
 - Compression: Gzip with **Decompression Fallback** enabled (GitHub Pages does not set Content-Encoding headers).
 - Hosting: GitHub Pages (or Netlify / Cloudflare Pages). Not itch.io, its iframe does not pass URL parameters.
 - Deployed at https://kingminato.github.io/Nina-Bachelor/ from the `gh-pages` branch (root). That branch only holds the contents of `Builds/WebGL` plus an empty `.nojekyll`; `Builds/` stays ignored on `main`. To deploy: build, then replace the files on `gh-pages` (e.g. via `git worktree add`), commit, push.
-- Performance targets for mobile browsers: 30 fps, baked lighting, no realtime shadows, low poly, texture size max 1024, keep build small (< 30 MB). Room is minimal so this should be easy, but mirror worlds multiply geometry and avatars by 4.
+- Performance targets for mobile browsers: 30 fps, baked lighting (done, two 512 lightmaps), no realtime lights or shadows, low poly, texture size max 1024, keep build small (< 30 MB). Room is minimal so this should be easy, but mirror worlds multiply geometry and avatars by 4.
 - Mobile-friendly WebGL template: full window canvas, loading bar, no Unity footer.
 
 ---

@@ -50,6 +50,28 @@ public class MirrorWorldTests
     // transform.forward ignores the parent's negative scale, the render matrix does not.
     Vector3 RenderedForward() => target.transform.localToWorldMatrix.MultiplyVector(Vector3.forward).normalized;
 
+    // Probe lighting of a mirror copy: light arriving from direction d at the original arrives from the reflected
+    // direction at the copy, for mirrors facing x and z.
+    [Test]
+    public void MirroredProbeLighting_IsReflected()
+    {
+        var sh = new UnityEngine.Rendering.SphericalHarmonicsL2();
+        sh.AddAmbientLight(new Color(0.2f, 0.2f, 0.2f));
+        sh.AddDirectionalLight(new Vector3(0.6f, -0.5f, 0.62f).normalized, new Color(1f, 0.8f, 0.6f), 1f);
+        var dirs = new[] { Vector3.right, Vector3.left, Vector3.up, Vector3.forward, new Vector3(0.5f, 0.3f, -0.8f).normalized };
+        foreach (var normal in new[] { Vector3.right, Vector3.forward })
+        {
+            var mirrored = MirrorProbes.Mirror(sh, normal);
+            var reflected = System.Array.ConvertAll(dirs, d => Vector3.Reflect(d, normal));
+            var a = new Color[dirs.Length];
+            var b = new Color[dirs.Length];
+            sh.Evaluate(dirs, a);
+            mirrored.Evaluate(reflected, b);
+            for (int i = 0; i < dirs.Length; i++)
+                Assert.Less(Mathf.Abs(a[i].r - b[i].r) + Mathf.Abs(a[i].b - b[i].b), 0.001f, $"normal {normal}, dir {dirs[i]}");
+        }
+    }
+
     static void AssertNear(Vector3 expected, Vector3 actual)
     {
         Assert.Less(Vector3.Distance(expected, actual), 0.001f, $"expected {expected}, got {actual}");

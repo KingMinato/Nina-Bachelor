@@ -68,6 +68,8 @@ public class MirrorWorld : MonoBehaviour
     {
         var copy = Instantiate(source.gameObject, roomCopy.transform).transform;
         Place(source, copy);
+        if (MirrorProbes.Baked)
+            MirrorProbes.CopyBaked(source, copy, transform.forward);
         return copy;
     }
 

@@ -549,6 +549,8 @@ public static class RoomVariantBuilder
     // so the tiling textures of the variants have the same scale everywhere.
     static void PrepareShell(Transform room)
     {
+        foreach (var old in room.GetComponentsInChildren<Transform>(true).Where(t => t.name == MergedWall).ToArray())
+            Object.DestroyImmediate(old.gameObject);
         foreach (var filter in room.GetComponentsInChildren<MeshFilter>(true))
         {
             string n = filter.name;
@@ -566,8 +568,104 @@ public static class RoomVariantBuilder
             so.FindProperty("kind").enumValueIndex = (int)kind;
             so.ApplyModifiedPropertiesWithoutUndo();
             filter.sharedMesh = MetreUvBox(filter.transform, room.name);
+            filter.GetComponent<MeshRenderer>().enabled = true;
+        }
+        MergeWalls(room);
+    }
+
+    const string MergedWall = "WallMerged";
+
+    // A wall with an opening (door, mirror) is several boxes. Each box would get its own lightmap, with visible
+    // edges between them (above the doors), so each such wall gets one mesh in which coplanar faces share their
+    // vertices: the lightmap unwrap then makes one chart per face. The boxes stay (builders find them by name),
+    // only their renderers are off. Faces pressed against each other (inside the wall) are left out.
+    static void MergeWalls(Transform room)
+    {
+        foreach (var parent in room.GetComponentsInChildren<Transform>(true))
+        {
+            var pieces = parent.Cast<Transform>()
+                .Where(c => c.name.StartsWith("Wall") && c.GetComponent<RoomSurface>() != null).ToList();
+            if (pieces.Count < 2)
+                continue;
+
+            // Faces per plane: axis, offset along it (mm) -> rectangles in the plane with their facing (+1/-1).
+            var planes = new Dictionary<(int, int), List<(Rect rect, int sign)>>();
+            foreach (var piece in pieces)
+            {
+                var v = piece.GetComponent<MeshFilter>().sharedMesh.vertices;
+                var nrm = piece.GetComponent<MeshFilter>().sharedMesh.normals;
+                for (int f = 0; f < v.Length; f += 4)
+                {
+                    var n = Vector3Int.RoundToInt(parent.InverseTransformDirection(piece.TransformDirection(nrm[f])));
+                    int axis = n.x != 0 ? 0 : n.y != 0 ? 1 : 2, sign = n[axis];
+                    var (a, b) = PlaneAxes(axis);
+                    var corners = Enumerable.Range(f, 4).Select(i => parent.InverseTransformPoint(piece.TransformPoint(v[i]))).ToArray();
+                    var key = (axis, Mathf.RoundToInt(corners[0][axis] * 1000f));
+                    if (!planes.TryGetValue(key, out var list))
+                        planes[key] = list = new List<(Rect, int)>();
+                    list.Add((Rect.MinMaxRect(corners.Min(c => Vector3.Dot(c, a)), corners.Min(c => Vector3.Dot(c, b)),
+                        corners.Max(c => Vector3.Dot(c, a)), corners.Max(c => Vector3.Dot(c, b))), sign));
+                }
+            }
+
+            var vertices = new List<Vector3>();
+            var normals = new List<Vector3>();
+            var uvs = new List<Vector2>();
+            var triangles = new List<int>();
+            foreach (var ((axis, offset), rects) in planes)
+            {
+                var (a, b) = PlaneAxes(axis);
+                float[] xs = Breaks(rects.SelectMany(r => new[] { r.rect.xMin, r.rect.xMax }));
+                float[] ys = Breaks(rects.SelectMany(r => new[] { r.rect.yMin, r.rect.yMax }));
+                foreach (int sign in new[] { 1, -1 })
+                {
+                    var n = Vector3.zero;
+                    n[axis] = sign;
+                    var index = new Dictionary<(int, int), int>();
+                    int Vertex(int i, int j)
+                    {
+                        if (index.TryGetValue((i, j), out int k))
+                            return k;
+                        var p = a * xs[i] + b * ys[j] + n * (sign * offset / 1000f);
+                        vertices.Add(p);
+                        normals.Add(n);
+                        uvs.Add(Project(parent.TransformPoint(p), parent.TransformDirection(n)));
+                        return index[(i, j)] = vertices.Count - 1;
+                    }
+                    bool front = Vector3.Dot(Vector3.Cross(a, b), n) > 0f;
+                    for (int i = 0; i + 1 < xs.Length; i++)
+                        for (int j = 0; j + 1 < ys.Length; j++)
+                        {
+                            var centre = new Vector2((xs[i] + xs[i + 1]) / 2, (ys[j] + ys[j + 1]) / 2);
+                            if (!rects.Any(r => r.sign == sign && r.rect.Contains(centre))
+                                || rects.Any(r => r.sign == -sign && r.rect.Contains(centre)))
+                                continue;
+                            int q0 = Vertex(i, j), q1 = Vertex(i + 1, j), q2 = Vertex(i + 1, j + 1), q3 = Vertex(i, j + 1);
+                            triangles.AddRange(front ? new[] { q0, q1, q2, q0, q2, q3 } : new[] { q0, q2, q1, q0, q3, q2 });
+                        }
+                }
+            }
+
+            var go = new GameObject(MergedWall);
+            go.layer = pieces[0].gameObject.layer;
+            go.transform.SetParent(parent, false);
+            go.AddComponent<MeshFilter>().sharedMesh =
+                SaveMesh(room.name + "_" + PathFrom(go.transform).Replace('/', '_'), vertices, normals, uvs, triangles);
+            go.AddComponent<MeshRenderer>().sharedMaterial = pieces[0].GetComponent<MeshRenderer>().sharedMaterial;
+            var so = new SerializedObject(go.AddComponent<RoomSurface>());
+            so.FindProperty("kind").enumValueIndex = (int)RoomSurface.Kind.Wall;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            foreach (var piece in pieces)
+                piece.GetComponent<MeshRenderer>().enabled = false;
         }
     }
+
+    // In-plane axes of a face whose normal lies on the given axis (same as MetreUvBox).
+    static (Vector3, Vector3) PlaneAxes(int axis) =>
+        (axis == 0 ? Vector3.forward : Vector3.right, axis == 1 ? Vector3.forward : Vector3.up);
+
+    static float[] Breaks(IEnumerable<float> values) =>
+        values.Select(x => Mathf.Round(x * 10000f) / 10000f).Distinct().OrderBy(x => x).ToArray();
 
     // Unit cube (like Unity's) whose UVs are the world position projected onto each face's plane, in metres.
     // Saved as an asset; rebuilding updates the existing asset.
@@ -596,7 +694,11 @@ public static class RoomVariantBuilder
                 : new[] { start, start + 2, start + 1, start, start + 3, start + 2 });
         }
 
-        string name = roomName + "_" + PathFrom(t).Replace('/', '_');
+        return SaveMesh(roomName + "_" + PathFrom(t).Replace('/', '_'), vertices, normals, uvs, triangles);
+    }
+
+    static Mesh SaveMesh(string name, List<Vector3> vertices, List<Vector3> normals, List<Vector2> uvs, List<int> triangles)
+    {
         string path = MeshFolder + name + ".asset";
         var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(path);
         bool create = mesh == null;

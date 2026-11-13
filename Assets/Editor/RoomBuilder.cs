@@ -348,6 +348,8 @@ public static class RoomBuilder
         mat.SetFloat("_Smoothness", 0.1f);
         mat.SetFloat("_Surface", 1f); // transparent
         mat.SetOverrideTag("RenderType", "Transparent");
+        mat.SetFloat("_BlendModePreserveSpecular", 0f); // premultiplied keeps reflections where the texture is clear
+        mat.DisableKeyword("_ALPHAPREMULTIPLY_ON");
         mat.SetFloat("_SrcBlend", (float)BlendMode.SrcAlpha);
         mat.SetFloat("_DstBlend", (float)BlendMode.OneMinusSrcAlpha);
         mat.SetFloat("_ZWrite", 0f);

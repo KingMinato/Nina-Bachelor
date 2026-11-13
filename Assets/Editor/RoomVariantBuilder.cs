@@ -8,7 +8,7 @@ using UnityEngine;
 // Builds the furnishing variants of Rooms 1-4 in the open scene (Main.unity) as mockups to compare:
 // materials for the shell (floor, walls, ceiling, door leaf), furniture from the Synty packs and door models.
 // The shell itself (walls, mirror openings, door, waypoints) is not changed. Rebuilding replaces all variants.
-// Menu: Mirror Game/Build Room Variants. Requires the licensed Synty packs (Office, Dungeon, Western Frontier) and Backrock (cow figurine),
+// Menu: Mirror Game/Build Room Variants. Requires the licensed Synty packs (Office, Dungeon, Western Frontier, Generic) and Backrock (cow figurine),
 // which are not in the repository.
 //
 // Rules (CLAUDE.md, sections 5 and 8): everything visible in the mirrors is a child of Room1, nothing is
@@ -18,7 +18,11 @@ public static class RoomVariantBuilder
     const string Office = "Assets/Synty/PolygonOffice";
     const string Dungeon = "Assets/Synty/PolygonDungeon";
     const string Western = "Assets/Synty/PolygonWesternFrontier";
+    const string Generic = "Assets/Synty/PolygonGeneric";
     const string Cow = "Assets/Backrock/LowPolyAnimals";
+    const string PaintingFolder = "Assets/Art/Environment/Paintings/";
+    // Heights of the three boards and the top of the Office shelf SM_Prop_Shelf_05 above its bottom.
+    static readonly float[] Shelf05Boards = { 0.63f, 0.93f, 1.23f, 1.52f };
     const string GenericTextures = "Assets/Synty/PolygonGeneric/Textures/";
     const string MaterialFolder = "Assets/Art/Environment/Rooms/";
     const string MeshFolder = "Assets/Art/Environment/ShellMeshes/";
@@ -152,30 +156,82 @@ public static class RoomVariantBuilder
         Put(v.room4, P(Office, "SM_Prop_Cabinets_02"), In(3, -1.4f, 0f, -Side), 0f, wall: Wall.MinusZ);
     }
 
-    // Warm: wooden floor, warm white walls, round ceiling lamps, wooden door.
+    // Warm: wooden floor, warm white walls, round ceiling lamps, wooden door; furnished like a home (2026-11-13):
+    // shelves with books, armchair, sofa, plants, clocks, framed paintings (Tools/paintings.py), the cow figurine
+    // in the Room 2 shelf. Kept clear: walk spots and paths, mirrors, key board, lever plate, the wall hints in
+    // Room 3 (-x wall z +1.6 high, +z wall x +1.4 low, -z wall x +2.0) and the wall behind the NPC.
     static void Holz(Variant v)
     {
         v.floor = Mat("Holz_Floor", GenericTextures + "Generic_Wood.png", new Color(1f, 0.93f, 0.85f), 1.5f);
         v.wall = Mat("Holz_Wall", GenericTextures + "Generic_Plaster.png", new Color(1f, 0.97f, 0.91f), 3f);
         v.ceiling = Mat("Holz_Ceiling", null, new Color(0.95f, 0.93f, 0.88f));
-        Baseboards(v, Mat("Holz_Trim", null, new Color(0.42f, 0.3f, 0.2f)));
+        var trim = Mat("Holz_Trim", null, new Color(0.42f, 0.3f, 0.2f));
+        Baseboards(v, trim);
         DoorModel(v, P(Office, "SM_Bld_Door_05"));
         for (int i = 0; i < 4; i++)
             Put(v.rooms[i], P(Office, "SM_Prop_Light_07"), In(i, i == 3 ? -0.8f : 0f, Height, 0f), ceiling: true);
+        GameObject O(string name) => P(Office, name);
 
-        Put(v.room1, P(Office, "SM_Prop_Rug_05"), new Vector3(0f, 0.005f, 0f));
+        // Room 1 (mirrors on -x, +z, -z): furniture in the corners, so it shows next to the avatar in the mirrors.
+        var r1 = v.room1;
+        Put(r1, O("SM_Prop_Rug_05"), new Vector3(0f, 0.005f, 0f));
+        var shelf1 = Bounds(Put(r1, O("SM_Prop_Shelf_05"), In(0, -Side, 0f, 1.95f), 90f, wall: Wall.MinusX));
+        OnBoard(r1, shelf1, 0, -0.1f, O("SM_Prop_Book_Group_03"), 90f, 0.9f);
+        OnBoard(r1, shelf1, 1, 0.25f, O("SM_Prop_Book_Group_01"), 90f, 0.7f);
+        OnBoard(r1, shelf1, 1, -0.35f, O("SM_Prop_Plant_09"), 0f, 0.75f);
+        OnBoard(r1, shelf1, 2, 0f, O("SM_Prop_Book_Group_05"), 90f, 0.75f);
+        OnBoard(r1, shelf1, 3, 0.25f, O("SM_Prop_Globe_01"), 60f);
+        Put(r1, O("SM_Prop_Couch_06"), In(0, 2.3f, 0f, 2.3f), -135f);
+        Put(r1, O("SM_Prop_Plant_Flowers_02"), On(Put(r1, O("SM_Prop_CoffeeTable_03"), In(0, 1.2f, 0f, Side), 0f, wall: Wall.PlusZ)));
+        Put(r1, O("SM_Prop_Plant_14"), In(0, 2.2f, 0f, -2.2f), 20f);
+        Put(r1, O("SM_Prop_Couch_04"), In(0, -1.95f, 0f, -Side), 0f, wall: Wall.MinusZ);
+        Painting(r1, "mountains", In(0, -1.95f, 1.55f, -Side), Wall.MinusZ, 0.9f, trim);
+        Painting(r1, "forest", In(0, 2.0f, 1.6f, Side), Wall.PlusZ, 0.8f, trim);
+        Put(r1, P(Generic, "SM_Gen_Prop_Clock_01"), In(0, Side, 2.45f, 0f), -90f, wall: Wall.PlusX);
 
-        var shelf = Bounds(Put(v.room2, P(Office, "SM_Prop_Shelf_05"), In(1, Side, 0f, 2.2f), -90f, wall: Wall.PlusX));
-        // The former cow avatar as a figurine on the shelf (thesis author's wish, 2026-11-13).
-        Put(v.room2, P(Cow, "Cow_Holstein"), new Vector3(shelf.center.x, shelf.max.y, shelf.center.z), -30f, scale: 0.15f);
-        Put(v.room2, P(Office, "SM_Prop_Plant_04"), In(1, -2.5f, 0f, -2.5f), 40f);
+        // Room 2 (key on +z, mirror on +x, doors on -x and -z): the cow figurine stands in the shelf.
+        var r2 = v.room2;
+        Put(r2, O("SM_Prop_Rug_02"), In(1, 0f, 0.005f, 0f), 90f);
+        var shelf2 = Bounds(Put(r2, O("SM_Prop_Shelf_05"), In(1, Side, 0f, 2.2f), -90f, wall: Wall.PlusX));
+        // The former cow avatar as a figurine (thesis author's wish, 2026-11-13).
+        OnBoard(r2, shelf2, 2, -0.15f, P(Cow, "Cow_Holstein"), -20f, 0.15f);
+        OnBoard(r2, shelf2, 2, 0.4f, O("SM_Prop_Book_Group_07"), -90f, 0.7f);
+        OnBoard(r2, shelf2, 1, 0f, O("SM_Prop_Book_Group_03"), -90f, 0.9f);
+        OnBoard(r2, shelf2, 0, 0.3f, O("SM_Prop_Book_Group_05"), -90f, 0.75f);
+        OnBoard(r2, shelf2, 0, -0.25f, O("SM_Prop_Book_Group_01"), -90f, 0.7f);
+        OnBoard(r2, shelf2, 3, -0.3f, O("SM_Prop_Plant_10"), 0f, 0.6f);
+        Put(r2, O("SM_Prop_Plant_04"), In(1, -2.5f, 0f, -2.5f), 40f);
+        Put(r2, O("SM_Prop_Couch_06"), In(1, -2.3f, 0f, 2.3f), 135f);
+        Painting(r2, "sunset", In(1, -1.55f, 1.6f, Side), Wall.PlusZ, 0.8f, trim);
+        Put(r2, P(Western, "SM_Prop_Chest_01"), In(1, 1.9f, 0f, -Side), 0f, wall: Wall.MinusZ);
+        Put(r2, O("SM_Prop_Child_Art_01"), In(1, -1.7f, 1.2f, -Side), 0f, wall: Wall.MinusZ);
 
-        ChairAt(v.room3, P(Western, "SM_Prop_Chair_01"), Put(v.room3, P(Office, "SM_Prop_Table_03"), In(2, -1.9f, 0f, Side - 0.05f), 0f, wall: Wall.PlusZ));
-        Put(v.room3, P(Office, "SM_Prop_Plant_04"), In(2, 2.5f, 0f, -2.5f), 10f);
+        // Room 3 (levers on +x, mirror on -z, doors on +z and -x): calm, nothing near the wall hints.
+        var r3 = v.room3;
+        var table3 = Put(r3, O("SM_Prop_Table_03"), In(2, -1.9f, 0f, Side - 0.05f), 0f, wall: Wall.PlusZ);
+        ChairAt(r3, P(Western, "SM_Prop_Chair_01"), table3);
+        var top3 = On(table3);
+        Put(r3, O("SM_Prop_Typewriter_01"), top3 + new Vector3(0.2f, 0f, 0.05f), 180f);
+        Put(r3, O("SM_Prop_Desklamp_02"), top3 + new Vector3(-0.6f, 0f, 0.15f), 150f);
+        Put(r3, P(Dungeon, "SM_Prop_Bookcase_02"), In(2, -Side, 0f, -1.9f), 90f, wall: Wall.MinusX);
+        Put(r3, O("SM_Prop_Plant_04"), In(2, 2.5f, 0f, -2.5f), 10f);
+        Put(r3, O("SM_Prop_Plant_01"), In(2, 2.5f, 0f, 2.5f), 30f);
+        Painting(r3, "forest", In(2, -1.6f, 1.55f, -Side), Wall.MinusZ, 0.8f, trim);
 
-        Put(v.room4, P(Office, "SM_Prop_Shelf_05"), In(3, -Side, 0f, -1.9f), 90f, wall: Wall.MinusX);
-        ChairAt(v.room4, P(Western, "SM_Prop_Chair_01"), Put(v.room4, P(Office, "SM_Prop_Table_03"), In(3, -1.4f, 0f, Side - 0.05f), 0f, wall: Wall.PlusZ));
-        Put(v.room4, P(Office, "SM_Prop_Plant_04"), In(3, -2.5f, 0f, 1.6f), -40f);
+        // Room 4 (NPC at the -x wall, door on +x): the wall behind the NPC stays plain.
+        var r4 = v.room4;
+        var shelf4 = Bounds(Put(r4, O("SM_Prop_Shelf_05"), In(3, -Side, 0f, -1.9f), 90f, wall: Wall.MinusX));
+        OnBoard(r4, shelf4, 0, 0f, O("SM_Prop_Book_Group_03"), 90f, 0.9f);
+        OnBoard(r4, shelf4, 1, 0.3f, O("SM_Prop_Book_Group_05"), 90f, 0.75f);
+        OnBoard(r4, shelf4, 2, -0.2f, O("SM_Prop_Book_Group_01"), 90f, 0.7f);
+        var table4 = Put(r4, O("SM_Prop_Table_03"), In(3, -1.4f, 0f, Side - 0.05f), 0f, wall: Wall.PlusZ);
+        ChairAt(r4, P(Western, "SM_Prop_Chair_01"), table4);
+        Put(r4, O("SM_Prop_FruitBowl_01"), On(table4) + new Vector3(0.3f, 0f, 0f));
+        Put(r4, O("SM_Prop_Plant_04"), In(3, -2.5f, 0f, 1.6f), -40f);
+        Painting(r4, "mountains", In(3, -1.4f, 1.6f, Side), Wall.PlusZ, 0.9f, trim);
+        Put(r4, O("SM_Prop_Couch_04"), In(3, 0.9f, 0f, -Side), 0f, wall: Wall.MinusZ);
+        Put(r4, O("SM_Prop_CoatRack_01"), In(3, 2.55f, 0f, 1.4f), -60f);
+        Put(r4, P(Generic, "SM_Gen_Prop_Clock_01"), In(3, Side, 2.45f, 0f), -90f, wall: Wall.PlusX);
     }
 
     // Stone: stone floor tiles, light stone walls, plank door, hanging lanterns (no light).
@@ -315,6 +371,60 @@ public static class RoomVariantBuilder
             return;
         var t = Bounds(table);
         Put(parent, chair, new Vector3(t.center.x, 0f, t.min.z + 0.12f), 0f, wall: Wall.PlusZ);
+    }
+
+    // Centre of the top of a table (or anything else): where Put stands things on it.
+    static Vector3 On(GameObject table)
+    {
+        var b = Bounds(table);
+        return new Vector3(b.center.x, b.max.y, b.center.z);
+    }
+
+    // Stands a prefab on board 0-2 (3 = top) of a SM_Prop_Shelf_05, `along` metres from the middle along its width.
+    static void OnBoard(Transform parent, Bounds shelf, int board, float along, GameObject prefab, float yaw = 0f, float scale = 1f)
+    {
+        var axis = shelf.size.z > shelf.size.x ? Vector3.forward : Vector3.right;
+        var c = shelf.center + axis * along;
+        Put(parent, prefab, new Vector3(c.x, shelf.min.y + Shelf05Boards[board], c.z), yaw, scale: scale);
+    }
+
+    // A framed painting (texture from Tools/paintings.py) hanging on a wall, pos = its centre on the wall plane.
+    static void Painting(Transform parent, string name, Vector3 pos, Wall wall, float width, Material frame)
+    {
+        const float border = 0.05f, depth = 0.04f;
+        string texture = PaintingFolder + name + ".png";
+        var tex = AssetDatabase.LoadAssetAtPath<Texture2D>(texture);
+        float height = width * tex.height / tex.width;
+        var into = wall == Wall.PlusX ? Vector3.right : wall == Wall.MinusX ? Vector3.left : wall == Wall.PlusZ ? Vector3.forward : Vector3.back;
+        var root = new GameObject("Painting_" + name).transform;
+        root.SetParent(parent, false);
+        // Local +z points into the wall; the quad's visible side faces -z, into the room.
+        root.SetPositionAndRotation(pos - into * (depth / 2f), Quaternion.LookRotation(into));
+
+        var canvas = GameObject.CreatePrimitive(PrimitiveType.Quad);
+        Object.DestroyImmediate(canvas.GetComponent<Collider>());
+        canvas.name = "Canvas";
+        canvas.transform.SetParent(root, false);
+        canvas.transform.localScale = new Vector3(width, height, 1f);
+        canvas.GetComponent<Renderer>().sharedMaterial = Mat("Holz_Painting_" + name, texture, Color.white);
+
+        float w = width + 2f * border, h = height + 2f * border;
+        foreach (var (p, size) in new[]
+                 {
+                     (new Vector3(0f, (height + border) / 2f, 0f), new Vector3(w, border, depth)),
+                     (new Vector3(0f, -(height + border) / 2f, 0f), new Vector3(w, border, depth)),
+                     (new Vector3((width + border) / 2f, 0f, 0f), new Vector3(border, h, depth)),
+                     (new Vector3(-(width + border) / 2f, 0f, 0f), new Vector3(border, h, depth)),
+                 })
+        {
+            var bar = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            Object.DestroyImmediate(bar.GetComponent<Collider>());
+            bar.name = "Frame";
+            bar.transform.SetParent(root, false);
+            bar.transform.localPosition = p;
+            bar.transform.localScale = size;
+            bar.GetComponent<Renderer>().sharedMaterial = frame;
+        }
     }
 
     // Colliders are not needed, lights and particles would break the symmetric mirror lighting.

@@ -173,13 +173,14 @@ Several furnishing variants of all four rooms live in `Main.unity` at the same t
 |---|---|---|
 | `Grau` | none | the greybox, reference |
 | `Buero` | Office + Generic | carpet, light grey plaster, ceiling panel lights, office door |
-| `Holz` | Office (+1 Western chair, Backrock cow figurine) | wooden floor, warm white walls, rug in Room 1, wooden shelf/table, small cow on the Room 2 shelf |
+| `Holz` | Office, Generic, Dungeon (bookcase), Western (chairs, chest), Backrock (cow) | wooden floor, warm white walls, furnished like a home (2026-11-13): shelves with books, armchairs, sofas, plants, side table, clocks, coat rack, rugs, framed paintings; the cow figurine stands in the Room 2 shelf |
 | `Stein` | Dungeon + Generic | stone floor tiles, light stone walls, plank door, hanging lanterns (no light) |
 | `Huette` | Western + Generic | wooden planks on walls/floor/ceiling, simple wooden furniture |
 
 - The shell (walls, mirror openings, door, waypoints, NPC position) is the same for all variants. Shell renderers carry `RoomSurface` (Floor/Wall/Ceiling/Door) and use generated meshes with UVs in metres (`Art/Environment/ShellMeshes`), so tiling textures have the same scale everywhere. Materials: `Art/Environment/Rooms/<Variant>_<Kind>.mat` (URP Lit referencing Synty textures).
 - Each variant (`World/RoomVariants/<Name>`, component `RoomVariant`) holds the four shell materials (empty = scene original) and its parts: `World/Room<N>/Variants/<Name>` for all four rooms (rooms 1-3 are mirrored), `World/Doors/Door<N>/Variants/<Name>` (door model fitted into each opening; variants without one use the plain `DoorLeaf`).
 - `RoomVariants` (start variant `Holz`, index 2, set by `RoomVariantBuilder.StartVariant`) applies the start variant in `Awake`, before the mirror worlds copy Room 1; switching later rebuilds the mirror copies. Debug switcher `DebugRoomSwitcher` (button "Raum"; the debug buttons "Avatar", "Raum", "UI" sit small in the bottom-left corner; in the Editor always, in builds in test runs: no `pid` or `?debug=1`), URL `room=` in test runs.
+- Paintings (Holz) are flat low-poly landscapes drawn by `Tools/paintings.py` into `Art/Environment/Paintings` (the packs only have office posters with text and photos of people), framed by `RoomVariantBuilder.Painting`. Shelf contents use `OnBoard` (board heights of `SM_Prop_Shelf_05`). Holz keeps clear: walk spots and paths, mirrors, key board, lever plate, the Room 3 wall hints and the wall behind the NPC.
 - No colliders, lights or particles in the props (stripped by the builder), no static flags, nothing in the walk path or in front of the mirrors. Colours above 1 in some materials brighten darker textures, because the walls only get ambient light.
 - Cost (build 2026-10-30, before rooms 3-4): all five variants together +1.2 MB compressed (Stein ~0.5 MB, the others 0.1-0.2 MB), +2 to +10 draw calls and at most +6k triangles over `Grau`. Their textures are limited to 1024 and compressed on WebGL (platform override).
 

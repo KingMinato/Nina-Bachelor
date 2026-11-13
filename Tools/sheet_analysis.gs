@@ -19,7 +19,7 @@
 // "species": s = 1-4, ids are <race>_<size> (size study, 2026-11-13).
 const SPECIES = ["humanC_big", "humanC_small", "goblin_big", "goblin_small"];
 const RACE_NAMES = { humanC: "Mensch", humanI: "Mensch (I)", goblin: "Goblin", robot: "Roboter", skeleton: "Skelett",
-  slime: "Blob", mushroom: "Pilz", cow: "Kuh" };
+  slime: "Blob", mushroom: "Pilz" };
 const SIZE_NAMES = { big: "groß", small: "klein" };
 const raceOf = s => (SPECIES[s - 1] || "?").split("_")[0];
 const sizeOf = s => (SPECIES[s - 1] || "").split("_")[1] || "?";

@@ -117,8 +117,8 @@ public class UrlParamsTests
     public void AvatarOverride_OnlyInTestRuns()
     {
         Assert.AreEqual("slime", Parse("?a=slime").AvatarOverride);
-        Assert.AreEqual("cow", Parse("?pid=R_1&debug=1&a=cow").AvatarOverride);
-        Assert.AreEqual("", Parse("?pid=R_1&a=cow").AvatarOverride);
+        Assert.AreEqual("slime", Parse("?pid=R_1&debug=1&a=slime").AvatarOverride);
+        Assert.AreEqual("", Parse("?pid=R_1&a=slime").AvatarOverride);
         Assert.AreEqual("", Parse("?debug=1").AvatarOverride);
     }
 

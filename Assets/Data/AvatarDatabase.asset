@@ -34,9 +34,6 @@ MonoBehaviour:
   - id: mushroom
     male: {fileID: 154260948868704171, guid: e92726068b71cf24b98194d8528504ea, type: 3}
     female: {fileID: 154260948868704171, guid: e92726068b71cf24b98194d8528504ea, type: 3}
-  - id: cow
-    male: {fileID: 6084984957756528620, guid: 6d85eb0afa0d4b7448a5366476adeb1a, type: 3}
-    female: {fileID: 6084984957756528620, guid: 6d85eb0afa0d4b7448a5366476adeb1a, type: 3}
   - id: humanC_big
     male: {fileID: 5214018608580454650, guid: 670a37a6662c45541bfbd3efe42f57e0, type: 3}
     female: {fileID: 665772667623416458, guid: 98f28d8a23fe46f459767247a4b95eb1, type: 3}

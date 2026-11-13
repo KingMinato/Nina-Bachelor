@@ -20,7 +20,6 @@ public static class AvatarBuilder
     const string Dungeon = "Assets/Synty/PolygonDungeon/Prefabs/Characters/";
     const string Slime = "Assets/Creatures_3D/Slime/";
     const string Mushroom = "Assets/Lil Pupinduy/Character/Mashroom Character/";
-    const string Cow = "Assets/Backrock/LowPolyAnimals/Cow/";
     const string ModularHero = "Assets/Synty/PolygonFantasyHeroCharacters/Prefabs/ModularCharacters.prefab";
 
     const string Anim = "Assets/Animations/";
@@ -59,8 +58,6 @@ public static class AvatarBuilder
             removeComponents = new[] { "CharacterController", "SlimeScript" }, overrideController = "Slime" },
         new Spec { id = "mushroom", male = Mushroom + "Prefabs/Mushroom_1.prefab", eyes = new Vector3(0f, 0.9f, 0.19f),
             overrideController = "Mushroom" },
-        new Spec { id = "cow", male = Cow + "Prefabs/Cow_Holstein.prefab", eyes = new Vector3(0f, 1.17f, 1.18f),
-            overrideController = "Cow" },
     };
 
     // The size variants: the same models scaled, eyes one head above / below the NPC's.
@@ -100,7 +97,6 @@ public static class AvatarBuilder
                 Clip(Slime + "AnimationClips/move.anim")),
             ["Mushroom"] = Override(controller, "Mushroom", Clip(Mushroom + "Animations/Anim_Mushroom_Idle.fbx"), MushroomJump(),
                 Clip(Mushroom + "Animations/Anim_Mushroom_Walk.fbx")),
-            ["Cow"] = Override(controller, "Cow", Clip(Cow + "Cow.fbx", "Idle"), Clip(Cow + "Cow.fbx", "Run"), Clip(Cow + "Cow.fbx", "Walk")),
         };
 
         var entries = new List<AvatarDatabase.Species>();

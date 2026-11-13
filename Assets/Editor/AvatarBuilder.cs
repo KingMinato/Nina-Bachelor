@@ -44,7 +44,6 @@ public static class AvatarBuilder
         public string[] removeComponents = new string[0];
         public string overrideController; // null = shared humanoid controller
         public float eyeHeight;          // > 0: scaled so the eyes end up at this height
-        public bool keepWidth;           // with eyeHeight: stretch only vertically (a uniformly scaled blob gets metres wide)
     }
 
     static readonly Spec[] Specs =
@@ -71,7 +70,7 @@ public static class AvatarBuilder
     static Spec Sized(Spec s, string suffix, float eyes) => new Spec
     {
         id = s.id + suffix, male = s.male, female = s.female, scale = s.scale, eyes = s.eyes, eyeBones = s.eyeBones,
-        removeComponents = s.removeComponents, overrideController = s.overrideController, eyeHeight = eyes, keepWidth = s.id == "slime",
+        removeComponents = s.removeComponents, overrideController = s.overrideController, eyeHeight = eyes,
     };
 
     // NPC "V": grey hood with face cloth and a long robe from the Modular Fantasy Hero kit.
@@ -294,9 +293,9 @@ public static class AvatarBuilder
             if (spec.eyeHeight > 0f)
             {
                 // The model sits at the origin, so its eye position scales with it.
-                float k = spec.eyeHeight / eyes.y, kw = spec.keepWidth ? 1f : k;
-                model.transform.localScale = Vector3.Scale(model.transform.localScale, new Vector3(kw, k, kw));
-                eyes = Vector3.Scale(eyes, new Vector3(kw, k, kw));
+                float k = spec.eyeHeight / eyes.y;
+                model.transform.localScale *= k;
+                eyes *= k;
             }
 
             // Root on the ground below the eyes.
